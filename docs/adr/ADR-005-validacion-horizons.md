@@ -10,7 +10,7 @@ El mayor riesgo del proyecto no es que algo no ande, sino que ande y dé un resu
 - **JPL Horizons es la fuente de verdad** para azimut y elevación del Sol y la Tierra desde un punto de la superficie lunar.
 - Se guardan valores de referencia en `tests/reference/` (CSV con sitio, fecha UTC, azimut y elevación esperados), obtenidos de Horizons para **3 sitios y 3 fechas** como mínimo.
 - `tests/` compara el cálculo propio contra esa referencia. La tolerancia inicial de partida es **0,1°** en azimut y elevación; se ajusta con evidencia en el primer test y se registra acá.
-- Todo cambio en el cálculo de efemérides o en la regla de visibilidad debe pasar estos tests antes de mergear a `develop`.
+- Todo cambio en el cálculo de efemérides o en la regla de visibilidad debe pasar estos tests antes de mergear a `dev`.
 - Cada archivo de referencia indica cómo se generó (parámetros de la consulta a Horizons) para poder repetirlo.
 
 ## Alternativas descartadas

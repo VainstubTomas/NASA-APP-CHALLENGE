@@ -1,19 +1,19 @@
 # 05. Roadmap e issues iniciales
 
-Última actualización: 2026-11-13 · Fuente de verdad de los issues: `scripts/issues.json` (este documento se genera a partir de ese archivo).
+Última actualización: 2026-11-13 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.md#mapa-del-proyecto).
 
-Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada uno es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Es un equipo multirubro: no hay roles fijos y cualquiera toma issues de cualquier área.
+Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada capa es una **épica** (`[EPICA] ...`, issue padre) y sus issues cuelgan de ella como sub-issues (ver "Épicas" en `docs/04-GIT-WORKFLOW.md` y ADR-008). Cada issue es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Es un equipo multirubro: no hay roles fijos y cualquiera toma issues de cualquier área.
 
 ## Hitos
 
 | Cuándo | Meta | Merge a `main` |
 |---|---|---|
-| Jue 12 (noche) | Kickoff: repo, ramas protegidas, issues cargados, mini sesión de Git | Estructura inicial |
-| Vie 13 | Recursos liberados: ajustar ADR-001 y PRD. Capa 0 completa; ensayo general a la noche (Sol validado contra Horizons y una silueta graficada) | Capa 0 |
+| Jue 12 (noche) | Kickoff: repo, `main` protegida, épicas e issues cargados, mini sesión de Git | Estructura inicial |
+| Vie 13 | Recursos liberados: ajustar ADR-001 y PRD. Capa 0 completa, con Horizons descargado para todos los sitios (C0-13); ensayo general a la noche (Sol validado contra Horizons y una silueta graficada) | Capa 0 |
 | Sáb 14, 09:30 a 12:30 | Capa 1; primera unión (web lee datos reales) antes de las 12:30 | |
 | Sáb 14, 13:30 a 14:30 | Capa 2 y demo mínima | **Demo mínima antes de las 14:30** |
 | Sáb 14, 14:30 a 16:30 | Mentoreo con jurados invitados: `main` demoable. Tomar feedback como issues | |
-| Sáb 14, 17:00 a 19:00 y sesión en casa hasta ~01:00 | Capa 3 y, si se puede, capa 4 | Lo que funcione, ~01:00 |
+| Sáb 14, 17:00 a 19:00 y sesión en casa hasta ~01:00 | Capa 3 y capa 4 | Lo que funcione, ~01:00 |
 | Dom 15, 09:00 a 12:30 | Pendientes, pulido y textos | **12:30: congelar features** |
 | Dom 15, 12:30 a 14:30 | Solo `fix/*`, README y guion | |
 | Dom 15, 14:30 | Últimos ajustes y subida a GitHub | Versión final |
@@ -35,10 +35,11 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 | C0-06 | Perfil de horizonte de un sitio (360 valores) y gráfico de la silueta | Terreno | L |
 | C0-07 | Lista de 10 a 20 sitios con coordenadas verificadas y fuente | Producto | M |
 | C0-08 | Revisar y aprobar el contrato de datos v1.0 | Web | S |
-| C0-09 | Proteger main y develop, cargar etiquetas e issues y armar el tablero | Producto | S |
+| C0-09 | Proteger main, cargar etiquetas, épicas e issues y armar el tablero | Producto | S |
 | C0-10 | Probar Quickmap, Moon Trek y Horizons y anotar lo confuso | Producto | S |
 | C0-11 | Preguntar a los organizadores si se puede llegar con trabajo previo | Producto | S |
 | C0-12 | Leer el portal de Exploración lunar de la CSA y sacar datos para el pitch | Producto | S |
+| C0-13 | Descargar de Horizons las efemérides de todos los sitios y guardarlas en caché | Efemérides | M |
 
 ### Capa 1: sitio, fecha y posiciones (obligatoria)
 
@@ -66,8 +67,9 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 | C3-03 | Línea de tiempo de Sol y Tierra para los próximos días | Web | M |
 | C3-04 | Cuenta regresiva: el Sol se oculta en N horas | Web | S |
 | C3-05 | Textos en lenguaje simple y diseño de la web | Producto | M |
+| C3-06 | Panel de validación: los números de la web contra JPL Horizons | Web | M |
 
-### Capa 4: comparación de escenarios (deseable)
+### Capa 4: comparación de escenarios (obligatoria desde el ADR-009)
 
 | ID | Tarea | Área | Tamaño |
 |---|---|---|---|
@@ -92,7 +94,7 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 
 ## Cómo se divide el trabajo
 
-- **Datos y lógica en Python** (efemérides y terreno): ruta crítica. Lo primero es el cliente de Horizons con las convenciones verificadas (C0-04 y C0-05) y conseguir el mapa de elevación (C0-03), porque los recursos oficiales no lo traen (ADR-006).
+- **Datos y lógica en Python** (efemérides y terreno): ruta crítica. Lo primero es el cliente de Horizons con las convenciones verificadas (C0-04 y C0-05) y la descarga completa a caché antes del sábado (C0-13) y conseguir el mapa de elevación (C0-03), porque los recursos oficiales no lo traen (ADR-006).
 - **Web**: arranca con los datos sintéticos de `data/public/` mientras el precálculo en Python genera los reales; la primera unión es el sábado antes de las 12:30.
 - **Producto, contenido y demo**: lista de sitios, textos, diseño, guion y presentación; es trabajo de todos.
 - Se equilibra la carga, no la cantidad de issues. Quien termina toma el siguiente issue disponible de cualquier área.

@@ -52,8 +52,8 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 | Elevación del Sol como métrica clave, "de forma destacada" | Cubierto (C1-03) | Que sea el número más visible de la pantalla (C3-05) |
 | Tiempo hasta la puesta del Sol **y de la Tierra** | Cubierto (C3-04) | Nada |
 | Libración y variaciones orbitales | Cubierto: Horizons ya las incluye | Mencionarlo en el pitch |
-| **Comparación rápida de escenarios** ("su interfaz podría priorizar…") | Capa 4, deseable | **Decisión del equipo**: es el eje del texto oficial; evaluar subirla de prioridad (con un ADR) |
-| Sitios Apolo, CLPS, comerciales y de otros países, más coordenadas propias | Lista de C0-07; coordenadas propias abiertas (C5-04) | **Ojo**: los sitios Apolo están lejos del polo y el mapa del polo sur (80°S a 90°S) no los cubre. Decidir si van sin relieve (horizonte liso, solo curvatura) o si la lista se limita al polo sur |
+| **Comparación rápida de escenarios** ("su interfaz podría priorizar…") | Capa 4, obligatoria (ADR-009) | Decidido: sube de prioridad |
+| Sitios Apolo, CLPS, comerciales y de otros países, más coordenadas propias | Lista de C0-07 (decisión pendiente en ese issue); coordenadas propias abiertas (C5-04) | **Ojo**: los sitios Apolo están lejos del polo y el mapa del polo sur (80°S a 90°S) no los cubre. Decidir si van sin relieve (horizonte liso, solo curvatura) o si la lista se limita al polo sur |
 | Animaciones o línea de tiempo de un día lunar | Cubierto (C3-02, C3-03) | Nada |
 | Por qué pequeños cambios de lugar o fecha cambian todo | Capa 5 (C5-01) | Puede ir en los textos y en la demo sin código extra |
 | Útil para planificadores, educadores y el público | Cubierto (PRD, C3-05) | Nada |
@@ -84,4 +84,4 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 ## Pendientes de confirmar con los organizadores
 1. ¿Se puede llegar con repo, datos y cálculos preparados de antemano, o el código debe escribirse durante el evento? ¿Se pueden usar datos públicos de NASA que no están en la lista de recursos (por ejemplo, el mapa LOLA del PDS)?
 2. Criterios de evaluación y entregables exactos.
-3. Si la presentación es en vivo, cuánto dura y si hay proyector y conexión.
+3. Si la presentación es en vivo, cuánto dura y si hay proyector y conexión (C0-11).
