@@ -2,7 +2,7 @@
 
 - **Estado**: Aceptado
 - **Fecha**: 2026-11-12
-- **Decidieron**: equipo completo (Toto, Panchi, Fer, Facu)
+- **Decidieron**: equipo completo
 
 ## Contexto
 Elegimos el desafío de navegación de sitios de aterrizaje lunar (polo sur): dado un sitio y una fecha, mostrar si habrá Sol y comunicación directa con la Tierra. Tenemos unas 15 horas efectivas de trabajo (≈10 en el lugar y ≈5 en la sesión del sábado a la noche), 4 personas con experiencia dispar y recursos oficiales que se liberan el viernes.

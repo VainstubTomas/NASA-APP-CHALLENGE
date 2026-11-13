@@ -1,6 +1,6 @@
 # 03. Contrato de datos (v1.0, propuesta)
 
-Última actualización: 2026-11-13 · Estado: **propuesto**, a validar entre backend y frontend en el issue C0-08. Los esquemas ejecutables están en `data/schema/`.
+Última actualización: 2026-11-13 · Estado: **propuesto**, a validar entre quienes trabajen en Python y en la web en el issue C0-08. Los esquemas ejecutables están en `data/schema/`.
 
 Es el acuerdo entre Python y la web. Cambiarlo requiere un ADR y avisar al equipo. Todos los archivos llevan `schema_version`.
 

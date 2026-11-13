@@ -1,6 +1,6 @@
 # ADR-004: Stack tecnológico
 
-- **Estado**: Propuesto (confirmar con Fer y Facu para el frontend, y con Toto y Panchi para Python). La parte de efemérides fue reemplazada por el ADR-006
+- **Estado**: Propuesto (confirmar con todo el equipo). La parte de efemérides fue reemplazada por el ADR-006
 - **Fecha**: 2026-11-12
 
 ## Contexto

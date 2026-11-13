@@ -2,7 +2,7 @@
 
 Última actualización: 2026-11-13 · Fuente de verdad de los issues: `scripts/issues.json` (este documento se genera a partir de ese archivo).
 
-Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada uno es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Cada área tiene un foco inicial (Backend: Toto y Panchi, Frontend: Fer y Facu, Producto: todos), pero al terminar se toman issues de cualquier área.
+Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada uno es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Es un equipo multirubro: no hay roles fijos y cualquiera toma issues de cualquier área.
 
 ## Hitos
 
@@ -92,7 +92,7 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 
 ## Cómo se divide el trabajo
 
-- **Backend, datos y lógica** (efemérides y terreno): ruta crítica. Lo primero es el cliente de Horizons con las convenciones verificadas (C0-04 y C0-05) y conseguir el mapa de elevación (C0-03), porque los recursos oficiales no lo traen (ADR-006).
-- **Frontend**: arranca con los datos sintéticos de `data/public/` mientras el backend calcula los reales; la primera unión es el sábado antes de las 12:30.
-- **Producto, contenido y demo**: lista de sitios, textos, diseño, guion y presentación; todos aportan.
+- **Datos y lógica en Python** (efemérides y terreno): ruta crítica. Lo primero es el cliente de Horizons con las convenciones verificadas (C0-04 y C0-05) y conseguir el mapa de elevación (C0-03), porque los recursos oficiales no lo traen (ADR-006).
+- **Web**: arranca con los datos sintéticos de `data/public/` mientras el precálculo en Python genera los reales; la primera unión es el sábado antes de las 12:30.
+- **Producto, contenido y demo**: lista de sitios, textos, diseño, guion y presentación; es trabajo de todos.
 - Se equilibra la carga, no la cantidad de issues. Quien termina toma el siguiente issue disponible de cualquier área.

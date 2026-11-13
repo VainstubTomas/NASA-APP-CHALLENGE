@@ -42,10 +42,12 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 ```
 
 ## Flujo de Git: MiniGitFlow (detalle en `docs/04-GIT-WORKFLOW.md`)
-- `main` (demoable, protegida) y `develop` (integración, protegida). **Nunca** commitear directo en ninguna de las dos.
+- `main` (demoable, protegida: el hook `pre-commit` bloquea commits directos) y `develop` (integración, es el arenero del equipo: sin protección técnica). **Nunca** se commitea directo en ninguna de las dos: todo entra por PR.
 - Un issue, una rama: `feature/<n>-<slug>` o `fix/<n>-<slug>`, creada desde `develop`.
-- PR hacia `develop`, 1 aprobación de otra persona, merge por squash, borrar la rama.
-- Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:` + descripción corta.
+- PR hacia `develop`, 1 aprobación de otra persona, merge por squash. Las ramas mergeadas no se borran (nos sirven de historial durante el hackatón).
+- Commits (los valida el hook `commit-msg`): `tipo(scope): descripción` **en inglés, de 10 palabras o más**. Tipos: `feat`, `fix`, `docs`, `test`, `chore`. Scope obligatorio y en minúsculas (`web`, `ephemeris`, `terrain`, `data`, `tests`, `docs`, `scripts`). Ejemplo: `feat(web): add site and date selector to the main map screen of the app`.
+- El título del PR sigue el mismo formato (el squash merge de GitHub no pasa por el hook y ese título se vuelve el commit).
+- Activar los hooks una vez por clon: `git config core.hooksPath .githooks`. `--no-verify` los saltea; no usarlo salvo emergencia.
 - Si necesitás algo de otra rama, traelo desde `develop` o avisá en el PR.
 - No commitear: mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_modules`, notebooks. Scripts `.py`, no `.ipynb`.
 
@@ -62,8 +64,8 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 0. Base: repo, contrato, datos de prueba, deploy, tests contra Horizons. 1. Elegir sitio y fecha; ver az/el del Sol y la Tierra. 2. Horizonte real con Sol y Tierra encima. 3. Línea de tiempo y cuenta regresiva. 4. Comparación de escenarios. 5. Extras.
 Objetivo realista: capas 1 a 3. **Recortar, no estirar.** Features congeladas el domingo 15 a las 12:30.
 
-## Equipo y foco inicial (no es exclusivo)
-Backend, datos y lógica: Toto y Panchi. Frontend: Fer y Facu. Producto, contenido y demo: todos.
+## Equipo
+Equipo multirubro: no hay roles fijos. Todos trabajan en cualquier área (Python, web, producto y demo) y toman los issues que sigan en el tablero.
 
 ## Más contexto
 `docs/00-CONTEXT.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-DATA-CONTRACT.md` · `docs/04-GIT-WORKFLOW.md` · `docs/05-ROADMAP.md` · `docs/06-PITCH-DEMO.md` · `docs/07-DESAFIO-OFICIAL.md` (texto oficial) · `docs/adr/`
