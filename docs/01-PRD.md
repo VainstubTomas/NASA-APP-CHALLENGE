@@ -24,10 +24,10 @@ Cada capa es una demo completa. Si algo se rompe, mostramos la última que funci
 | 1 | Elegir sitio y fecha; ver elevación y azimut del Sol y la Tierra | Obligatoria |
 | 2 | Dibujo del horizonte real con el Sol y la Tierra encima | Obligatoria |
 | 3 | Línea de tiempo de varios días y cuenta regresiva hasta que se ocultan | Obligatoria |
-| 4 | Comparación de 2 o 3 escenarios lado a lado | Deseable |
+| 4 | Comparación de 2 o 3 escenarios lado a lado | Obligatoria (ADR-009) |
 | 5 | "Se atrasó el lanzamiento", pendiente del terreno, mejores ventanas, explicaciones simples | Solo si sobra tiempo |
 
-Objetivo realista: capas 1 a 3 aseguradas, capa 4 como meta probable.
+Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje del texto oficial). Si hay atraso, se recorta igual que antes: se muestra la última capa que funcione.
 
 ## Fuera de alcance
 - Visualización 3D del terreno o render realista de la superficie.
@@ -63,7 +63,7 @@ Objetivo realista: capas 1 a 3 aseguradas, capa 4 como meta probable.
 | Resultado falso que parece razonable (ejes, azimut, unidades) | Convenciones escritas en `CLAUDE.md` y validación contra Horizons desde la capa 0 |
 | Proyección del mapa LOLA mal usada | Usar `pyproj`/`rasterio`, nunca convertir a mano |
 | Archivos enormes | Resolución media o recorte del polo sur; datos fuera de git |
-| Poco tiempo efectivo | Precalcular lo pesado el viernes, apuntar a capas 1 a 3, recortar sin culpa |
+| Poco tiempo efectivo | Precalcular lo pesado el viernes, apuntar a capas 1 a 4, recortar sin culpa |
 | Los recursos oficiales no traen archivos de datos (solo Quickmap, Moon Trek, Horizons y el portal de la CSA) | ADR-006: efemérides desde la API de Horizons; mapa de elevación por confirmar en C0-03, con plan B |
 | Horizons caído o con límite de consultas durante el evento | Descargar todo antes del sábado; caché en `data/raw/horizons/` y copia en la nube |
 

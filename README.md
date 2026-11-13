@@ -13,12 +13,40 @@ Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y 
 
 Las posiciones del Sol y la Tierra salen de [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); los sitios y el terreno se exploran con Quickmap y Moon Trek, los recursos oficiales del desafío.
 
+## Mapa del proyecto
+El trabajo se divide en capas (fases). Cada capa es una **épica** en el tablero (`[EPICA] ...`) y una demo completa por sí sola: si algo se atrasa, se muestra la última capa que funcione.
+
+```mermaid
+flowchart TD
+    subgraph C0["Capa 0 · Base · viernes 13"]
+        H["Horizons descargado<br/>y validado"]
+        M["Mapa de elevación<br/>del polo sur"]
+        S["Sitios con<br/>coordenadas verificadas"]
+        W["Web con Vite<br/>y deploy de prueba"]
+    end
+    C1["Capa 1 · Elegir sitio y fecha; ver el Sol y la Tierra<br/>sábado, antes de las 12:30"]
+    C2["Capa 2 · Horizonte real con el Sol y la Tierra<br/>demo mínima, sábado 14:30"]
+    C3["Capa 3 · Línea de tiempo, cuenta regresiva y validación<br/>sábado a la noche"]
+    C4["Capa 4 · Comparación de escenarios<br/>sábado a la noche"]
+    C5["Capa 5 · Extras<br/>solo si sobra tiempo"]
+    E["Entrega · README, demo y presentación<br/>features congeladas dom 12:30 · subida 14:30"]
+
+    H --> C1
+    S --> C1
+    W --> C1
+    M --> C2
+    C1 --> C2 --> C3 --> C4 --> E
+    C4 -.-> C5 -.-> E
+```
+
+Obligatorias: capas 0 a 4. Opcional: capa 5. Los issues de cada capa, los horarios y los hitos están en [`docs/05-ROADMAP.md`](docs/05-ROADMAP.md).
+
 ## Estructura
 | Carpeta | Contenido |
 |---|---|
 | `docs/` | Contexto, PRD, arquitectura, contrato de datos, flujo de trabajo, roadmap, ADRs |
 | `precompute/` | Scripts Python que generan los datos (`ephemeris/`, `terrain/`) |
-| `web/` | Frontend |
+| `web/` | Web (Vite) |
 | `data/public/` | JSON precalculados que consume la web |
 | `data/schema/` | Esquemas JSON del contrato de datos |
 | `tests/` | Pruebas del contrato y validación contra Horizons |

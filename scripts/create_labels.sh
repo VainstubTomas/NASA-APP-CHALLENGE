@@ -11,7 +11,7 @@ mk "capa:entrega" "1B2A41" "Preparación de la entrega"
 
 mk "area:efemerides" "2E6FDB" "Efemérides y validación (Python)"
 mk "area:terreno"    "2E6FDB" "Terreno y horizontes (Python)"
-mk "area:web"        "2F9E6E" "Frontend"
+mk "area:web"        "2F9E6E" "Web (Vite)"
 mk "area:producto"   "E0A800" "Producto, contenido y demo"
 
 mk "tamaño:S" "C5DEF5" "Menos de ~1 hora"
@@ -23,7 +23,7 @@ mk "tipo:fix"   "D73A4A" "Corrección"
 mk "tipo:docs"  "0075CA" "Documentación"
 mk "tipo:test"  "BFDADC" "Tests"
 mk "tipo:chore" "EDEDED" "Mantenimiento"
+mk "tipo:epica" "5319E7" "Épica: agrupa los issues de una capa (fase); no se trabaja directo"
 
 mk "prioridad:alta" "B60205" "Bloquea a otros o es ruta crítica"
-mk "bloqueado"      "000000" "Espera algo de otra persona"
 echo "Etiquetas creadas en $REPO"

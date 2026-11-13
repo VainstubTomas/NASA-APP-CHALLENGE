@@ -14,8 +14,22 @@ Un GitFlow reducido a lo útil para un hackatón de dos jornadas. Objetivo: que 
 
 No usamos `release/*` ni `hotfix/*`: el "release" es mergear `dev` a `main` en un hito, y si `main` se rompe se revierte el merge y se arregla en un `fix/*`.
 
+## Épicas
+Una **épica** es un issue padre que agrupa todos los issues de una **capa** (fase) del MVP: hay una por cada capa (0 a 5) y una para la entrega. Representa una demo completa: la épica de la capa 2, por ejemplo, está cumplida cuando se ve el horizonte real con el Sol y la Tierra encima.
+- **Cómo se reconoce**: el título empieza con `[EPICA]` (ej. `[EPICA] Capa 2: horizonte real con el Sol y la Tierra encima`) y lleva la etiqueta `tipo:epica` más la de su capa.
+- **Qué contiene**: los issues de su capa cuelgan como **sub-issues** (función nativa de GitHub). En la épica se ve el avance (cuántos sub-issues están cerrados) y en cada issue, a qué épica pertenece.
+- **Cómo se usa**: una épica **no se toma ni se trabaja directamente**: no lleva asignado, rama ni PR. Se trabaja en sus sub-issues y la épica se cierra cuando están todos cerrados (o descartados al recortar) y la demo de la capa funciona.
+- **De dónde sale**: se define en `scripts/issues.json` (`epics`) y la crea `scripts/create_issues.py` junto con sus sub-issues. Un issue nuevo de una capa se cuelga de la épica de esa capa.
+- Ver ADR-008.
+
+## Tablero y dependencias
+Tablero "Hackaton" (GitHub Projects #3). Columnas: `Backlog` → `Todo` → `In progress` → `Code review` → `Done`, más `Blocked`.
+- Las épicas arrancan en `Todo` y los issues en `Backlog`. Cuando se arranca una capa, sus issues pasan a `Todo`.
+- **Dependencias**: solo las reales de datos (por ejemplo, no hay efemérides sin la descarga de Horizons) se cargan como relación "blocked by" de GitHub, desde `blocked_by` en `scripts/issues.json`. Cada issue muestra qué lo frena, sin congelar a nadie: la mayor parte de la web avanza con datos sintéticos.
+- **Columna `Blocked`**: solo para un issue que ya empezaste y en el que estás trabado (falta algo de otra persona, un dato, una respuesta). Avisá en el issue qué esperás. No se usa para marcar fases futuras.
+
 ## Ciclo de trabajo
-1. Tomar un issue del tablero y asignártelo.
+1. Tomar un issue del tablero (nunca una épica) y asignártelo.
 2. Crear la rama desde `dev`.
 3. Trabajar con commits chicos.
 4. Traer los últimos cambios de `dev` antes de abrir el PR.
@@ -70,7 +84,7 @@ En GitHub, `Settings > Branches > Add branch ruleset` para `main` (`dev` queda s
 - Block force pushes.
 - En el ruleset, dejar los tres métodos de merge permitidos (sin limitantes). Squash es lo recomendado, pero no se fuerza.
 - Dejar desactivado "Automatically delete head branches": las ramas mergeadas se conservan a propósito.
-Luego correr `scripts/create_labels.sh` y `scripts/create_issues.py` (necesitan `gh auth login`).
+Luego correr `scripts/create_labels.sh` y `scripts/create_issues.py` (necesitan `gh auth login` con el scope `project`: `gh auth refresh -s project`). El script crea las épicas, los issues como sub-issues de su épica y los agrega al tablero "Hackaton" (Project #3): las épicas en la columna `Todo` y los issues en `Backlog`.
 
 ### Por cada clon (cada integrante)
 - `git config core.hooksPath .githooks` para activar los hooks de commits.

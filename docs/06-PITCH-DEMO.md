@@ -11,7 +11,7 @@
 3. **Nuestra solución** (30 s): una pantalla, una pregunta.
 4. **Demo en vivo** (90 s): ver guion.
 5. **Cómo sabemos que está bien** (30 s): los datos salen de JPL Horizons, la herramienta oficial de NASA, y verificamos contra su interfaz que los mostramos bien en tres sitios y tres fechas.
-6. **Qué sigue** (15 s): comparación de escenarios, coordenadas propias, más misiones.
+6. **Qué sigue** (15 s): coordenadas propias, más misiones, mejores ventanas de aterrizaje.
 
 Contexto internacional (opcional): el portal de Exploración lunar de la CSA, recurso oficial del desafío, cuenta el aporte de Canadá a Artemis. Usar 1 o 2 datos con fuente si suman (issue C0-12).
 
@@ -20,8 +20,8 @@ Contexto internacional (opcional): el portal de Exploración lunar de la CSA, re
 1. Elegir un sitio de la lista y la fecha original: se ve el horizonte, el Sol y la Tierra, y los números.
 2. Avanzar el reproductor de tiempo: el Sol se acerca a una montaña. Aparece la cuenta regresiva: "el Sol se oculta en N horas".
 3. Cambiar la fecha (retraso): mirar la línea de tiempo de luz y de contacto con la Tierra.
-4. (Si existe la capa 4) Comparar los dos escenarios lado a lado y concluir cuál conviene.
-5. Mostrar el panel de validación contra Horizons.
+4. Comparar los dos escenarios lado a lado y concluir cuál conviene (capa 4).
+5. Mostrar el panel de validación contra Horizons (C3-06): para casos conocidos, nuestros números al lado de los de Horizons, con la diferencia.
 
 Elegir un sitio y fechas donde la diferencia sea visible y dramática; probarlas el sábado.
 

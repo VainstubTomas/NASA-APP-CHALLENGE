@@ -1,6 +1,6 @@
 # ADR-001: Desafío elegido y alcance del MVP por capas
 
-- **Estado**: Aceptado
+- **Estado**: Aceptado (prioridad de la capa 4 reemplazada por el ADR-009)
 - **Fecha**: 2026-11-12
 - **Decidieron**: equipo completo
 
