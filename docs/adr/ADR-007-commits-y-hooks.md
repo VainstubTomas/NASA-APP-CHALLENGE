@@ -6,19 +6,20 @@
 - **Reemplaza en parte a**: ADR-003 (reglas de commits y protección de `develop`)
 
 ## Contexto
-La rama `chore/git-hooks` agregó hooks (`.githooks/`) más estrictos que lo documentado en el ADR-003, `CLAUDE.md` y `docs/04-GIT-WORKFLOW.md`: scope obligatorio, mensajes en inglés, mínimo de 10 palabras y bloqueo de commits solo en `main`. La documentación decía otra cosa y `develop` figuraba como protegida sin que el hook la cubriera.
+La rama `chore/git-hooks` agregó hooks (`.githooks/`) más estrictos que lo documentado en el ADR-003, `CLAUDE.md` y `docs/04-GIT-WORKFLOW.md`: scope obligatorio, formato fijo, mensajes en inglés, mínimo de 10 palabras y bloqueo de commits solo en `main`. La documentación decía otra cosa y `develop` figuraba como protegida sin que el hook la cubriera.
 
 ## Decisión
-- **Formato**: `tipo(scope): descripción`, con tipos `feat`, `fix`, `docs`, `test`, `chore`.
-- **Idioma**: los mensajes de commit van en inglés; el resto de la documentación sigue en español.
-- **Largo**: mínimo 10 palabras en la primera línea, incluso para commits chicos.
-- **Scopes sugeridos**: `web`, `ephemeris`, `terrain`, `data`, `tests`, `docs`, `scripts`. El hook acepta cualquiera en minúsculas, números, `_` o `-`.
+- **Formato**: no se exige. Se sugiere `tipo(scope): descripción` (tipos `feat`, `fix`, `docs`, `test`, `chore`), pero el hook acepta cualquier primera línea para poder usar los mensajes que genera el IDE con IA.
+- **Idioma**: por convención los mensajes de commit van en inglés (el hook no lo verifica); el resto de la documentación sigue en español.
+- **Largo (única regla validada)**: mínimo 10 palabras en la primera línea, incluso para commits chicos.
+- **Scopes sugeridos**: `web`, `ephemeris`, `terrain`, `data`, `tests`, `docs`, `scripts`. Son solo sugerencias.
 - **Hooks**: se activan una vez por clon con `git config core.hooksPath .githooks`; `--no-verify` los saltea (solo emergencias).
-- **Squash merge**: GitHub no ejecuta `commit-msg`, así que el título del PR debe seguir el mismo formato.
+- **Squash merge**: es el método recomendado, pero no se fuerza (los tres quedan permitidos). GitHub no ejecuta `commit-msg` al hacer squash, así que el título del PR también debe tener 10 palabras o más.
 - **`develop` sin protección**: solo `main` queda protegida (hook y regla de GitHub). `develop` es el arenero del equipo; igual todo entra por PR por convención.
 
 ## Alternativas descartadas
 - Proteger también `develop` con el hook: fricción sin beneficio, porque el flujo ya obliga a trabajar en ramas y entrar por PR.
+- Exigir el formato `tipo(scope)`: se descartó porque bloquea los mensajes autogenerados por el IDE, que son útiles.
 - Mensajes en español: se prefirió inglés por ser el estándar de la herramienta y del historial.
 - Mínimo de palabras menor: 10 es razonable y obliga a explicar qué y por qué.
 

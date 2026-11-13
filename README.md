@@ -29,7 +29,7 @@ Estado: la estructura está lista; el código se está construyendo. Los comando
 ```bash
 # Hooks de Git (una vez después de clonar)
 git config core.hooksPath .githooks
-# Commits (in English): type(scope): description of 10+ words. No commits on main.
+# Commits (in English): first line of 10+ words, suggested type(scope): description. No commits on main.
 
 # Python (precálculo y tests)
 python -m venv .venv
