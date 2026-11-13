@@ -66,4 +66,4 @@ Objetivo realista: capas 1 a 3. **Recortar, no estirar.** Features congeladas el
 Backend, datos y lógica: Toto y Panchi. Frontend: Fer y Facu. Producto, contenido y demo: todos.
 
 ## Más contexto
-`docs/00-CONTEXT.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-DATA-CONTRACT.md` · `docs/04-GIT-WORKFLOW.md` · `docs/05-ROADMAP.md` · `docs/06-PITCH-DEMO.md` · `docs/adr/`
+`docs/00-CONTEXT.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-DATA-CONTRACT.md` · `docs/04-GIT-WORKFLOW.md` · `docs/05-ROADMAP.md` · `docs/06-PITCH-DEMO.md` · `docs/07-DESAFIO-OFICIAL.md` (texto oficial) · `docs/adr/`

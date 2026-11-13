@@ -29,7 +29,7 @@ Tiempo efectivo de trabajo: unas 15 horas (estimación: ~10 en el lugar y ~5 en 
 ## El desafío elegido
 **Lunar Landing Site Navigator**: una herramienta que, dado un sitio de la Luna y una fecha, muestra dónde están el Sol y la Tierra respecto del terreno, y por lo tanto cuánta energía solar y cuánta comunicación directa con la Tierra habrá.
 
-> Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). Pendiente: copiar acá el texto oficial del desafío y los criterios de evaluación.
+> Texto oficial completo (traducido) en [`docs/07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). **La página del desafío no publica criterios de evaluación**: confirmarlos con los organizadores (C0-11). La página avisa que se pueden sumar recursos antes del hackatón: revisar la pestaña Recursos el sábado a la mañana.
 
 ### Qué pide el desafío, traducido
 | Pedido | En la práctica |
@@ -43,6 +43,20 @@ Tiempo efectivo de trabajo: unas 15 horas (estimación: ~10 en el lugar y ~5 en 
 | Accesible | Que lo entienda un ingeniero y un estudiante de secundaria |
 
 No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se vea claro.
+
+### Texto oficial contra nuestro alcance (revisión del 13/11)
+| El texto oficial dice | Estado en nuestro plan | Qué hacer |
+|---|---|---|
+| Efemérides con Horizons o datos precalculados | Cubierto (ADR-006) | Nada |
+| Topografía LOLA para el horizonte; sin atmósfera, el horizonte es el terreno más el borde de la esfera lunar | Cubierto: pieza 2 con curvatura lunar | Que C0-06 incluya la curvatura y no use refracción |
+| Elevación del Sol como métrica clave, "de forma destacada" | Cubierto (C1-03) | Que sea el número más visible de la pantalla (C3-05) |
+| Tiempo hasta la puesta del Sol **y de la Tierra** | Cubierto (C3-04) | Nada |
+| Libración y variaciones orbitales | Cubierto: Horizons ya las incluye | Mencionarlo en el pitch |
+| **Comparación rápida de escenarios** ("su interfaz podría priorizar…") | Capa 4, deseable | **Decisión del equipo**: es el eje del texto oficial; evaluar subirla de prioridad (con un ADR) |
+| Sitios Apolo, CLPS, comerciales y de otros países, más coordenadas propias | Lista de C0-07; coordenadas propias abiertas (C5-04) | **Ojo**: los sitios Apolo están lejos del polo y el mapa del polo sur (80°S a 90°S) no los cubre. Decidir si van sin relieve (horizonte liso, solo curvatura) o si la lista se limita al polo sur |
+| Animaciones o línea de tiempo de un día lunar | Cubierto (C3-02, C3-03) | Nada |
+| Por qué pequeños cambios de lugar o fecha cambian todo | Capa 5 (C5-01) | Puede ir en los textos y en la demo sin código extra |
+| Útil para planificadores, educadores y el público | Cubierto (PRD, C3-05) | Nada |
 
 ## Por qué importa (para el pitch)
 - Las futuras misiones apuntan al polo sur lunar por el hielo de agua. Ahí el Sol y la Tierra quedan pegados al horizonte y cualquier relieve los tapa.
