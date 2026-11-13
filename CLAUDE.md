@@ -1,6 +1,6 @@
 # Lunar Landing Site Navigator: contexto para Claude
 
-> Léelo completo antes de tocar código. Última actualización: 2026-11-12. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
+> Léelo completo antes de tocar código. Última actualización: 2026-11-13. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
 
 ## Qué estamos construyendo
 Una web que responde una pregunta: **si aterrizo en este lugar de la Luna en esta fecha, ¿voy a tener Sol y voy a poder comunicarme con la Tierra?**
@@ -8,10 +8,16 @@ El usuario elige un sitio (polo sur lunar) y una fecha; la web dibuja el horizon
 Proyecto del NASA Space Apps Challenge 2026 (evento presencial, 14 y 15 de noviembre). Entregables: proyecto en GitHub + presentación.
 
 ## Arquitectura en 3 piezas (detalle en `docs/02-ARCHITECTURE.md`)
-1. **Efemérides** (Python, offline): azimut y elevación del Sol y la Tierra por sitio y por hora, con SPICE. Carpeta `precompute/ephemeris/`.
-2. **Terreno** (Python, offline): perfil de horizonte de 360 valores por sitio desde el mapa LOLA. Carpeta `precompute/terrain/`.
+1. **Efemérides** (Python, offline): azimut y elevación del Sol y la Tierra por sitio y por hora, consultados a la **API de JPL Horizons** (recurso oficial; ADR-006). Carpeta `precompute/ephemeris/`.
+2. **Terreno** (Python, offline): perfil de horizonte de 360 valores por sitio desde un mapa de elevación LOLA (fuente según ADR-006: Moon Trek/Quickmap o, como plan B, PDS). Carpeta `precompute/terrain/`.
 3. **Web** (JS): lee los JSON precalculados y compara elevación del cuerpo contra horizonte. Carpeta `web/`.
 Python y la web **solo se hablan por los JSON** de `data/public/`. El contrato está en `docs/03-DATA-CONTRACT.md` y los esquemas en `data/schema/`.
+
+## Recursos oficiales del desafío (liberados el 13/11; ver ADR-006)
+- **JPL Horizons**: posiciones del Sol y la Tierra vistas desde cualquier punto de la Luna. Es nuestra fuente de efemérides.
+- **Quickmap** (Arizona State University, datos LRO) y **Moon Trek** (NASA): exploración del terreno y de los sitios; fuente de coordenadas y, si permiten exportarlo, del mapa de elevación.
+- **Portal de Exploración lunar de la CSA** (Agencia Espacial Canadiense): contexto para el pitch.
+- **No** se entregaron kernels SPICE ni archivos de mapas. No suponer que existen.
 
 ## Convenciones obligatorias (si dudás, preguntá antes de asumir)
 - **Azimut**: grados, 0° = norte, sentido horario (90° = este). Rango [0, 360).
@@ -20,7 +26,7 @@ Python y la web **solo se hablan por los JSON** de `data/public/`. El contrato e
 - **Coordenadas de sitios**: latitud planetocéntrica y longitud este-positiva, en grados, rango [-180, 180]. Cada sitio lleva su fuente.
 - **Marco**: topocéntrico (desde la superficie en el punto del sitio, no desde el centro de la Luna).
 - El Sol y la Tierra son **discos**, no puntos (radios angulares en el contrato).
-- Los números se **validan contra JPL Horizons**. Un resultado que parece razonable pero no coincide es el peor error posible.
+- Los números **salen de JPL Horizons** y se verifican contra respuestas guardadas y contra su interfaz web (ADR-006). Un resultado que parece razonable pero no coincide es el peor error posible.
 
 ## Estructura del repo
 ```
@@ -29,7 +35,7 @@ docs/                contexto, PRD, arquitectura, contrato, workflow, roadmap, p
 precompute/          Python offline (ephemeris/, terrain/), requirements.txt
 tests/               pytest: contrato y validación contra Horizons
 web/                 frontend (Vite)
-data/raw/            datos pesados (kernels, LOLA). NO se commitea
+data/raw/            datos pesados (mapa de elevación, caché de Horizons). NO se commitea
 data/public/         JSON que consume la web. Se commitea
 data/schema/         JSON Schema del contrato
 scripts/             utilidades (labels, issues, datos sintéticos)
@@ -41,7 +47,7 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 - PR hacia `develop`, 1 aprobación de otra persona, merge por squash, borrar la rama.
 - Commits: `feat:`, `fix:`, `docs:`, `test:`, `chore:` + descripción corta.
 - Si necesitás algo de otra rama, traelo desde `develop` o avisá en el PR.
-- No commitear: mapa LOLA (`*.tif`), kernels SPICE, `.venv`, `node_modules`, notebooks. Scripts `.py`, no `.ipynb`.
+- No commitear: mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_modules`, notebooks. Scripts `.py`, no `.ipynb`.
 
 ## Cómo trabajar con Claude en este repo
 1. Trabajá siempre sobre una rama de feature. Antes de empezar, confirmá en qué rama estás (`git branch --show-current`).

@@ -1,6 +1,6 @@
 # 03. Contrato de datos (v1.0, propuesta)
 
-Última actualización: 2026-11-12 · Estado: **propuesto**, a validar entre backend y frontend en el issue C0-08. Los esquemas ejecutables están en `data/schema/`.
+Última actualización: 2026-11-13 · Estado: **propuesto**, a validar entre backend y frontend en el issue C0-08. Los esquemas ejecutables están en `data/schema/`.
 
 Es el acuerdo entre Python y la web. Cambiarlo requiere un ADR y avisar al equipo. Todos los archivos llevan `schema_version`.
 
@@ -58,6 +58,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 - `elevation_deg[i]` es la elevación del horizonte en el azimut `azimuth_start_deg + i * azimuth_step_deg`.
 - La web interpola linealmente entre muestras y cierra el círculo (el azimut 359 conecta con el 0).
+- `dem.name` y `dem.pixel_m` describen el mapa realmente usado (la fuente se fija en el ADR-006; el ejemplo muestra el plan B).
 
 ## `ephemeris.json`
 ```json
@@ -68,7 +69,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
   "sun":   { "azimuth_deg": [], "elevation_deg": [] },
   "earth": { "azimuth_deg": [], "elevation_deg": [] },
   "angular_radius_deg": { "sun": 0.25, "earth": 1.0 },
-  "source": "spiceypy + kernels (lista y versión)"
+  "source": "JPL Horizons API (parámetros de la consulta y fecha de descarga)"
 }
 ```
 - Cada arreglo tiene exactamente `count` valores.

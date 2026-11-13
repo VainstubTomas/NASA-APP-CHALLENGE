@@ -1,6 +1,6 @@
 # 01. PRD: Lunar Landing Site Navigator
 
-Última actualización: 2026-11-12 · Estado: borrador para validar con el equipo
+Última actualización: 2026-11-13 · Estado: borrador para validar con el equipo
 
 ## Problema
 Para planificar un aterrizaje cerca del polo sur lunar hay que saber, para un lugar y una fecha, si habrá Sol (energía, temperatura) y línea de vista con la Tierra (comunicación). Con el Sol y la Tierra a pocos grados del horizonte, una montaña de un par de grados los tapa, y moverse 1 km o atrasarse 2 días cambia el resultado. La información existe en herramientas de NASA, pero son difíciles de usar para quien no es especialista.
@@ -46,13 +46,13 @@ Objetivo realista: capas 1 a 3 aseguradas, capa 4 como meta probable.
 6. La URL guarda sitio y fecha para compartirla.
 
 ## Requisitos no funcionales
-- **Correctitud**: los ángulos coinciden con JPL Horizons dentro de la tolerancia del ADR-005.
+- **Correctitud**: los ángulos son los de JPL Horizons, leídos sin errores de convención, unidades ni tiempo (verificación del ADR-006).
 - **Rendimiento**: la web no hace cálculo pesado; lee JSON precalculados y funciona sin conexión durante la demo.
 - **Claridad**: textos en lenguaje simple, como para un estudiante de secundaria.
 - **Responsive**: se ve bien en celular.
 
 ## Criterios de éxito
-1. Un sitio y una fecha conocidos dan el mismo resultado que Horizons (test automático en verde).
+1. Un sitio y una fecha conocidos muestran en la web los mismos valores que la interfaz de Horizons (test automático en verde).
 2. La demo cuenta una historia completa en menos de 3 minutos (ver `docs/06-PITCH-DEMO.md`).
 3. Cualquier persona nueva entiende qué muestra la pantalla sin explicación.
 4. El repo corre desde cero siguiendo el README.
@@ -64,7 +64,8 @@ Objetivo realista: capas 1 a 3 aseguradas, capa 4 como meta probable.
 | Proyección del mapa LOLA mal usada | Usar `pyproj`/`rasterio`, nunca convertir a mano |
 | Archivos enormes | Resolución media o recorte del polo sur; datos fuera de git |
 | Poco tiempo efectivo | Precalcular lo pesado el viernes, apuntar a capas 1 a 3, recortar sin culpa |
-| Recursos que se liberan el viernes sin hora | Avanzar con datos públicos conocidos y ajustar al recibir los recursos |
+| Los recursos oficiales no traen archivos de datos (solo Quickmap, Moon Trek, Horizons y el portal de la CSA) | ADR-006: efemérides desde la API de Horizons; mapa de elevación por confirmar en C0-03, con plan B |
+| Horizons caído o con límite de consultas durante el evento | Descargar todo antes del sábado; caché en `data/raw/horizons/` y copia en la nube |
 
 ## Preguntas abiertas
 - Coordenadas personalizadas: ¿grilla de puntos precalculada o un servidor pequeño? (decidir en un ADR; por defecto, solo sitios de la lista).

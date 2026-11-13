@@ -1,6 +1,6 @@
 # ADR-005: Validación contra JPL Horizons
 
-- **Estado**: Propuesto (la tolerancia se fija después de la primera comparación real)
+- **Estado**: Reemplazado en parte por el ADR-006: Horizons pasó de ser la referencia a ser la fuente de las efemérides. Sigue vigente la idea de guardar referencias reproducibles en `tests/reference/`
 - **Fecha**: 2026-11-12
 
 ## Contexto

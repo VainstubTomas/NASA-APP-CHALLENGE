@@ -10,8 +10,10 @@
 2. **Por qué es difícil hoy** (30 s): las herramientas actuales (Quickmap, Moon Trek, Horizons) son potentes pero confusas. Mostrar 2 o 3 capturas y lo que resulta confuso (esa lista se arma en el issue C0-10).
 3. **Nuestra solución** (30 s): una pantalla, una pregunta.
 4. **Demo en vivo** (90 s): ver guion.
-5. **Cómo sabemos que está bien** (30 s): validación contra JPL Horizons con tres sitios y tres fechas.
+5. **Cómo sabemos que está bien** (30 s): los datos salen de JPL Horizons, la herramienta oficial de NASA, y verificamos contra su interfaz que los mostramos bien en tres sitios y tres fechas.
 6. **Qué sigue** (15 s): comparación de escenarios, coordenadas propias, más misiones.
+
+Contexto internacional (opcional): el portal de Exploración lunar de la CSA, recurso oficial del desafío, cuenta el aporte de Canadá a Artemis. Usar 1 o 2 datos con fuente si suman (issue C0-12).
 
 ## Guion de la demo (historia)
 "Una misión iba a aterrizar el día X en este sitio. Se atrasó. ¿Qué cambia?"
@@ -36,7 +38,7 @@ Elegir un sitio y fechas donde la diferencia sea visible y dramática; probarlas
 - [ ] `main` contiene la versión final y arranca siguiendo el README
 - [ ] Datos sintéticos de desarrollo eliminados (`synthetic: true` fuera de `sites.json`)
 - [ ] Web desplegada con link en el README
-- [ ] Créditos y fuentes de datos citados (NASA LRO/LOLA, SPICE, JPL Horizons)
+- [ ] Créditos y fuentes de datos citados (JPL Horizons, Quickmap de ASU, NASA Moon Trek, datos LRO/LOLA; CSA si se usa)
 - [ ] Presentación lista
 - [ ] Subido con margen antes de las 14:30 del domingo 15
 - [ ] Video corto de respaldo (si lo piden o por seguridad)
