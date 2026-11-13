@@ -1,5 +1,5 @@
 numpy
-spiceypy
+requests
 rasterio
 pyproj
 matplotlib

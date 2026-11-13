@@ -1,6 +1,6 @@
 # 05. Roadmap e issues iniciales
 
-Última actualización: 2026-11-12 · Fuente de verdad de los issues: `scripts/issues.json` (este documento se genera a partir de ese archivo).
+Última actualización: 2026-11-13 · Fuente de verdad de los issues: `scripts/issues.json` (este documento se genera a partir de ese archivo).
 
 Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada uno es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Cada área tiene un foco inicial (Backend: Toto y Panchi, Frontend: Fer y Facu, Producto: todos), pero al terminar se toman issues de cualquier área.
 
@@ -29,15 +29,16 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 |---|---|---|---|
 | C0-01 | Crear proyecto web con Vite y publicar una versión de prueba | Web | S |
 | C0-02 | Entorno Python reproducible y probado | Efemérides | S |
-| C0-03 | Descargar kernels SPICE y mapa LOLA con copia de respaldo | Terreno | M |
-| C0-04 | Sol y Tierra desde un punto de la Luna: azimut y elevación validados contra Horizons | Efemérides | L |
-| C0-05 | Test automático contra valores de referencia de Horizons | Efemérides | M |
+| C0-03 | Conseguir el mapa de elevación del polo sur (Moon Trek, Quickmap o PDS) | Terreno | M |
+| C0-04 | Cliente de la API de Horizons: azimut y elevación del Sol y la Tierra desde un sitio lunar | Efemérides | L |
+| C0-05 | Test automático contra respuestas guardadas de Horizons | Efemérides | M |
 | C0-06 | Perfil de horizonte de un sitio (360 valores) y gráfico de la silueta | Terreno | L |
 | C0-07 | Lista de 10 a 20 sitios con coordenadas verificadas y fuente | Producto | M |
 | C0-08 | Revisar y aprobar el contrato de datos v1.0 | Web | S |
 | C0-09 | Proteger main y develop, cargar etiquetas e issues y armar el tablero | Producto | S |
 | C0-10 | Probar Quickmap, Moon Trek y Horizons y anotar lo confuso | Producto | S |
 | C0-11 | Preguntar a los organizadores si se puede llegar con trabajo previo | Producto | S |
+| C0-12 | Leer el portal de Exploración lunar de la CSA y sacar datos para el pitch | Producto | S |
 
 ### Capa 1: sitio, fecha y posiciones (obligatoria)
 
@@ -91,7 +92,7 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 
 ## Cómo se divide el trabajo
 
-- **Backend, datos y lógica** (efemérides y terreno): ruta crítica. La validación contra Horizons (C0-04 y C0-05) es lo primero.
+- **Backend, datos y lógica** (efemérides y terreno): ruta crítica. Lo primero es el cliente de Horizons con las convenciones verificadas (C0-04 y C0-05) y conseguir el mapa de elevación (C0-03), porque los recursos oficiales no lo traen (ADR-006).
 - **Frontend**: arranca con los datos sintéticos de `data/public/` mientras el backend calcula los reales; la primera unión es el sábado antes de las 12:30.
 - **Producto, contenido y demo**: lista de sitios, textos, diseño, guion y presentación; todos aportan.
 - Se equilibra la carga, no la cantidad de issues. Quien termina toma el siguiente issue disponible de cualquier área.

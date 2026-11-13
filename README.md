@@ -7,11 +7,11 @@
 Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y cualquier montaña los tapa. Esta herramienta toma un sitio y una fecha, calcula dónde están el Sol y la Tierra, dibuja el horizonte real del lugar y muestra cuándo hay energía y cuándo hay comunicación.
 
 ## Cómo funciona
-1. **Efemérides** (Python + SPICE): azimut y elevación del Sol y la Tierra por sitio y por hora.
+1. **Efemérides** (Python + API de JPL Horizons): azimut y elevación del Sol y la Tierra por sitio y por hora.
 2. **Terreno** (Python + mapa de elevación LOLA): perfil de horizonte de 360 direcciones por sitio.
 3. **Web**: lee esos datos precalculados y compara cada cuerpo contra el horizonte.
 
-Los cálculos se validan contra [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/).
+Las posiciones del Sol y la Tierra salen de [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); los sitios y el terreno se exploran con Quickmap y Moon Trek, los recursos oficiales del desafío.
 
 ## Estructura
 | Carpeta | Contenido |
@@ -41,7 +41,7 @@ python -m pytest tests/
 cd web && npm install && npm run dev
 ```
 
-Los datos pesados (kernels SPICE y el mapa LOLA) no están en el repo. Ver `docs/02-ARCHITECTURE.md` para saber dónde descargarlos.
+Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
 
 ## Documentación
 Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md).

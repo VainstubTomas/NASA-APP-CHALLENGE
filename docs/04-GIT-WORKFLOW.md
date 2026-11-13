@@ -33,7 +33,7 @@ No usamos `release/*` ni `hotfix/*`: el "release" es mergear `develop` a `main` 
 Prefijo + descripción corta: `feat:`, `fix:`, `docs:`, `test:`, `chore:`. Ejemplo: `feat: perfil de horizonte para un sitio`.
 
 ## Qué NO va a git
-Mapa LOLA (`*.tif`), kernels SPICE, `.venv`, `node_modules`, notebooks. Scripts `.py` en lugar de `.ipynb`. Los datos pesados se comparten por la nube. Los JSON de `data/public/` sí se versionan y los genera un script.
+Mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_modules`, notebooks. Scripts `.py` en lugar de `.ipynb`. Los datos pesados se comparten por la nube. Los JSON de `data/public/` sí se versionan y los genera un script.
 
 ## Hitos: merges de `develop` a `main`
 | Cuándo | Qué debe estar en `main` |
