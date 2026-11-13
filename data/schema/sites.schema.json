@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "sites.schema.json",
+  "title": "sites.json",
+  "type": "object",
+  "required": ["schema_version", "sites"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "$ref": "common.defs.json#/$defs/schema_version" },
+    "sites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "lat_deg", "lon_deg", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.defs.json#/$defs/site_id" },
+          "name": { "type": "string", "minLength": 1 },
+          "lat_deg": { "type": "number", "minimum": -90, "maximum": 90 },
+          "lon_deg": { "type": "number", "minimum": -180, "maximum": 180 },
+          "source": { "type": "string", "minLength": 1 },
+          "source_url": { "type": "string" },
+          "synthetic": { "type": "boolean" },
+          "mission": { "type": "string" },
+          "country": { "type": "string" },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

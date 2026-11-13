@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.defs.json",
+  "$defs": {
+    "schema_version": { "const": "1.0" },
+    "site_id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "time": {
+      "type": "object",
+      "required": ["start_utc", "step_s", "count"],
+      "additionalProperties": false,
+      "properties": {
+        "start_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+        "step_s": { "type": "integer", "minimum": 1 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "number_array": { "type": "array", "items": { "type": "number" }, "minItems": 1 },
+    "body_series": {
+      "type": "object",
+      "required": ["azimuth_deg", "elevation_deg"],
+      "additionalProperties": false,
+      "properties": {
+        "azimuth_deg": { "type": "array", "items": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 }, "minItems": 1 },
+        "elevation_deg": { "type": "array", "items": { "type": "number", "minimum": -90, "maximum": 90 }, "minItems": 1 }
+      }
+    }
+  }
+}

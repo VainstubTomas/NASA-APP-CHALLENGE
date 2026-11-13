@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "metrics.schema.json",
+  "title": "metrics.json",
+  "type": "object",
+  "required": ["schema_version", "site_id", "time", "daily"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "$ref": "common.defs.json#/$defs/schema_version" },
+    "site_id": { "$ref": "common.defs.json#/$defs/site_id" },
+    "time": { "$ref": "common.defs.json#/$defs/time" },
+    "daily": {
+      "type": "object",
+      "required": ["sun_hours", "earth_hours", "both_hours"],
+      "additionalProperties": false,
+      "properties": {
+        "sun_hours": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 24 }, "minItems": 1 },
+        "earth_hours": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 24 }, "minItems": 1 },
+        "both_hours": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 24 }, "minItems": 1 }
+      }
+    }
+  }
+}

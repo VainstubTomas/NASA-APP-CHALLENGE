@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "horizon.schema.json",
+  "title": "horizon.json",
+  "type": "object",
+  "required": ["schema_version", "site_id", "azimuth_start_deg", "azimuth_step_deg", "elevation_deg"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "$ref": "common.defs.json#/$defs/schema_version" },
+    "site_id": { "$ref": "common.defs.json#/$defs/site_id" },
+    "azimuth_start_deg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+    "azimuth_step_deg": { "type": "number", "exclusiveMinimum": 0 },
+    "elevation_deg": { "type": "array", "items": { "type": "number", "minimum": -90, "maximum": 90 }, "minItems": 4 },
+    "max_distance_km": { "type": "number", "exclusiveMinimum": 0 },
+    "observer_height_m": { "type": "number" },
+    "dem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "pixel_m": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    }
+  }
+}

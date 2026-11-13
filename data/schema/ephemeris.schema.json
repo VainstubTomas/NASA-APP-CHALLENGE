@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ephemeris.schema.json",
+  "title": "ephemeris.json",
+  "type": "object",
+  "required": ["schema_version", "site_id", "time", "sun", "earth", "angular_radius_deg"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "$ref": "common.defs.json#/$defs/schema_version" },
+    "site_id": { "$ref": "common.defs.json#/$defs/site_id" },
+    "time": { "$ref": "common.defs.json#/$defs/time" },
+    "sun": { "$ref": "common.defs.json#/$defs/body_series" },
+    "earth": { "$ref": "common.defs.json#/$defs/body_series" },
+    "angular_radius_deg": {
+      "type": "object",
+      "required": ["sun", "earth"],
+      "additionalProperties": false,
+      "properties": {
+        "sun": { "type": "number", "exclusiveMinimum": 0 },
+        "earth": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "source": { "type": "string" }
+  }
+}

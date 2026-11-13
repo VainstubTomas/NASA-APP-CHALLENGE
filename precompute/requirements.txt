@@ -1,0 +1,7 @@
+numpy
+spiceypy
+rasterio
+pyproj
+matplotlib
+pytest
+jsonschema
