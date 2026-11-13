@@ -1,8 +1,8 @@
 # ADR-006: Recursos oficiales: Horizons como fuente de efemérides y mapa de elevación por confirmar
 
-- **Estado**: Propuesto (confirmar con el equipo; los puntos "a verificar" se cierran en C0-03 y C0-04)
+- **Estado**: Aceptado (el uso de la API de Horizons como fuente fue indicado por el organizador del evento; los puntos "a verificar" y la fuente del mapa de elevación se cierran en C0-03 y C0-04)
 - **Fecha**: 2026-11-13
-- **Decidieron**: pendiente de confirmar por el equipo
+- **Decidieron**: el organizador del evento (uso de Horizons) y el equipo
 
 ## Contexto
 El repo se armó antes de que se liberaran los recursos y supuso que la pestaña Recursos traería kernels SPICE y el mapa de elevación LOLA `LDEM_80S_80MPP_ADJ.TIF`. Los recursos reales, publicados el 13/11, son otros:
@@ -46,4 +46,4 @@ No se entregaron archivos de datos: ni kernels ni mapas.
 - `precompute/requirements.txt`: sale `spiceypy` y entra `requests`.
 - Se reescriben los issues C0-02, C0-03, C0-04, C0-05, C0-06, C0-11, C1-01 y C2-01, y se agrega C0-12.
 - Horizons pasa a ser una dependencia externa: hay que descargar todo antes del sábado y trabajar desde el caché.
-- Queda pendiente copiar el texto oficial del desafío y los criterios de evaluación en `docs/00-CONTEXT.md`.
+- El texto oficial del desafío ya está en `docs/07-DESAFIO-OFICIAL.md`. Queda pendiente confirmar los criterios de evaluación con los organizadores (C0-11): la página del desafío no los publica.

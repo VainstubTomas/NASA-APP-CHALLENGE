@@ -11,6 +11,6 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-007-...`) y 
 | [003](ADR-003-minigitflow.md) | MiniGitFlow | Aceptado |
 | [004](ADR-004-stack.md) | Stack tecnológico | Propuesto (efemérides reemplazadas por 006) |
 | [005](ADR-005-validacion-horizons.md) | Validación contra JPL Horizons | Reemplazado en parte por 006 |
-| [006](ADR-006-recursos-oficiales.md) | Recursos oficiales: Horizons como fuente y mapa de elevación por confirmar | Propuesto |
+| [006](ADR-006-recursos-oficiales.md) | Recursos oficiales: Horizons como fuente y mapa de elevación por confirmar | Aceptado |
 
 Estados: Propuesto, Aceptado, Reemplazado.
