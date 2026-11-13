@@ -39,12 +39,5 @@ cd web && npm install && npm run dev
 
 Los datos pesados (kernels SPICE y el mapa LOLA) no están en el repo. Ver `docs/02-ARCHITECTURE.md` para saber dónde descargarlos.
 
-## Equipo
-Toto, Panchi, Fer y Facu.
-
-## Datos y créditos
-- Mapa de elevación lunar LOLA, misión LRO (NASA).
-- Kernels SPICE (NAIF/JPL) y servicio JPL Horizons (NASA/JPL).
-
 ## Documentación
 Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md).
