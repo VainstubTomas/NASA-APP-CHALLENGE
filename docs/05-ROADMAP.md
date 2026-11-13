@@ -35,7 +35,7 @@ Regla: **recortar, no estirar**. Si hay atraso, se baja una capa y se muestra la
 | C0-06 | Perfil de horizonte de un sitio (360 valores) y gráfico de la silueta | Terreno | L |
 | C0-07 | Lista de 10 a 20 sitios con coordenadas verificadas y fuente | Producto | M |
 | C0-08 | Revisar y aprobar el contrato de datos v1.0 | Web | S |
-| C0-09 | Proteger main y develop, cargar etiquetas e issues y armar el tablero | Producto | S |
+| C0-09 | Proteger main, cargar etiquetas e issues y armar el tablero | Producto | S |
 | C0-10 | Probar Quickmap, Moon Trek y Horizons y anotar lo confuso | Producto | S |
 | C0-11 | Preguntar a los organizadores si se puede llegar con trabajo previo | Producto | S |
 | C0-12 | Leer el portal de Exploración lunar de la CSA y sacar datos para el pitch | Producto | S |

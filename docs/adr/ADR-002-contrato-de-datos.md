@@ -2,7 +2,7 @@
 
 - **Estado**: Propuesto (validar en el issue C0-08)
 - **Fecha**: 2026-11-12
-- **Decidieron**: pendiente de confirmar por backend y frontend
+- **Decidieron**: pendiente de confirmar por quienes trabajan en Python y en la web
 
 ## Contexto
 Python (efemérides y terreno) y la web trabajan en paralelo. Si no acordamos el formato desde el principio, la primera integración del sábado va a fallar.
@@ -13,7 +13,7 @@ Python (efemérides y terreno) y la web trabajan en paralelo. Si no acordamos el
 - Convenciones: azimut 0° = norte, sentido horario; elevación sobre el horizonte local; grados; UTC; marco topocéntrico; discos para Sol y Tierra.
 - **Regla de visibilidad provisional**: un cuerpo es visible si su borde superior supera el horizonte (`elevación + radio > horizonte(azimut)`). Falta confirmarla.
 - Esquemas JSON en `data/schema/`, validados por `tests/test_contract.py`.
-- El frontend arranca con datos sintéticos generados por `scripts/make_synthetic_data.py`.
+- La web arranca con datos sintéticos generados por `scripts/make_synthetic_data.py`.
 
 ## Alternativas descartadas
 - Lista de objetos por muestra: archivos más pesados y lentos de leer.
@@ -22,5 +22,5 @@ Python (efemérides y terreno) y la web trabajan en paralelo. Si no acordamos el
 
 ## Consecuencias
 - Cambios al contrato requieren ADR y aviso al equipo.
-- Backend y web implementan la misma regla de visibilidad y se cruzan contra `metrics.json`.
+- Python y la web implementan la misma regla de visibilidad y se cruzan contra `metrics.json`.
 - Pendiente de decidir: centro vs borde vs disco completo como métrica oficial; radio angular variable (v1.1).

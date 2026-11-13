@@ -34,7 +34,7 @@ def layer_name(layer):
 def body(issue):
     lines = [f"**ID:** {issue['id']}", "", "## Contexto", issue["context"], "", "## Criterio de aceptación"]
     lines += [f"- [ ] {a}" for a in issue["acceptance"]]
-    lines += ["", "## Notas", "Ver `docs/05-ROADMAP.md` y `docs/03-DATA-CONTRACT.md`. Rama: `feature/<n>-<slug>` desde `develop`."]
+    lines += ["", "## Notas", "Ver `docs/05-ROADMAP.md` y `docs/03-DATA-CONTRACT.md`. Rama: `feature/<n>-<slug>` desde `dev`."]
     return "\n".join(lines)
 
 

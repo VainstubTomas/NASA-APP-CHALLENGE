@@ -7,7 +7,7 @@ Closes #
 <!-- Pasos o comando para ver que funciona -->
 
 ## Checklist
-- [ ] Mi rama sale de `develop` y la actualicé antes de abrir el PR
+- [ ] Mi rama sale de `dev` y la actualicé antes de abrir el PR
 - [ ] Corre sin errores (y los tests pasan, si aplica)
 - [ ] No rompe el contrato de datos (`docs/03-DATA-CONTRACT.md`); si lo cambia, hay ADR
 - [ ] No commiteé datos pesados ni notebooks

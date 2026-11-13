@@ -42,13 +42,13 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 ```
 
 ## Flujo de Git: MiniGitFlow (detalle en `docs/04-GIT-WORKFLOW.md`)
-- `main` (demoable, protegida: el hook `pre-commit` bloquea commits directos) y `develop` (integración, es el arenero del equipo: sin protección técnica). **Nunca** se commitea directo en ninguna de las dos: todo entra por PR.
-- Un issue, una rama: `feature/<n>-<slug>` o `fix/<n>-<slug>`, creada desde `develop`.
-- PR hacia `develop`, 1 aprobación de otra persona, merge por squash (recomendado, no obligatorio: GitHub permite los tres métodos). Las ramas mergeadas no se borran (nos sirven de historial durante el hackatón).
+- `main` (demoable, protegida: el hook `pre-commit` bloquea commits directos) y `dev` (integración, es el arenero del equipo: sin protección técnica). **Nunca** se commitea directo en ninguna de las dos: todo entra por PR.
+- Un issue, una rama: `feature/<n>-<slug>` o `fix/<n>-<slug>`, creada desde `dev`.
+- PR hacia `dev`, 1 aprobación de otra persona, merge por squash (recomendado, no obligatorio: GitHub permite los tres métodos). Las ramas mergeadas no se borran (nos sirven de historial durante el hackatón).
 - Commits (los valida el hook `commit-msg`): la primera línea debe tener **10 palabras o más**; el hook no exige otro formato, así que sirven los mensajes generados por el IDE. Por convención van en inglés y, si se puede, con el formato sugerido `tipo(scope): descripción` (tipos `feat`, `fix`, `docs`, `test`, `chore`; scopes `web`, `ephemeris`, `terrain`, `data`, `tests`, `docs`, `scripts`). Ejemplo: `feat(web): add site and date selector to the main map screen of the app`.
 - El título del PR también debe ser descriptivo, de 10 palabras o más (si se mergea por squash, GitHub no pasa por el hook y ese título se vuelve el commit).
 - Activar los hooks una vez por clon: `git config core.hooksPath .githooks`. `--no-verify` los saltea; no usarlo salvo emergencia.
-- Si necesitás algo de otra rama, traelo desde `develop` o avisá en el PR.
+- Si necesitás algo de otra rama, traelo desde `dev` o avisá en el PR.
 - No commitear: mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_modules`, notebooks. Scripts `.py`, no `.ipynb`.
 
 ## Cómo trabajar con Claude en este repo
