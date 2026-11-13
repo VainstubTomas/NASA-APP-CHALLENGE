@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Bloquea commits directos en main. Trabajá en una rama feature/<n>-<slug> o fix/<n>-<slug>.
+rama=$(git branch --show-current)
+if [ "$rama" = "main" ]; then
+  echo "ERROR: no se puede commitear directo en 'main'."
+  echo "Creá una rama: git switch -c feature/<n>-<slug>"
+  exit 1
+fi
