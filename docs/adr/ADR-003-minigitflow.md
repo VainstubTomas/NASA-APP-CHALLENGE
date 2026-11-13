@@ -1,6 +1,6 @@
 # ADR-003: MiniGitFlow como flujo de ramas
 
-- **Estado**: Aceptado
+- **Estado**: Aceptado (en parte reemplazado por el ADR-007: formato de commits y protección de `develop`)
 - **Fecha**: 2026-11-12
 - **Decidieron**: equipo completo
 

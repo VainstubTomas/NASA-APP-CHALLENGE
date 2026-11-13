@@ -18,5 +18,5 @@ El mayor riesgo del proyecto no es que algo no ande, sino que ande y dé un resu
 - Confiar en el cálculo sin referencia externa: es justo el riesgo que queremos evitar.
 
 ## Consecuencias
-- Una persona de backend es quien mantiene los tests de referencia; el panel de validación de la demo se alimenta de ellos.
+- Quien tome el issue de validación mantiene los tests de referencia; el panel de validación de la demo se alimenta de ellos.
 - Validación secundaria del terreno: comparar nuestro horizonte contra el porcentaje de tiempo con luz de los mapas de iluminación de NASA (debe parecerse a grandes rasgos).
