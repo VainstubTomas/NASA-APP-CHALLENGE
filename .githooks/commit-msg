@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Format: type(scope): description of 10 or more words, written in English
+# Example: feat(web): add site and date selector to the main map screen of the app
+msg=$(head -n 1 "$1")
+
+# Dejar pasar merges y reverts automáticos de Git
+case "$msg" in
+  Merge*|Revert*) exit 0 ;;
+esac
+
+regex='^(feat|fix|docs|test|chore)\([a-z0-9_-]+\): .+'
+if ! [[ "$msg" =~ $regex ]]; then
+  echo "ERROR: invalid commit message: \"$msg\""
+  echo "Format: type(scope): description (in English)"
+  echo "Types: feat, fix, docs, test, chore"
+  echo "Example: feat(web): add site and date selector to the main map screen of the app"
+  exit 1
+fi
+
+desc="${msg#*: }"
+palabras=$(echo "$desc" | wc -w)
+if [ "$palabras" -lt 10 ]; then
+  echo "ERROR: description has $palabras words, at least 10 are required."
+  echo "Say what you changed and why, so the team understands without opening the code."
+  exit 1
+fi

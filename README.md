@@ -27,6 +27,10 @@ Los cálculos se validan contra [JPL Horizons](https://ssd.jpl.nasa.gov/horizons
 Estado: la estructura está lista; el código se está construyendo. Los comandos definitivos se completan a medida que existen.
 
 ```bash
+# Hooks de Git (una vez después de clonar)
+git config core.hooksPath .githooks
+# Commits (in English): type(scope): description of 10+ words. No commits on main.
+
 # Python (precálculo y tests)
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
