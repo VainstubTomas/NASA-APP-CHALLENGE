@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { horizonAt } from './horizon.js';
+import { horizonAt, statusAgainstHorizon } from './horizon.js';
 
 // Perfil de prueba: la elevación del horizonte en el azimut i vale i/10 (0,0° en N ... 35,9° en 359°).
 const ramp = {
@@ -55,4 +55,23 @@ test('un azimut que no es un número da un error claro (no NaN silencioso)', () 
   assert.throws(() => horizonAt(ramp, NaN), /azimut inválido/);
   assert.throws(() => horizonAt(ramp, undefined), /azimut inválido/);
   assert.throws(() => horizonAt(ramp, Infinity), /azimut inválido/);
+});
+
+test('estado del panel contra el horizonte real en la dirección del cuerpo (parte 2 de #32)', () => {
+  // Sol (radio 0,25°) a 5° de altura mirando al azimut 100°, donde la rampa tiene horizonte de 10°: tapado.
+  assert.equal(statusAgainstHorizon({ azimuth_deg: 100, elevation_deg: 5 }, 0.25, ramp), 'down');
+  // Mismo Sol mirando al azimut 20° (horizonte de 2°): se ve entero.
+  assert.equal(statusAgainstHorizon({ azimuth_deg: 20, elevation_deg: 5 }, 0.25, ramp), 'up');
+  // Tierra (radio 1°) a 10,5° hacia el azimut 100° (horizonte 10°): asoma solo una parte.
+  assert.equal(statusAgainstHorizon({ azimuth_deg: 100, elevation_deg: 10.5 }, 1, ramp), 'partial');
+});
+
+test('sin horizonte (o con la Luna lisa) da lo mismo que comparar contra 0°', () => {
+  const flat = JSON.parse(
+    readFileSync(new URL('../../data/public/sites/apollo-11/horizon.json', import.meta.url), 'utf8'),
+  );
+  for (const [el, r, expected] of [[1, 0.25, 'up'], [-0.03, 1, 'partial'], [-2, 1, 'down']]) {
+    assert.equal(statusAgainstHorizon({ azimuth_deg: 123, elevation_deg: el }, r, flat), expected);
+    assert.equal(statusAgainstHorizon({ azimuth_deg: 123, elevation_deg: el }, r, undefined), expected);
+  }
 });

@@ -24,7 +24,7 @@ initSelector({
     }
     try {
       // Primera unión (#32): ephemeris.json y horizon.json reales, revisados contra el contrato.
-      // El panel empieza a usar el horizonte en la parte 2 (hoy es 0° en todo el círculo).
+      // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
       const { ephemeris, horizon } = await loadSite(site);
       renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: await getSiteName(site) });
     } catch (err) {
