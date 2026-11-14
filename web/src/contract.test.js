@@ -55,3 +55,14 @@ test('horizon: detecta valores que no son números', () => {
   hor.elevation_deg[10] = null;
   assert.match(checkHorizon(hor, 'apollo-11').join(' '), /elevation_deg/);
 });
+
+test('horizon: azimuth_start_deg tiene que estar en [0, 360) como pide el esquema', () => {
+  for (const bad of [360, -1, 400]) {
+    const hor = clone(read('apollo-11', 'horizon.json'));
+    hor.azimuth_start_deg = bad;
+    assert.match(checkHorizon(hor, 'apollo-11').join(' '), /azimuth_start_deg/, `no detectó ${bad}`);
+  }
+  const ok = clone(read('apollo-11', 'horizon.json'));
+  ok.azimuth_start_deg = 359.5;
+  assert.deepEqual(checkHorizon(ok, 'apollo-11'), []);
+});

@@ -6,6 +6,7 @@
   "selector.syntheticTag": "[测试数据]",
   "selector.noData": "该地点尚未计算数据。",
   "app.loadError": "无法加载地点列表：{error}",
+  "app.siteError": "无法加载该地点的数据：{error}",
   "panel.noData": "该地点在此日期没有数据。",
   "panel.sun": "太阳",
   "panel.earth": "地球",

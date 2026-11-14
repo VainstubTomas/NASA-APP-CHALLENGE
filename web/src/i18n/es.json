@@ -6,6 +6,7 @@
   "selector.syntheticTag": "[datos de prueba]",
   "selector.noData": "Este sitio todavía no tiene datos calculados.",
   "app.loadError": "No se pudo cargar la lista de sitios: {error}",
+  "app.siteError": "No se pudieron cargar los datos de este sitio: {error}",
   "panel.noData": "No hay datos para esa fecha en este sitio.",
   "panel.sun": "Sol",
   "panel.earth": "Tierra",

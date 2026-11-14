@@ -50,3 +50,9 @@ test('con el horizon.json real (Luna lisa) es 0° en cualquier dirección', () =
   );
   for (const az of [0, 47.3, 180, 359.9]) assert.equal(horizonAt(real, az), 0);
 });
+
+test('un azimut que no es un número da un error claro (no NaN silencioso)', () => {
+  assert.throws(() => horizonAt(ramp, NaN), /azimut inválido/);
+  assert.throws(() => horizonAt(ramp, undefined), /azimut inválido/);
+  assert.throws(() => horizonAt(ramp, Infinity), /azimut inválido/);
+});

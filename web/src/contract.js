@@ -39,7 +39,10 @@ export function checkHorizon(hor, siteId) {
   if (hor?.schema_version !== '1.0') problems.push(`schema_version es ${hor?.schema_version}, se espera 1.0`);
   if (hor?.site_id !== siteId) problems.push(`site_id es ${hor?.site_id}, se espera ${siteId}`);
   const step = hor?.azimuth_step_deg;
-  if (!isNum(hor?.azimuth_start_deg)) problems.push(`azimuth_start_deg (${hor?.azimuth_start_deg}) no es un número`);
+  const start = hor?.azimuth_start_deg;
+  if (!isNum(start) || start < 0 || start >= 360) {
+    problems.push(`azimuth_start_deg (${start}) no es un número en [0, 360)`);
+  }
   if (!isNum(step) || step <= 0) problems.push(`azimuth_step_deg (${step}) no es un número positivo`);
   const values = hor?.elevation_deg;
   if (!Array.isArray(values)) {

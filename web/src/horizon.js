@@ -6,9 +6,12 @@
 /**
  * Elevación del horizonte (grados) en `azimuthDeg` (0° = norte, sentido horario).
  * @param {object} horizon contenido de horizon.json
- * @param {number} azimuthDeg cualquier valor; se lleva a [0, 360)
+ * @param {number} azimuthDeg cualquier número finito; se lleva a [0, 360)
  */
 export function horizonAt(horizon, azimuthDeg) {
+  if (!Number.isFinite(azimuthDeg)) {
+    throw new TypeError(`horizonAt: azimut inválido (${azimuthDeg}); se espera un número en grados`);
+  }
   const { azimuth_start_deg: start, azimuth_step_deg: step, elevation_deg: values } = horizon;
   const n = values.length;
   // Posición en "muestras" desde la primera, dentro de [0, n).
