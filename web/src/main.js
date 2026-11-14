@@ -1,5 +1,8 @@
 // Prueba de contrato (C0-08): la web lee los datos sinteticos de data/public
 // sin modificarlos y chequea que respeten lo que dice docs/03-DATA-CONTRACT.md.
+import { renderPanel } from './panel.js';
+import { sampleAt } from './ephemeris.js';
+
 const base = import.meta.env.BASE_URL;
 const list = document.getElementById('sites');
 
@@ -27,6 +30,15 @@ async function main() {
     getJson(`sites/${id}/horizon.json`),
     getJson(`sites/${id}/metrics.json`),
   ]);
+
+  // Panel de números (C1-03). Hasta que esté el selector (C1-02): primer sitio y
+  // ahora mismo si hay datos, si no el primer instante disponible.
+  const now = Date.now();
+  renderPanel(document.getElementById('panel'), {
+    ephemeris: eph,
+    utcMs: sampleAt(eph, now) ? now : Date.parse(eph.time.start_utc),
+    siteName: sites[0].name,
+  });
 
   const n = eph.time.count;
   const lens = [eph.sun.azimuth_deg, eph.sun.elevation_deg, eph.earth.azimuth_deg, eph.earth.elevation_deg].map((a) => a.length);

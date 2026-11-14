@@ -1,0 +1,111 @@
+/* Panel de números (C1-03). Prefijo .panel para no chocar con otros estilos. */
+.panel {
+  --panel-bg: #ffffff;
+  --panel-border: #d9dde3;
+  --panel-text: #1b2a41;
+  --panel-muted: #5b6676;
+  --panel-up: #1f7a3a;
+  --panel-up-bg: #e3f4e8;
+  --panel-down: #6b7280;
+  --panel-down-bg: #eceef1;
+  --panel-accent: #b86e00;
+
+  max-width: 44rem;
+  color: var(--panel-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.panel-header__site {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.panel-header__time {
+  margin: 0.25rem 0 1rem;
+  color: var(--panel-muted);
+}
+
+.panel-cards {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 36rem) {
+  .panel-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.panel-card--featured {
+  border-color: var(--panel-accent);
+  border-width: 2px;
+}
+
+.panel-card__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.panel-card__elevation {
+  margin: 0.5rem 0 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* La elevación del Sol es el número más destacado de la pantalla (criterio de C1-03). */
+.panel-card--featured .panel-card__elevation {
+  font-size: 4rem;
+  color: var(--panel-accent);
+}
+
+.panel-card__caption {
+  margin: 0;
+  color: var(--panel-muted);
+}
+
+.panel-card__azimuth {
+  margin: 0.75rem 0 0;
+}
+
+.panel-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+}
+
+.panel-status--up {
+  color: var(--panel-up);
+  background: var(--panel-up-bg);
+}
+
+.panel-status--partial {
+  color: var(--panel-accent);
+  background: #fdf0dc;
+}
+
+.panel-status--down {
+  color: var(--panel-down);
+  background: var(--panel-down-bg);
+}
+
+.panel-note,
+.panel-empty {
+  margin-top: 1rem;
+  color: var(--panel-muted);
+  font-size: 0.875rem;
+}
