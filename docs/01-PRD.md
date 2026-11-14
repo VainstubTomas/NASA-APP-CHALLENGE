@@ -1,6 +1,6 @@
 # 01. PRD: Lunar Landing Site Navigator
 
-Última actualización: 2026-11-13 · Estado: borrador para validar con el equipo
+Última actualización: 2026-11-14 · Estado: borrador para validar con el equipo
 
 ## Problema
 Para planificar un aterrizaje cerca del polo sur lunar hay que saber, para un lugar y una fecha, si habrá Sol (energía, temperatura) y línea de vista con la Tierra (comunicación). Con el Sol y la Tierra a pocos grados del horizonte, una montaña de un par de grados los tapa, y moverse 1 km o atrasarse 2 días cambia el resultado. La información existe en herramientas de NASA, pero son difíciles de usar para quien no es especialista.
@@ -21,16 +21,19 @@ Cada capa es una demo completa. Si algo se rompe, mostramos la última que funci
 | Capa | Entrega | Prioridad |
 |---|---|---|
 | 0 | Repo, contrato de datos, datos de prueba, deploy de prueba, tests contra Horizons | Antes del sábado |
-| 1 | Elegir sitio y fecha; ver elevación y azimut del Sol y la Tierra | Obligatoria |
-| 2 | Dibujo del horizonte real con el Sol y la Tierra encima | Obligatoria |
+| 1 | Elegir sitio y fecha y hora desde la primera pantalla; ver elevación y azimut del Sol y la Tierra | Obligatoria |
+| 2 | Dibujo del horizonte liso (Luna esfera sin relieve, 0°) con el Sol y la Tierra encima | Obligatoria |
 | 3 | Línea de tiempo de varios días y cuenta regresiva hasta que se ocultan | Obligatoria |
 | 4 | Comparación de 2 o 3 escenarios lado a lado | Obligatoria (ADR-009) |
-| 5 | "Se atrasó el lanzamiento", pendiente del terreno, mejores ventanas, explicaciones simples | Solo si sobra tiempo |
+| 5 | "Se atrasó el lanzamiento", mejores ventanas, explicaciones simples y, **último de todo**, el relieve real (mapa de elevación, horizonte con montañas, pendiente del terreno) | Solo si sobra tiempo |
 
 Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje del texto oficial). Si hay atraso, se recorta igual que antes: se muestra la última capa que funcione.
 
+**Luna lisa primero (ADR-011).** Las capas 1 a 4 suponen una Luna esfera sin relieve: el horizonte es 0° en todas las direcciones. El relieve real llega al final y solo cambia los datos de `horizon.json`, no la web. Mientras tanto la web avisa "horizonte ideal, sin relieve": el resultado es optimista, porque una montaña de un par de grados puede tapar el Sol o la Tierra.
+
 ## Fuera de alcance
 - Visualización 3D del terreno o render realista de la superficie.
+- Relieve real antes de cerrar las capas 1 a 4 (ADR-011).
 - Calcular iluminación para todo el polo (solo los sitios de la lista y, como mucho, una grilla).
 - Backend en producción, cuentas de usuario, base de datos.
 - App móvil nativa (la web debe verse bien en celular, nada más).
@@ -39,9 +42,9 @@ Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje d
 
 ## Requisitos funcionales (resumen)
 1. Lista de 10 a 20 sitios con coordenadas verificadas y fuente.
-2. Selector de fecha y hora (UTC) y reproductor de tiempo.
+2. Selector de fecha y hora (UTC) desde la primera pantalla, y reproductor de tiempo.
 3. Para cada instante: azimut y elevación del Sol y la Tierra, y si cada uno es visible sobre el horizonte.
-4. Horizonte del sitio dibujado como silueta de 360° con el Sol y la Tierra como discos.
+4. Horizonte del sitio dibujado con el Sol y la Tierra como discos: liso (0°) hasta la capa 4 y silueta de 360° con relieve cuando llegue la capa 5.
 5. Métricas: horas de luz por día, horas con Tierra visible, tiempo hasta la próxima puesta.
 6. La URL guarda sitio y fecha para compartirla.
 
@@ -61,10 +64,11 @@ Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje d
 | Riesgo | Mitigación |
 |---|---|
 | Resultado falso que parece razonable (ejes, azimut, unidades) | Convenciones escritas en `CLAUDE.md` y validación contra Horizons desde la capa 0 |
-| Proyección del mapa LOLA mal usada | Usar `pyproj`/`rasterio`, nunca convertir a mano |
-| Archivos enormes | Resolución media o recorte del polo sur; datos fuera de git |
+| Sin relieve, la herramienta es optimista (muestra Sol o Tierra donde una montaña los taparía) | Aviso visible "horizonte ideal, sin relieve" en la web y en el pitch (ADR-011); el relieve se suma en la capa 5 |
+| Proyección del mapa LOLA mal usada (solo capa 5) | Usar `pyproj`/`rasterio`, nunca convertir a mano |
+| Archivos enormes (solo capa 5) | Resolución media o recorte del polo sur; datos fuera de git |
 | Poco tiempo efectivo | Precalcular lo pesado el viernes, apuntar a capas 1 a 4, recortar sin culpa |
-| Los recursos oficiales no traen archivos de datos (solo Quickmap, Moon Trek, Horizons y el portal de la CSA) | ADR-006: efemérides desde la API de Horizons; mapa de elevación por confirmar en C0-03, con plan B |
+| Los recursos oficiales no traen archivos de datos (solo Quickmap, Moon Trek, Horizons y el portal de la CSA) | ADR-006: efemérides desde la API de Horizons; mapa de elevación por confirmar en C5-05, antes C0-03, con plan B |
 | Horizons caído o con límite de consultas durante el evento | Descargar todo antes del sábado; caché en `data/raw/horizons/` y copia en la nube |
 
 ## Preguntas abiertas

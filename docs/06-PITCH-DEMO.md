@@ -11,13 +11,13 @@
 3. **Nuestra solución** (30 s): una pantalla, una pregunta.
 4. **Demo en vivo** (90 s): ver guion.
 5. **Cómo sabemos que está bien** (30 s): los datos salen de JPL Horizons, la herramienta oficial de NASA, y verificamos contra su interfaz que los mostramos bien en tres sitios y tres fechas.
-6. **Qué sigue** (15 s): coordenadas propias, más misiones, mejores ventanas de aterrizaje.
+6. **Qué sigue** (15 s): el relieve real del terreno (si no llegó), coordenadas propias, más misiones, mejores ventanas de aterrizaje.
 
 Contexto internacional (opcional): el portal de Exploración lunar de la CSA, recurso oficial del desafío, cuenta el aporte de Canadá a Artemis. Usar 1 o 2 datos con fuente si suman (issue C0-12).
 
 ## Guion de la demo (historia)
 "Una misión iba a aterrizar el día X en este sitio. Se atrasó. ¿Qué cambia?"
-1. Elegir un sitio de la lista y la fecha original: se ve el horizonte, el Sol y la Tierra, y los números.
+1. Elegir un sitio de la lista y la fecha original: se ve el horizonte, el Sol y la Tierra, y los números. Mientras no esté el relieve (capa 5), decir que el horizonte es ideal y que la montaña es el siguiente paso; no afirmar que la herramienta muestra montañas tapando el Sol (ADR-011).
 2. Avanzar el reproductor de tiempo: el Sol se acerca a una montaña. Aparece la cuenta regresiva: "el Sol se oculta en N horas".
 3. Cambiar la fecha (retraso): mirar la línea de tiempo de luz y de contacto con la Tierra.
 4. Comparar los dos escenarios lado a lado y concluir cuál conviene (capa 4).

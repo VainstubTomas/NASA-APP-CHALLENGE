@@ -1,6 +1,6 @@
 # 02. Arquitectura
 
-Última actualización: 2026-11-13
+Última actualización: 2026-11-14
 
 ## Idea central
 El problema se divide en **tres piezas independientes**. Las dos primeras corren en Python **antes** de la demo y producen archivos JSON. La tercera es una web estática que lee esos archivos y compara. Así la web es rápida, no depende de internet durante la demo y nadie bloquea a nadie: la web arranca con datos sintéticos mientras Python calcula los reales.
@@ -9,9 +9,9 @@ El problema se divide en **tres piezas independientes**. Las dos primeras corren
    API Horizons ───► [1. Efemérides] ──► ephemeris.json ─┐
    (JPL, caché)       precompute/ephemeris/              │
                                                           ├──► [3. Web] ──► pantalla
-   DEM LOLA  ───────► [2. Terreno]   ──► horizon.json  ───┘     web/
-   (Moon Trek/        precompute/terrain/                         compara elevación vs horizonte
-    Quickmap o PDS)
+   Luna lisa (capas 1 a 4) ► [2. Terreno] ► horizon.json ─┘     web/
+   DEM LOLA (capa 5, al final) precompute/terrain/             compara elevación vs horizonte
+   (Moon Trek/Quickmap o PDS)
                                                                   
    Respuestas guardadas de Horizons ──► tests/ (valida la lectura, las convenciones y la regla de visibilidad)
 ```
@@ -25,7 +25,11 @@ El problema se divide en **tres piezas independientes**. Las dos primeras corren
 - Cuidados (verificar con un caso conocido antes de generar todo): que el azimut de Horizons sea 0° = norte y sentido horario, que la longitud sea este-positiva, que la latitud de la consulta coincida con nuestra planetocéntrica, la escala de tiempo (UTC) y el límite de filas por consulta (partir el rango si hace falta).
 
 ## Pieza 2: cómo es el horizonte
-- Entrada: mapa de alturas LOLA del polo sur y coordenadas del sitio. Los recursos oficiales no incluyen el archivo: la fuente (Moon Trek, Quickmap o, como plan B, `LDEM_80S_80MPP_ADJ.TIF` del PDS, 80 m por píxel, polar estereográfica en metros) se fija en C0-03 y se anota en el ADR-006.
+**Etapa 1, Luna lisa (capas 1 a 4, ADR-011).** Sin mapa de elevación: el horizonte es 0° en los 360 azimuts. Un script trivial escribe `horizon.json` con 360 ceros y sin el campo opcional `dem`, para que la web lea siempre el mismo archivo. Los números de Horizons ya son topocéntricos sobre una esfera lisa, así que coinciden con este horizonte sin conversión.
+
+**Etapa 2, relieve real (capa 5, lo último).** Lo que sigue en esta sección describe esa etapa; solo se hace si sobra tiempo y reemplaza los ceros por valores reales sin tocar la web.
+
+- Entrada: mapa de alturas LOLA del polo sur y coordenadas del sitio. Los recursos oficiales no incluyen el archivo: la fuente (Moon Trek, Quickmap o, como plan B, `LDEM_80S_80MPP_ADJ.TIF` del PDS, 80 m por píxel, polar estereográfica en metros) se fija en C5-05 (antes C0-03) y se anota en el ADR-006.
 - Proceso: desde el punto, en cada una de las 360 direcciones recorrer el terreno hasta ~150 km y quedarse con el ángulo máximo de elevación que ve el observador.
 - Salida: `data/public/sites/<id>/horizon.json` con 360 valores de elevación del horizonte.
 - Herramientas: `rasterio`, `pyproj`, `numpy`.

@@ -1,6 +1,6 @@
 # ADR-006: Recursos oficiales: Horizons como fuente de efemérides y mapa de elevación por confirmar
 
-- **Estado**: Aceptado (el uso de la API de Horizons como fuente fue indicado por el organizador del evento; los puntos "a verificar" y la fuente del mapa de elevación se cierran en C0-03 y C0-04)
+- **Estado**: Aceptado (el uso de la API de Horizons como fuente fue indicado por el organizador del evento; los puntos "a verificar" y la fuente del mapa de elevación se cierran en C0-04 y, para el mapa de elevación, en C5-05, antes C0-03: ADR-011 lo movió al final de la capa 5)
 - **Fecha**: 2026-11-13
 - **Decidieron**: el organizador del evento (uso de Horizons) y el equipo
 
@@ -26,10 +26,10 @@ No se entregaron archivos de datos: ni kernels ni mapas.
      - [ ] La latitud de la consulta coincide con nuestra latitud planetocéntrica.
      - [ ] La escala de tiempo de la salida es UTC.
      - [ ] El límite de filas por consulta y cómo partir el rango.
-2. **Terreno: el mapa de elevación sale de Moon Trek o de Quickmap, si permiten exportarlo** (C0-03, timebox de 1 h). El cálculo del horizonte (pieza 2) no cambia.
+2. **Terreno: el mapa de elevación sale de Moon Trek o de Quickmap, si permiten exportarlo** (C5-05, antes C0-03; ADR-011, timebox de 1 h). El cálculo del horizonte (pieza 2) no cambia.
    - Plan B: `LDEM_80S_80MPP_ADJ.TIF` del archivo PDS de LOLA (dato público de NASA, fuera de la lista de recursos), solo con el OK de los organizadores (C0-11).
    - Plan C: si no hay mapa a tiempo, se recorta a la capa 1 (sin horizonte real), según la regla "recortar, no estirar".
-   - Fuente elegida (completar en C0-03): producto, resolución y proyección.
+   - Fuente elegida (completar en C5-05): producto, resolución y proyección.
 3. **Validación** (reemplaza en parte al ADR-005): como Horizons es la fuente, se verifica que **lo leemos bien**.
    - Tests contra respuestas de Horizons guardadas en `tests/reference/`, con la consulta exacta que las generó.
    - Comparación manual con la interfaz web de Horizons en 3 sitios y 3 fechas.

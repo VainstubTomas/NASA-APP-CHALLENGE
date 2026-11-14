@@ -58,6 +58,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 - `elevation_deg[i]` es la elevación del horizonte en el azimut `azimuth_start_deg + i * azimuth_step_deg`.
 - La web interpola linealmente entre muestras y cierra el círculo (el azimut 359 conecta con el 0).
+- **Luna lisa (ADR-011)**: hasta que haya relieve, `elevation_deg` son 360 ceros y se omite `dem` (es opcional). Es el mismo formato; la web no distingue y, cuando falta `dem`, muestra el aviso "horizonte ideal, sin relieve".
 - `dem.name` y `dem.pixel_m` describen el mapa realmente usado (la fuente se fija en el ADR-006; el ejemplo muestra el plan B).
 
 ## `ephemeris.json`

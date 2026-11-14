@@ -1,6 +1,6 @@
 # 00. Contexto del evento y del desafío
 
-Última actualización: 2026-11-13 
+Última actualización: 2026-11-14
 
 ## El evento
 NASA Space Apps Challenge 2026, hackatón global de dos días (sábado 14 y domingo 15 de noviembre). Nuestra sede es presencial.
@@ -48,12 +48,12 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 | El texto oficial dice | Estado en nuestro plan | Qué hacer |
 |---|---|---|
 | Efemérides con Horizons o datos precalculados | Cubierto (ADR-006) | Nada |
-| Topografía LOLA para el horizonte; sin atmósfera, el horizonte es el terreno más el borde de la esfera lunar | Cubierto: pieza 2 con curvatura lunar | Que C0-06 incluya la curvatura y no use refracción |
+| Topografía LOLA para el horizonte; sin atmósfera, el horizonte es el terreno más el borde de la esfera lunar | Primero Luna lisa (horizonte 0°, capas 1 a 4); el relieve LOLA va al final, en la capa 5 (ADR-011) | Que C5-06 incluya la curvatura y no use refracción; avisar "sin relieve" en la web mientras tanto |
 | Elevación del Sol como métrica clave, "de forma destacada" | Cubierto (C1-03) | Que sea el número más visible de la pantalla (C3-05) |
 | Tiempo hasta la puesta del Sol **y de la Tierra** | Cubierto (C3-04) | Nada |
 | Libración y variaciones orbitales | Cubierto: Horizons ya las incluye | Mencionarlo en el pitch |
 | **Comparación rápida de escenarios** ("su interfaz podría priorizar…") | Capa 4, obligatoria (ADR-009) | Decidido: sube de prioridad |
-| Sitios Apolo, CLPS, comerciales y de otros países, más coordenadas propias | Lista de C0-07 (decisión pendiente en ese issue); coordenadas propias abiertas (C5-04) | **Ojo**: los sitios Apolo están lejos del polo y el mapa del polo sur (80°S a 90°S) no los cubre. Decidir si van sin relieve (horizonte liso, solo curvatura) o si la lista se limita al polo sur |
+| Sitios Apolo, CLPS, comerciales y de otros países, más coordenadas propias | Lista de C0-07 (decisión pendiente en ese issue); coordenadas propias abiertas (C5-04) | Resuelto por el ADR-011: con la Luna lisa entran todos los sitios, también los Apolo (lejos del polo). Cuando llegue el relieve, solo los del polo sur (80°S a 90°S) lo tendrán y los demás seguirán con horizonte liso |
 | Animaciones o línea de tiempo de un día lunar | Cubierto (C3-02, C3-03) | Nada |
 | Por qué pequeños cambios de lugar o fecha cambian todo | Capa 5 (C5-01) | Puede ir en los textos y en la demo sin código extra |
 | Útil para planificadores, educadores y el público | Cubierto (PRD, C3-05) | Nada |
