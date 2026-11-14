@@ -11,7 +11,7 @@ import pytest
 
 from precompute.ephemeris import build_ephemeris as be
 from precompute.ephemeris import horizons_client as hc
-from tests.test_contract import _validator
+from tests.helpers import _validator
 from tests.test_ephemeris_horizons import compare_ephemeris
 
 ROOT = Path(__file__).resolve().parent.parent
