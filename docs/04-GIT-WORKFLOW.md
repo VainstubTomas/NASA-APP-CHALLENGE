@@ -78,6 +78,74 @@ Mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_m
 
 Antes de cada merge a `main`: prueba rápida de la web desplegada. En la sesión de la noche, con cansancio, lo que se rompe se rompe en `dev`, nunca en `main`.
 
+## Automatizaciones
+Qué hace GitHub solo cuando se mergea un PR, y qué queda configurado a mano. Ver ADR-010.
+
+### Capas de protección
+| Dónde | Qué | Cómo |
+|---|---|---|
+| Local (cada clon) | Hooks `commit-msg` y `pre-commit` | `.githooks/` (ver "Hooks" arriba) |
+| Servidor (GitHub) | Ruleset `main-protector` sobre la rama por defecto (`main`) | PR con 1 aprobación, bloquea force push, borrado y creación; los tres métodos de merge permitidos |
+| Servidor (GitHub) | Action `post-merge` | Cierra y etiqueta las issues del PR mergeado (ver abajo) |
+| GitHub Projects | Workflows de los tableros | Mueven la issue entre columnas y entre proyectos |
+
+Los hooks y el ruleset se complementan: los hooks frenan antes del push en tu máquina; el ruleset frena en GitHub aunque alguien no haya activado los hooks o use `--no-verify`. `dev` queda fuera del ruleset a propósito (ADR-007).
+
+### Action `post-merge` (`.github/workflows/post-merge.yml`)
+**Para qué**: cuando un PR se mergea, cerrar la issue que resuelve y ponerle la etiqueta `ready:to:main`, sin depender de que el PR diga `Closes #n`. Hace falta porque `Closes #n` solo cierra la issue automáticamente si el PR va a la rama por defecto (`main`), y nuestros PRs van a `dev`.
+
+- **Disparador**: `pull_request` de tipo `closed`, solo si `merged == true` (un PR cerrado sin mergear no hace nada).
+- **Permisos**: `issues: write` y `pull-requests: read`, con el `GITHUB_TOKEN` del propio workflow.
+- **Cómo encuentra las issues** (une ambas vías y quita duplicados):
+  1. Las issues linkeadas al PR, vía GraphQL `closingIssuesReferences` (cubre `Closes #n` en la descripción y el link manual del panel *Development*).
+  2. El número del nombre de la rama: `feature/<n>-...` o `fix/<n>-...`.
+- **Qué hace con cada una**: crea la etiqueta `ready:to:main` si no existe, se la agrega y cierra la issue como *completed*.
+- **Efecto en cadena**: al cerrarse la issue, los workflows de los tableros la pasan a `Done` en "Hackaton" y la agregan a "Main migrate" (ver abajo).
+- **Dónde tiene que estar**: GitHub ejecuta el workflow que está en la rama **base** del PR. Hoy está en `dev`; todavía no en `main`.
+
+Cuidados:
+- Si la rama lleva el número de una issue que el PR no termina de resolver, la issue se cierra igual. Lo aceptamos por la regla "un PR por issue"; si pasa, se reabre a mano.
+- Sin verificar: si `closingIssuesReferences` devuelve datos cuando el PR no va a la rama por defecto. Por eso existe el respaldo por nombre de rama: **respetá el formato `feature/<n>-<slug>`**.
+
+### Tableros de GitHub Projects y su relación
+Una misma issue puede estar en varios proyectos a la vez: no se duplica, se agrega al otro proyecto.
+
+| Proyecto | Para qué | Columnas (`Status`) | Otros campos |
+|---|---|---|---|
+| **A: "Hackaton 🪐"** (Project #3) | Trabajo del hackatón | `Backlog`, `Todo`, `In progress`, `Blocked`, `Code review`, `Done` | `Priority` (P0 a P2), `Size` (XS a XL) |
+| **B: "Main migrate 🚀"** (Project #4) | Seguimiento de issues cerradas en `dev` que tienen que llegar a `main` | `From dev`, `Agrupation`, `Migrated` | |
+
+Flujo esperado:
+1. El PR se mergea en `dev` → la Action cierra la issue y le pone `ready:to:main`.
+2. En A, los workflows "Item closed" / "Auto-close issue" la dejan en `Done`.
+3. En B, "Auto-add to project" la agrega (filtro del tipo `is:issue is:closed label:ready:to:main`; sin etiqueta en el filtro entra toda issue cerrada).
+4. En B, "Item added to project" la deja en `From dev`.
+5. Al mergear `dev` a `main` en un hito, se mueven a mano a `Agrupation` / `Migrated`.
+
+Workflows activos (confirmado por API): en ambos proyectos, *Auto-add sub-issues*, *Auto-add to project*, *Auto-close issue*, *Item added to project*, *Item closed* y *Pull request merged*. *Pull request linked to issue* está activo en A y desactivado en B.
+
+Problema conocido: algunas issues cayeron directo en `Migrated` en B (el último estado). Causa probable: "Item added to project" o "Item closed" de B configurado con `Status: Migrated`. Corrección:
+- En B, `Workflows > Item added to project > Set Status: From dev`.
+- En B, desactivar "Item closed" o cambiarle el estado.
+- Las issues que ya cayeron en `Migrated` se mueven a mano a `From dev`.
+
+Límites:
+- Los workflows de los tableros solo se editan desde la web de GitHub (no se pueden leer ni cambiar por API).
+- El plan gratuito limita la cantidad de workflows de *auto-add*.
+- El filtro de *Auto-add to project* de B tiene que usar la misma etiqueta que pone la Action (`ready:to:main`).
+
+### Checklist de configuración
+| Tarea | Estado |
+|---|---|
+| Ruleset `main-protector` para `main` | Hecho (verificado por API) |
+| Rama `dev` en GitHub | Hecho |
+| `post-merge.yml` en `dev` | Hecho |
+| `post-merge.yml` en `main` | Pendiente: llega con el próximo merge de `dev` a `main` |
+| B: "Item added to project" → `From dev` | Indicado a mano; sin verificar (no es legible por API) |
+| B: desactivar o corregir "Item closed" | Pendiente |
+| B: filtro de "Auto-add to project" con `label:ready:to:main` | A confirmar en la web |
+| "Automatically delete head branches" desactivado | A confirmar en `Settings > General` |
+
 ## Configuración inicial del repo (una sola vez)
 En GitHub, `Settings > Branches > Add branch ruleset` para `main` (`dev` queda sin protección a propósito, ver ADR-007):
 - Require a pull request before merging, con 1 aprobación.
