@@ -1,31 +1,19 @@
+import './theme.css';
 import { initSelector } from './selector.js';
 import { renderPanel } from './panel.js';
+import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
+import { loadSite, loadSites } from './data.js';
 
-const base = import.meta.env.BASE_URL;
+applyStaticTexts();
+initLangSelect(document.getElementById('lang'));
+
 const panel = document.getElementById('panel');
+const notice = document.getElementById('notice');
 
-async function getJson(path) {
-  const res = await fetch(`${base}${path}`);
-  if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
-  return res.json();
-}
-
-const ephemerisBySite = new Map();
-let sitesByIdPromise;
-
-async function loadEphemeris(siteId) {
-  if (!ephemerisBySite.has(siteId)) {
-    ephemerisBySite.set(siteId, await getJson(`sites/${siteId}/ephemeris.json`));
-  }
-  return ephemerisBySite.get(siteId);
-}
-
+// Nombres de los sitios en el idioma actual (sites.json se descarga una sola vez, en data.js).
 async function getSiteName(siteId) {
-  if (!sitesByIdPromise) {
-    sitesByIdPromise = getJson('sites.json').then(({ sites }) => new Map(sites.map((site) => [site.id, site.name])));
-  }
-  const sitesById = await sitesByIdPromise;
-  return sitesById.get(siteId) ?? siteId;
+  const site = (await loadSites()).find((s) => s.id === siteId);
+  return site ? siteName(site) : siteId;
 }
 
 initSelector({
@@ -34,11 +22,19 @@ initSelector({
       panel.replaceChildren();
       return;
     }
-    const ephemeris = await loadEphemeris(site);
-    renderPanel(panel, { ephemeris, utcMs: t, siteName: await getSiteName(site) });
+    try {
+      // Primera unión (#32): ephemeris.json y horizon.json reales, revisados contra el contrato.
+      // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
+      const { ephemeris, horizon } = await loadSite(site);
+      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: await getSiteName(site) });
+    } catch (err) {
+      console.error(err);
+      panel.replaceChildren();
+      notice.hidden = false;
+      notice.textContent = i18nT('app.siteError', { error: err.message });
+    }
   },
 }).catch((err) => {
-  const notice = document.getElementById('notice');
   notice.hidden = false;
-  notice.textContent = `No se pudo cargar la lista de sitios: ${err.message}`;
+  notice.textContent = i18nT('app.loadError', { error: err.message });
 });

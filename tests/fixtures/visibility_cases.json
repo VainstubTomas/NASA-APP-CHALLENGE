@@ -1,0 +1,195 @@
+{
+  "_doc": "Casos compartidos entre Python (tests/test_visibility.py) y la web (web/src/horizon.test.js). Regla del ADR-002: visible si elevacion + radio > horizonte(azimut); totalmente visible si elevacion - radio > horizonte(azimut). Desigualdad estricta.",
+  "horizons": {
+    "flat": {
+      "azimuth_start_deg": 0,
+      "azimuth_step_deg": 90,
+      "elevation_deg": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "steps": {
+      "azimuth_start_deg": 0,
+      "azimuth_step_deg": 90,
+      "elevation_deg": [
+        0,
+        10,
+        20,
+        30
+      ]
+    }
+  },
+  "horizon_at": [
+    {
+      "horizon": "steps",
+      "azimuth_deg": 0,
+      "expected": 0
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 45,
+      "expected": 5
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 90,
+      "expected": 10
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 135,
+      "expected": 15
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 270,
+      "expected": 30
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 315,
+      "expected": 15,
+      "note": "cierra el circulo: entre 270 (30) y 360=0 (0)"
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 360,
+      "expected": 0
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": -45,
+      "expected": 15,
+      "note": "azimut negativo equivale a 315"
+    },
+    {
+      "horizon": "steps",
+      "azimuth_deg": 450,
+      "expected": 10,
+      "note": "450 equivale a 90"
+    }
+  ],
+  "visibility": [
+    {
+      "name": "bien arriba",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": 5,
+      "radius_deg": 0.25,
+      "visible": true,
+      "fully_visible": true
+    },
+    {
+      "name": "asoma solo el borde",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": 0.1,
+      "radius_deg": 0.25,
+      "visible": true,
+      "fully_visible": false
+    },
+    {
+      "name": "disco justo tangente por arriba",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": 0.25,
+      "radius_deg": 0.25,
+      "visible": true,
+      "fully_visible": false
+    },
+    {
+      "name": "igualdad exacta: borde justo en el horizonte no es visible",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": -0.25,
+      "radius_deg": 0.25,
+      "visible": false,
+      "fully_visible": false
+    },
+    {
+      "name": "bajo el horizonte",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": -1,
+      "radius_deg": 0.25,
+      "visible": false,
+      "fully_visible": false
+    },
+    {
+      "name": "Tierra (radio 1) asomando",
+      "horizon": "flat",
+      "azimuth_deg": 0,
+      "elevation_deg": -0.5,
+      "radius_deg": 1,
+      "visible": true,
+      "fully_visible": false
+    },
+    {
+      "name": "relieve: tapado por la montana",
+      "horizon": "steps",
+      "azimuth_deg": 90,
+      "elevation_deg": 9,
+      "radius_deg": 1,
+      "visible": false,
+      "fully_visible": false
+    },
+    {
+      "name": "relieve: asoma sobre la montana",
+      "horizon": "steps",
+      "azimuth_deg": 90,
+      "elevation_deg": 10.5,
+      "radius_deg": 1,
+      "visible": true,
+      "fully_visible": false
+    },
+    {
+      "name": "relieve: totalmente sobre la montana",
+      "horizon": "steps",
+      "azimuth_deg": 90,
+      "elevation_deg": 11.5,
+      "radius_deg": 1,
+      "visible": true,
+      "fully_visible": true
+    },
+    {
+      "name": "relieve interpolado entre muestras",
+      "horizon": "steps",
+      "azimuth_deg": 45,
+      "elevation_deg": 4.5,
+      "radius_deg": 0.25,
+      "visible": false,
+      "fully_visible": false
+    },
+    {
+      "name": "relieve interpolado: justo sobre el borde",
+      "horizon": "steps",
+      "azimuth_deg": 45,
+      "elevation_deg": 5,
+      "radius_deg": 0.25,
+      "visible": true,
+      "fully_visible": false
+    },
+    {
+      "name": "relieve en el cierre del circulo 315",
+      "horizon": "steps",
+      "azimuth_deg": 315,
+      "elevation_deg": 14.9,
+      "radius_deg": 0.25,
+      "visible": true,
+      "fully_visible": false
+    }
+  ],
+  "series_golden": {
+    "demo-sintetico": {
+      "samples": 2880,
+      "sun_visible_hours": 1815,
+      "sun_fully_visible_hours": 1094,
+      "earth_visible_hours": 2349,
+      "earth_fully_visible_hours": 1758,
+      "sun_first_48h": "000000000000000000000000000000000000000000000000"
+    }
+  }
+}
