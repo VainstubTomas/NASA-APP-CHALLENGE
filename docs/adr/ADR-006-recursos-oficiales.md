@@ -20,12 +20,39 @@ No se entregaron archivos de datos: ni kernels ni mapas.
 1. **Efemérides: la API de JPL Horizons es la fuente** (antes era solo la referencia de validación). Se descarta SPICE.
    - Consulta por sitio y por cuerpo: tabla de observador, Sol (`10`) y Tierra (`399`), observador en la superficie lunar (`CENTER='coord@301'`), azimut y elevación (`QUANTITIES=4`) en grados, paso de 1 h, sin refracción, en UTC. Los nombres exactos de los parámetros se confirman contra la documentación de la API en C0-04.
    - Las respuestas crudas se guardan en `data/raw/horizons/` (no versionado, con copia en la nube) para no depender de Horizons durante el evento.
-   - **A verificar con un caso conocido antes de generar todos los sitios** (se anota el resultado acá):
-     - [ ] El azimut de Horizons es 0° = norte y crece en sentido horario.
-     - [ ] La longitud de `SITE_COORD` es este-positiva.
-     - [ ] La latitud de la consulta coincide con nuestra latitud planetocéntrica.
-     - [ ] La escala de tiempo de la salida es UTC.
-     - [ ] El límite de filas por consulta y cómo partir el rango.
+   - **A verificar con un caso conocido antes de generar todos los sitios** (se anota el resultado acá; verificado en C0-04 el 2026-11-14 con `precompute/ephemeris/horizons_client.py` y `tests/test_horizons_client.py`):
+     - [x] El azimut de Horizons es 0° = norte y crece en sentido horario. La respuesta lo declara ("Azimuth is measured clockwise from north: North(0) -> East(90) -> South(180) -> West(270)"), y lo confirman dos casos conocidos: en el ecuador lunar el Sol sale con azimut de unos 90° y se pone con unos 270°, y desde 0°N 30°E la Tierra queda al oeste (azimut de unos 278°).
+     - [x] La longitud de `SITE_COORD` es este-positiva. El encabezado dice `Center geodetic : 30.0, 0.0, 0.0 {E-lon(deg),Lat(deg),Alt(km)}` y `Center pole/equ : MEAN_ME {East-longitude positive}`. El parser falla si Horizons devuelve otra unidad o un sitio distinto del pedido.
+     - [x] La latitud de la consulta coincide con nuestra latitud planetocéntrica. Con `COORD_TYPE=GEODETIC`, Horizons modela la Luna como una esfera (`Center radii : 1737.4, 1737.4, 1737.4 km`), y sobre una esfera la latitud geodética y la planetocéntrica son la misma.
+     - [x] La escala de tiempo de la salida es UTC. La columna es `Date__(UT)__HR:MN` y la respuesta aclara que "Times AFTER 1962 are in UTC". Para fechas futuras Horizons usa el último segundo intercalar conocido, lo que no afecta a un paso de 1 h.
+     - [x] El límite de filas por consulta y cómo partir el rango: **90 000 instantes**. Con más, Horizons devuelve error ("Output length exceeded, 90648 times requested, max. is 90000") en vez de truncar. El cliente parte el rango en tramos de 90 000 (`split_range`); con paso de 1 h, eso son unos 10 años por consulta.
+   - **Consulta confirmada contra la API** (`https://ssd.jpl.nasa.gov/api/horizons.api`): `format=json`, `COMMAND='10'|'399'`, `OBJ_DATA='NO'`, `MAKE_EPHEM='YES'`, `EPHEM_TYPE='OBSERVER'`, `CENTER='coord@301'`, `COORD_TYPE='GEODETIC'`, `SITE_COORD='<E-lon>,<lat>,0'`, `START_TIME`/`STOP_TIME` en UTC (`'YYYY-MM-DD HH:MM'`, inclusivos), `STEP_SIZE='60 m'`, `QUANTITIES='4'`, `ANG_FORMAT='DEG'`, `APPARENT='AIRLESS'`, `CSV_FORMAT='YES'`, `TIME_TYPE='UT'`. Las columnas que se leen son `Azi_(a-app)` y `Elev_(a-app)`: azimut y elevación aparentes sin atmósfera, del **centro** del disco y topocéntricos.
+   - **Comparación manual con la interfaz web de Horizons** (C0-04). Hecha por Tomás Vainstub el 2026-11-14 en <https://ssd.jpl.nasa.gov/horizons/app.html>. Configuración: Observer Table, Target Body = Sol (10) o Tierra (399), Observer Location = Luna (301) con las coordenadas de la tabla, cantidad 4, sin refracción, salida en grados y paso de 6 h desde 2026-11-14 00:00 UTC. Así, las tres fechas caen en filas de la salida. Las 12 filas comparadas coinciden con el cliente hasta el último decimal impreso. Las de la Tierra desde 30°E y desde 89,5°S no se cargaron en la web; las cubren los tests geométricos. Los puntos son geométricos y no sitios de aterrizaje: la lista real de sitios es C0-07. La tolerancia es la del ADR-005 (0,1°).
+     - Evidencia: las salidas de la web para el Sol desde 0°N 30°E y desde 89,5°S 0°E están en `docs/adr/evidencia/ADR-006-horizons-web/`. Su encabezado dice `WWW_USER`, mientras que las de la API dicen `API_USER`. Las salidas de 0°N 0°E (Sol y Tierra) no se conservaron.
+     - Que coincidan exactamente es lo esperable, porque la web y la API usan el mismo motor. Lo que la comparación confirma es que el cliente arma la consulta igual que alguien que la carga a mano y que lee bien la tabla. No es una validación independiente de las efemérides.
+
+     | Lat, E-lon (°) | UTC | Cuerpo | Az cliente (°) | El cliente (°) | Web: az / el | ¿Coincide? |
+     |---|---|---|---|---|---|---|
+     | 0, 0 | 2026-11-14T00:00:00Z | Sol | 91.939942 | -36.602284 | 91.939942 / -36.602284 | ✅ |
+     | 0, 0 | 2026-11-21T12:00:00Z | Sol | 92.657444 | 54.591315 | 92.657444 / 54.591315 | ✅ |
+     | 0, 0 | 2026-11-30T06:00:00Z | Sol | 268.437933 | 19.173705 | 268.437933 / 19.173705 | ✅ |
+     | 0, 0 | 2026-11-14T00:00:00Z | Tierra | 344.456450 | 85.409203 | 344.456450 / 85.409203 | ✅ |
+     | 0, 0 | 2026-11-21T12:00:00Z | Tierra | 232.654574 | 81.449201 | 232.654574 / 81.449201 | ✅ |
+     | 0, 0 | 2026-11-30T06:00:00Z | Tierra | 88.488658 | 83.696534 | 88.488658 / 83.696534 | ✅ |
+     | 0, 30 | 2026-11-14T00:00:00Z | Sol | 91.567718 | -6.615682 | 91.567718 / -6.615682 | ✅ |
+     | 0, 30 | 2026-11-21T12:00:00Z | Sol | 105.995387 | 84.405446 | 105.995387 / 84.405446 | ✅ |
+     | 0, 30 | 2026-11-30T06:00:00Z | Sol | 268.497923 | -10.816083 | 268.497923 / -10.816083 | ✅ |
+     | 0, 30 | 2026-11-14T00:00:00Z | Tierra | 278.449072 | 58.366038 | | |
+     | 0, 30 | 2026-11-21T12:00:00Z | Tierra | 261.438845 | 52.746055 | | |
+     | 0, 30 | 2026-11-30T06:00:00Z | Tierra | 270.410409 | 66.163503 | | |
+     | -89.5, 0 | 2026-11-14T00:00:00Z | Sol | 126.627333 | 1.258335 | 126.627333 / 1.258335 | ✅ |
+     | -89.5, 0 | 2026-11-21T12:00:00Z | Sol | 35.387998 | 1.946330 | 35.387998 / 1.946330 | ✅ |
+     | -89.5, 0 | 2026-11-30T06:00:00Z | Sol | 289.168108 | 1.638940 | 289.168108 / 1.638940 | ✅ |
+     | -89.5, 0 | 2026-11-14T00:00:00Z | Tierra | 358.773423 | -4.148545 | | |
+     | -89.5, 0 | 2026-11-21T12:00:00Z | Tierra | 353.209670 | 5.383071 | | |
+     | -89.5, 0 | 2026-11-30T06:00:00Z | Tierra | 6.272055 | 0.064782 | | |
+
+     Para repetir una fila: `python -m precompute.ephemeris.horizons_client --lat <lat> --lon <lon> --body sun|earth --start <UTC> --stop <UTC>`.
 2. **Terreno: el mapa de elevación sale de Moon Trek o de Quickmap, si permiten exportarlo** (C5-05, antes C0-03; ADR-011, timebox de 1 h). El cálculo del horizonte (pieza 2) no cambia.
    - Plan B: `LDEM_80S_80MPP_ADJ.TIF` del archivo PDS de LOLA (dato público de NASA, fuera de la lista de recursos), solo con el OK de los organizadores (C0-11).
    - Plan C: si no hay mapa a tiempo, se recorta a la capa 1 (sin horizonte real), según la regla "recortar, no estirar".
