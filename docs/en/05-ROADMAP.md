@@ -101,6 +101,7 @@ Order: first the extras and **last of all the relief** (ADR-011).
 | E-01 | Repo ready for delivery: final README and cleanup of synthetic data | Product | S |
 | E-02 | Demo script and rehearsal | Product | M |
 | E-03 | Presentation and backup video | Product | M |
+| E-04 | Moon vs. Earth slide: sunlight hours at a lunar site and in a city on Earth | Product | S |
 
 ## How the work is split
 

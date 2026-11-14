@@ -60,3 +60,38 @@ export function compassLabel(azimuthDeg) {
   const a = ((azimuthDeg % 360) + 360) % 360;
   return POINTS[Math.round(a / 45) % 8];
 }
+
+/**
+ * Cuenta regresiva (C3-04): próximo cambio de visibilidad de un cuerpo desde utcMs.
+ * Usa la regla del contrato (borde superior sobre el horizonte). Resolución = paso de los datos.
+ * Si el cuerpo está visible busca la próxima puesta ('sets'); si no, la próxima salida ('rises').
+ * Devuelve event: null si no hay cambio dentro de los datos, o null si utcMs está fuera de ellos.
+ * @param {string} body 'sun' | 'earth'
+ * @param {number|function} horizonDeg horizonte en grados, o función azimut -> grados
+ */
+export function nextVisibilityChange(ephemeris, utcMs, body, horizonDeg = 0) {
+  const start = sampleAt(ephemeris, utcMs);
+  if (!start) return null;
+  const { count, step_s } = ephemeris.time;
+  const radius = ephemeris.angular_radius_deg[body];
+  const { azimuth_deg, elevation_deg } = ephemeris[body];
+  const horizonAt = typeof horizonDeg === 'function' ? horizonDeg : () => horizonDeg;
+  const visibleAt = (i) => isAboveHorizon(elevation_deg[i], radius, horizonAt(azimuth_deg[i]));
+  // Margen sobre el horizonte del borde superior del disco; cambia de signo en la puesta/salida.
+  const marginAt = (i) => elevation_deg[i] + radius - horizonAt(azimuth_deg[i]);
+
+  const visible = visibleAt(start.index);
+  for (let i = start.index + 1; i < count; i += 1) {
+    if (visibleAt(i) !== visible) {
+      const atMs = start.utcMs + (i - start.index) * step_s * 1000;
+      // crossMs: cruce estimado por interpolación lineal entre la muestra anterior y esta.
+      // atMs es la primera muestra ya cambiada (cota superior); crossMs es la mejor estimación.
+      const m0 = marginAt(i - 1);
+      const m1 = marginAt(i);
+      const frac = m0 === m1 ? 1 : Math.min(1, Math.max(0, m0 / (m0 - m1)));
+      const crossMs = atMs - (1 - frac) * step_s * 1000;
+      return { visible, event: visible ? 'sets' : 'rises', atMs, inHours: (atMs - utcMs) / 3600000, crossMs };
+    }
+  }
+  return { visible, event: null, atMs: null, inHours: null, crossMs: null };
+}
