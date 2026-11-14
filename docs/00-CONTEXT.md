@@ -1,6 +1,6 @@
 # 00. Contexto del evento y del desafío
 
-Última actualización: 2026-11-13
+Última actualización: 2026-11-13 
 
 ## El evento
 NASA Space Apps Challenge 2026, hackatón global de dos días (sábado 14 y domingo 15 de noviembre). Nuestra sede es presencial.
