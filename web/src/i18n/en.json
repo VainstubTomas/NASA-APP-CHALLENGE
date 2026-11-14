@@ -6,6 +6,7 @@
   "selector.syntheticTag": "[test data]",
   "selector.noData": "This site has no computed data yet.",
   "app.loadError": "Could not load the list of sites: {error}",
+  "app.siteError": "Could not load the data for this site: {error}",
   "panel.noData": "No data for that date at this site.",
   "panel.sun": "Sun",
   "panel.earth": "Earth",

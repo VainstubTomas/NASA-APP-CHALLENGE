@@ -6,6 +6,7 @@
   "selector.syntheticTag": "[परीक्षण डेटा]",
   "selector.noData": "इस स्थल के लिए अभी तक डेटा की गणना नहीं हुई है।",
   "app.loadError": "स्थलों की सूची लोड नहीं हो सकी: {error}",
+  "app.siteError": "इस स्थल का डेटा लोड नहीं हो सका: {error}",
   "panel.noData": "इस स्थल पर उस तारीख के लिए कोई डेटा नहीं है।",
   "panel.sun": "सूर्य",
   "panel.earth": "पृथ्वी",
