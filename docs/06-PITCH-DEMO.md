@@ -26,7 +26,7 @@ Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por pr
 
 **Para el pitch (top 3):**
 1. En Horizons, buscar "moon" como lugar de observación devuelve observatorios de la Tierra con "Moon" en el nombre, no la Luna (captura 02).
-2. Con las opciones por defecto, la respuesta de Horizons a "¿hay Sol?" es un asterisco `*` al lado de la fecha, explicado unas 70 líneas más abajo; y aparece una `i` ("cuerpo que interfiere", sin decir cuál; probablemente la Tierra) (captura 07). Horizons sí da azimut y elevación si se marca esa opción: lo confuso es que hay que saber cuál marcar.
+2. Con las opciones por defecto, la respuesta de Horizons a "¿hay Sol?" es un asterisco `*` al lado de la fecha, explicado unas 70 líneas más abajo; y aparece una `i` ("cuerpo que interfiere"; hay que mirar el encabezado para saber que es la Tierra: `Vis. interferer: EARTH`) (captura 07). Horizons sí da azimut y elevación si se marca esa opción: lo confuso es que hay que saber cuál marcar.
 3. En Moon Trek, al buscar Shackleton, el polo sur se ve como franjas estiradas e irreconocibles (captura 12).
 
 ### JPL Horizons
@@ -38,7 +38,7 @@ Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por pr
 | 4 | [04](img/c0-10/04-horizons-target-body.png) | Elegir el Sol | Buscador vacío, sin sugerencias: hay que saber de antemano el nombre o código del cuerpo |
 | 5 | [05](img/c0-10/05-horizons-resultado-inicio.png) | Ver el resultado | Lo primero que muestra es la ficha física del Sol (masa, temperatura, ciclo de manchas solares), que no responde la pregunta |
 | 6 | [06](img/c0-10/06-horizons-resultado-encabezado.png) | Encontrar el dato | Casi 60 líneas de encabezado técnico (`DE441`, `EOP file`, `Center cylindric`…) antes del primer dato |
-| 7 | [07](img/c0-10/07-horizons-resultado-tabla.png) ([texto completo](img/c0-10/07-horizons-resultado-completo.txt)) | Saber si hay Sol | Tabla de 15 columnas con unidades mezcladas (horas, grados, UA). La respuesta es un `*` cuyo significado está al final del documento; además aparece una `i` ("interfering body"; la tabla no dice cuál, probablemente la Tierra) |
+| 7 | [07](img/c0-10/07-horizons-resultado-tabla.png) ([texto completo](img/c0-10/07-horizons-resultado-completo.txt)) | Saber si hay Sol | Tabla de 15 columnas con unidades mezcladas (horas, grados, UA). La respuesta es un `*` cuyo significado está al final del documento; además aparece una `i` ("interfering body"); solo el encabezado revela que es la Tierra (`Vis. interferer: EARTH`) |
 
 ### Quickmap (ASU / LROC)
 | # | Captura | Qué intentamos | Qué confunde |
