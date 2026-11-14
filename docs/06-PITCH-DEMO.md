@@ -22,11 +22,11 @@ Contexto internacional (opcional, issue C0-12): el portal de Exploración lunar 
 - El astronauta canadiense **Jeremy Hansen** forma parte de la tripulación de Artemis II, la primera misión tripulada a la Luna desde 1972. Fuente: [Canada's role in Moon exploration, CSA](https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/canada-role.asp) (última modificación de la página: 2025-06-05).
 
 ## Por qué es difícil hoy: lo que encontramos (C0-10)
-Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por primera vez, con una sola pregunta: **"¿el polo sur de la Luna (cráter Shackleton) tiene Sol en noviembre?"**. Capturas en [`docs/img/c0-10/`](img/c0-10/).
+Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por primera vez, con una sola pregunta: **"¿el polo sur de la Luna (cráter Shackleton) tiene Sol en noviembre?"**. En Quickmap y Moon Trek se buscó Shackleton; en Horizons se usó un punto cercano al polo (lat -89,5, lon 0°), no el cráter exacto, que según Quickmap está en lat -89,67, lon 129,78. Capturas en [`docs/img/c0-10/`](img/c0-10/).
 
 **Para el pitch (top 3):**
 1. En Horizons, buscar "moon" como lugar de observación devuelve observatorios de la Tierra con "Moon" en el nombre, no la Luna (captura 02).
-2. La respuesta de Horizons a "¿hay Sol?" es un asterisco `*` al lado de la fecha, explicado unas 70 líneas más abajo; y la Tierra aparece como `i`, "cuerpo que interfiere" (captura 07).
+2. Con las opciones por defecto, la respuesta de Horizons a "¿hay Sol?" es un asterisco `*` al lado de la fecha, explicado unas 70 líneas más abajo; y aparece una `i` ("cuerpo que interfiere", sin decir cuál; probablemente la Tierra) (captura 07). Horizons sí da azimut y elevación si se marca esa opción: lo confuso es que hay que saber cuál marcar.
 3. En Moon Trek, al buscar Shackleton, el polo sur se ve como franjas estiradas e irreconocibles (captura 12).
 
 ### JPL Horizons
@@ -38,7 +38,7 @@ Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por pr
 | 4 | [04](img/c0-10/04-horizons-target-body.png) | Elegir el Sol | Buscador vacío, sin sugerencias: hay que saber de antemano el nombre o código del cuerpo |
 | 5 | [05](img/c0-10/05-horizons-resultado-inicio.png) | Ver el resultado | Lo primero que muestra es la ficha física del Sol (masa, temperatura, ciclo de manchas solares), que no responde la pregunta |
 | 6 | [06](img/c0-10/06-horizons-resultado-encabezado.png) | Encontrar el dato | Casi 60 líneas de encabezado técnico (`DE441`, `EOP file`, `Center cylindric`…) antes del primer dato |
-| 7 | [07](img/c0-10/07-horizons-resultado-tabla.png) ([texto completo](img/c0-10/07-horizons-resultado-completo.txt)) | Saber si hay Sol | Tabla de 15 columnas con unidades mezcladas (horas, grados, UA). La respuesta es un `*` cuyo significado está al final del documento; la Tierra figura como `i`, "interfering body" |
+| 7 | [07](img/c0-10/07-horizons-resultado-tabla.png) ([texto completo](img/c0-10/07-horizons-resultado-completo.txt)) | Saber si hay Sol | Tabla de 15 columnas con unidades mezcladas (horas, grados, UA). La respuesta es un `*` cuyo significado está al final del documento; además aparece una `i` ("interfering body"; la tabla no dice cuál, probablemente la Tierra) |
 
 ### Quickmap (ASU / LROC)
 | # | Captura | Qué intentamos | Qué confunde |
