@@ -1,6 +1,6 @@
 import './theme.css';
 import { initSelector } from './selector.js';
-import { renderPanel } from './panel.js';
+import { renderPanel, clearPanel } from './panel.js';
 import { initPlayer } from './player.js';
 import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
 import { loadSite, loadSites, loadValidation, loadMetrics } from './data.js';
@@ -28,7 +28,7 @@ initSelector({
   onChange: async ({ site, t, hasData }) => {
     player?.sync(t);
     if (!hasData) {
-      panel.replaceChildren();
+      clearPanel(panel);
       timeline.replaceChildren();
       validationBody.replaceChildren();
       return;
@@ -42,7 +42,7 @@ initSelector({
       renderTimeline(timeline, ephemeris, horizon, t, 7);
     } catch (err) {
       console.error(err);
-      panel.replaceChildren();
+      clearPanel(panel);
       timeline.replaceChildren();
       notice.hidden = false;
       notice.textContent = i18nT('app.siteError', { error: err.message });

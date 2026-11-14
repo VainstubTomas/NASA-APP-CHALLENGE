@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sampleAt, isAboveHorizon, horizonStatus, compassLabel, elevationDisplay } from './ephemeris.js';
+import { sampleAt, isAboveHorizon, horizonStatus, compassLabel, elevationDisplay, nextVisibilityChange } from './ephemeris.js';
 
 const demo = JSON.parse(
   readFileSync(new URL('../../data/public/sites/demo-sintetico/ephemeris.json', import.meta.url), 'utf8'),
@@ -75,4 +75,57 @@ test('azimut a punto cardinal: 0° = norte, sentido horario', () => {
   assert.equal(compassLabel(359), 'N');
   assert.equal(compassLabel(100), 'E'); // más cerca de 90° (E) que de 135° (SE)
   assert.equal(compassLabel(120), 'SE');
+});
+
+// Efeméride mínima hecha a mano: 1 muestra por hora desde 2026-11-01T00:00Z.
+// Sol (radio 0,25°): visible en las muestras 0..3, bajo el horizonte de la 4 en adelante.
+const mini = {
+  time: { start_utc: '2026-11-01T00:00:00Z', step_s: 3600, count: 8 },
+  angular_radius_deg: { sun: 0.25, earth: 1.0 },
+  sun: { azimuth_deg: Array(8).fill(10), elevation_deg: [2, 1, 0.5, 0.1, -0.25, -1, -2, 0.3] },
+  earth: { azimuth_deg: Array(8).fill(90), elevation_deg: [-5, -4, -3, -2, -1, 0, 3, 3] },
+};
+const T0 = Date.parse('2026-11-01T00:00:00Z');
+const H = 3600 * 1000;
+
+test('cuenta regresiva: el Sol visible se oculta en la primera muestra no visible', () => {
+  const r = nextVisibilityChange(mini, T0, 'sun');
+  assert.deepEqual({ ...r, crossMs: undefined }, { visible: true, event: 'sets', atMs: T0 + 4 * H, inHours: 4, crossMs: undefined });
+});
+
+test('cuenta regresiva: se mide desde el instante pedido, no desde el inicio', () => {
+  const r = nextVisibilityChange(mini, T0 + 2 * H, 'sun');
+  assert.equal(r.inHours, 2);
+});
+
+test('cuenta regresiva: con el cuerpo oculto avisa cuándo sale', () => {
+  // Tierra (radio 1°): elevación 0 en la muestra 5 -> 0 + 1 > 0, ya asoma.
+  const r = nextVisibilityChange(mini, T0, 'earth');
+  assert.deepEqual({ ...r, crossMs: undefined }, { visible: false, event: 'rises', atMs: T0 + 5 * H, inHours: 5, crossMs: undefined });
+});
+
+test('cuenta regresiva: sin cambio dentro de los datos devuelve event null', () => {
+  const r = nextVisibilityChange(mini, T0 + 5 * H, 'earth');
+  assert.deepEqual(r, { visible: true, event: null, atMs: null, inHours: null, crossMs: null });
+});
+
+test('cuenta regresiva: respeta el horizonte pasado por parámetro', () => {
+  // Con horizonte a 1°, el Sol (centro 1° + 0,25 > 1 en muestra 1) se oculta en la muestra 2.
+  assert.equal(nextVisibilityChange(mini, T0, 'sun', 1).inHours, 2);
+});
+
+test('cuenta regresiva: fuera del rango de datos devuelve null', () => {
+  assert.equal(nextVisibilityChange(mini, T0 - 10 * H, 'sun'), null);
+});
+
+test('cuenta regresiva: crossMs interpola el cruce entre muestras horarias', () => {
+  // Horizonte 0,5°. Margen del Sol = elevación + 0,25 - 0,5: muestra 2 = 0,25; muestra 3 = -0,15.
+  // Cruza a 0,25 / 0,40 = 0,625 de la hora entre ambas muestras.
+  const r = nextVisibilityChange(mini, T0, 'sun', 0.5);
+  assert.equal(r.atMs, T0 + 3 * H);
+  assert.ok(Math.abs(r.crossMs - (T0 + 2.625 * H)) < 1);
+});
+
+test('cuenta regresiva: sin evento no hay crossMs', () => {
+  assert.equal(nextVisibilityChange(mini, T0 + 5 * H, 'earth').crossMs, null);
 });
