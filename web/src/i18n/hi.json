@@ -76,5 +76,17 @@
   "timeline.aria": "सूर्य और पृथ्वी की टाइमलाइन: {start} (UTC) से {days} दिन",
   "timeline.legend": "रंगीन भाग: सूर्य या पृथ्वी क्षितिज के ऊपर है। सफ़ेद रेखा चुनी हुई तारीख़ और समय दिखाती है। दिन UTC में हैं।",
   "timeline.noData": "उस तारीख़ के लिए टाइमलाइन बनाने का डेटा नहीं है।",
-  "timeline.partial": "उस तारीख़ से केवल {days} दिनों का डेटा है।"
+  "timeline.partial": "उस तारीख़ से केवल {days} दिनों का डेटा है।",
+  "player.title": "समय प्लेयर",
+  "player.back1d": "−1 दिन",
+  "player.back1h": "−1 घंटा",
+  "player.fwd1h": "+1 घंटा",
+  "player.fwd1d": "+1 दिन",
+  "player.play": "चलाएँ",
+  "player.pause": "रोकें",
+  "player.slider": "समय में आगे-पीछे जाएँ",
+  "player.speed": "गति",
+  "player.speed.hour": "प्रति सेकंड 1 घंटा",
+  "player.speed.day": "प्रति सेकंड 1 दिन",
+  "player.end": "डेटा के अंत तक पहुँच गए।"
 }

@@ -76,5 +76,17 @@
   "timeline.aria": "Sun and Earth timeline: {days} days from {start} (UTC)",
   "timeline.legend": "Colored: the Sun or the Earth is above the horizon. The white line marks the chosen date and time. Days in UTC.",
   "timeline.noData": "There is no data to draw the timeline for that date.",
-  "timeline.partial": "There is only data for {days} days from that date."
+  "timeline.partial": "There is only data for {days} days from that date.",
+  "player.title": "Time player",
+  "player.back1d": "−1 day",
+  "player.back1h": "−1 hour",
+  "player.fwd1h": "+1 hour",
+  "player.fwd1d": "+1 day",
+  "player.play": "Play",
+  "player.pause": "Pause",
+  "player.slider": "Move through time",
+  "player.speed": "Speed",
+  "player.speed.hour": "1 hour per second",
+  "player.speed.day": "1 day per second",
+  "player.end": "You reached the end of the data."
 }

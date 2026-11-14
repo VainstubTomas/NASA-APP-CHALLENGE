@@ -76,5 +76,17 @@
   "timeline.aria": "Línea de tiempo de Sol y Tierra: {days} días desde el {start} (UTC)",
   "timeline.legend": "Color: hay Sol o hay Tierra sobre el horizonte. La línea blanca marca la fecha y hora elegidas. Días en UTC.",
   "timeline.noData": "No hay datos para dibujar la línea de tiempo en esa fecha.",
-  "timeline.partial": "Solo hay datos para {days} días desde esa fecha."
+  "timeline.partial": "Solo hay datos para {days} días desde esa fecha.",
+  "player.title": "Reproductor de tiempo",
+  "player.back1d": "−1 día",
+  "player.back1h": "−1 hora",
+  "player.fwd1h": "+1 hora",
+  "player.fwd1d": "+1 día",
+  "player.play": "Reproducir",
+  "player.pause": "Pausar",
+  "player.slider": "Mover en el tiempo",
+  "player.speed": "Velocidad",
+  "player.speed.hour": "1 hora por segundo",
+  "player.speed.day": "1 día por segundo",
+  "player.end": "Llegaste al final de los datos."
 }

@@ -1,6 +1,7 @@
 import './theme.css';
 import { initSelector } from './selector.js';
 import { renderPanel } from './panel.js';
+import { initPlayer } from './player.js';
 import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
 import { loadSite, loadSites } from './data.js';
 import { renderTimeline } from './timeline.js';
@@ -18,8 +19,12 @@ async function getSiteName(siteId) {
   return site ? siteName(site) : siteId;
 }
 
+let player; // se crea después del primer render del selector
+
 initSelector({
+  onUserInput: () => player?.pause(),
   onChange: async ({ site, t, hasData }) => {
+    player?.sync(t);
     if (!hasData) {
       panel.replaceChildren();
       timeline.replaceChildren();
@@ -40,6 +45,8 @@ initSelector({
       notice.textContent = i18nT('app.siteError', { error: err.message });
     }
   },
+}).then((selector) => {
+  player = initPlayer(document.getElementById('player'), selector);
 }).catch((err) => {
   notice.hidden = false;
   notice.textContent = i18nT('app.loadError', { error: err.message });
