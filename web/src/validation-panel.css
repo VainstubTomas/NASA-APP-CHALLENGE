@@ -1,0 +1,10 @@
+/* Panel de validación (#39). */
+.validation__table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.validation__table th,
+.validation__table td { padding: 0.35rem 0.5rem; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.validation-status--within { color: #6fd39a; }
+.validation-status--outside { color: #ff8a80; }
+.validation-status--outOfRange,
+.validation-status--noData { opacity: 0.7; }
+.validation__note,
+.validation__source { font-size: 0.9rem; opacity: 0.8; }
