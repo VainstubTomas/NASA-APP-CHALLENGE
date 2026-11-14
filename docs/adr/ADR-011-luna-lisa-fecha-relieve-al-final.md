@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-011-flat-moon-date-and-relief-last.md)
+
 # ADR-011: Luna lisa primero, fecha desde el inicio y relieve al final
 
 - **Estado**: Propuesto

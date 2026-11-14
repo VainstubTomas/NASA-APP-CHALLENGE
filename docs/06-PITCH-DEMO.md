@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/06-PITCH-DEMO.md)
+
 # 06. Pitch, demo y entrega
 
 Última actualización: 2026-11-14 · Estado: borrador. El guion definitivo se cierra el sábado a la noche.

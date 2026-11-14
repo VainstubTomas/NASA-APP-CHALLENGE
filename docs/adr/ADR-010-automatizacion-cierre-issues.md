@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-010-issue-closing-automation.md)
+
 # ADR-010: Automatización de cierre de issues y seguimiento entre proyectos
 
 - **Estado**: Propuesto

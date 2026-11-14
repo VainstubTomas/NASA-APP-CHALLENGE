@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-009-layer-4-mandatory.md)
+
 # ADR-009: La comparación de escenarios (capa 4) pasa a obligatoria
 
 - **Estado**: Propuesto
