@@ -3,6 +3,7 @@ import { initSelector } from './selector.js';
 import { renderPanel } from './panel.js';
 import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
 import { loadSite, loadSites } from './data.js';
+import { renderTimeline } from './timeline.js';
 
 applyStaticTexts();
 initLangSelect(document.getElementById('lang'));
@@ -27,6 +28,8 @@ initSelector({
       // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
       const { ephemeris, horizon } = await loadSite(site);
       renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: await getSiteName(site) });
+      // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
+      renderTimeline(document.getElementById('timeline'), ephemeris, horizon, new Date(t).toISOString(), 7);
     } catch (err) {
       console.error(err);
       panel.replaceChildren();
