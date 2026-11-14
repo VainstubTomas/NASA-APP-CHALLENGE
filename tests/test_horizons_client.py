@@ -160,8 +160,18 @@ START, STOP = "2026-11-01T00:00:00Z", "2026-12-01T00:00:00Z"   # algo más de un
 def _get(lat, lon, body):
     try:
         return hc.get_az_el(lat, lon, body, START, STOP)
-    except requests.ConnectionError:
-        pytest.skip("Sin conexión a Horizons y sin caché local")
+    except (requests.ConnectionError, requests.Timeout):
+        pytest.skip("Horizons no responde (sin conexión o tiempo de espera agotado) y no hay caché local")
+
+
+@pytest.mark.parametrize("exc", [requests.ConnectionError, requests.ConnectTimeout, requests.ReadTimeout])
+def test_network_helper_skips_when_horizons_does_not_answer(monkeypatch, exc):
+    """Sin red o con Horizons lento, los tests de red se saltean en vez de fallar."""
+    def boom(*args, **kwargs):
+        raise exc("simulado")
+    monkeypatch.setattr(hc, "get_az_el", boom)
+    with pytest.raises(pytest.skip.Exception):
+        _get(0.0, 0.0, "sun")
 
 
 @pytest.mark.network
