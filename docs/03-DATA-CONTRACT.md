@@ -93,6 +93,13 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 Horas por día UTC con el Sol visible, la Tierra visible y ambos a la vez, calculadas con la regla de visibilidad de abajo. Sirven para cruzar contra lo que calcula la web.
 
+## `validation.json` (capa 3, panel de validación, ADR-013)
+Valores de referencia de JPL Horizons para el panel de validación (C3-06). Lo genera `scripts/make_validation_json.py` desde `tests/reference/`; no calcula nada nuevo.
+- `tolerance_deg`: tolerancia de comparación (0,1°, ADR-005), la misma que `TOL_DEG` en los tests.
+- `source`: consulta a Horizons y fechas de descarga de las respuestas guardadas.
+- `rows`: una fila por sitio, cuerpo (`sun` o `earth`) e instante UTC, con `azimuth_deg` y `elevation_deg`.
+Esquema: `data/schema/validation.schema.json`.
+
 ## Regla de visibilidad (confirmada, v1)
 Un cuerpo es **visible** en la muestra `i` si el borde superior de su disco está sobre el horizonte en su azimut:
 
