@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-012-target-award.md)
+
 # ADR-012: Premio objetivo: Best Use of Data y, en segundo lugar, Best Use of Science
 
 - **Estado**: Propuesto

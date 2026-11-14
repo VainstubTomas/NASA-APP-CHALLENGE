@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](README.en.md)
+
 # Lunar Landing Site Navigator
 
 > NASA Space Apps Challenge 2026. Proyecto en desarrollo.

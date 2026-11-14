@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-005-horizons-validation.md)
+
 # ADR-005: Validación contra JPL Horizons
 
 - **Estado**: Reemplazado en parte por el ADR-006: Horizons pasó de ser la referencia a ser la fuente de las efemérides. Sigue vigente la idea de guardar referencias reproducibles en `tests/reference/`

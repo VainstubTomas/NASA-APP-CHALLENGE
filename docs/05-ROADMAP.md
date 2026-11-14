@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/05-ROADMAP.md)
+
 # 05. Roadmap e issues iniciales
 
 Última actualización: 2026-11-14 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.md#mapa-del-proyecto).

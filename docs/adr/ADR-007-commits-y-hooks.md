@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-007-commits-and-hooks.md)
+
 # ADR-007: Formato de commits, hooks de Git y `dev` sin protección
 
 - **Estado**: Aceptado

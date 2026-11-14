@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/README.md)
+
 # ADRs (Architecture Decision Records)
 
 Una decisión importante por archivo, de una página como máximo. Se escriben en 2 minutos y evitan discutir lo mismo a las 4 am.

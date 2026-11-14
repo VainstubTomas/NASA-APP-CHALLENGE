@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/02-ARCHITECTURE.md)
+
 # 02. Arquitectura
 
 Última actualización: 2026-11-14
