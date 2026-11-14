@@ -1,3 +1,4 @@
+import './theme.css';
 import { initSelector } from './selector.js';
 import { renderPanel } from './panel.js';
 import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
