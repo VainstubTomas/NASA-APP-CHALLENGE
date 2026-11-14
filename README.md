@@ -63,9 +63,11 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r precompute/requirements.txt   # con uv: uv pip install -r precompute/requirements.txt
 python -m pytest tests/          # incluye tests/test_environment.py, que revisa que las librerías importen
 
-# Web (cuando exista web/package.json)
-cd web && npm install && npm run dev
+# Web (Vite; sirve data/public/ como carpeta estática)
+cd web && npm ci && npm run dev   # http://localhost:5173 y /sites.json
 ```
+
+Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 
 Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
 
