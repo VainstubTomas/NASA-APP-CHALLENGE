@@ -54,10 +54,13 @@ test('estado para el panel: sobre, asomando o bajo el horizonte', () => {
 });
 
 test('azimut a punto cardinal: 0° = norte, sentido horario', () => {
+  // Devuelve la clave neutra (en inglés); cada idioma la traduce con compass.<clave> (#58).
   assert.equal(compassLabel(0), 'N');
   assert.equal(compassLabel(90), 'E');
   assert.equal(compassLabel(180), 'S');
-  assert.equal(compassLabel(270), 'O');
+  assert.equal(compassLabel(270), 'W');
+  assert.equal(compassLabel(225), 'SW');
+  assert.equal(compassLabel(315), 'NW');
   assert.equal(compassLabel(45), 'NE');
   assert.equal(compassLabel(359), 'N');
   assert.equal(compassLabel(100), 'E'); // más cerca de 90° (E) que de 135° (SE)

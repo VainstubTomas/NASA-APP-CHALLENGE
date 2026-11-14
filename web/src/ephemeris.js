@@ -40,9 +40,12 @@ export function horizonStatus(elevationDeg, angularRadiusDeg, horizonDeg = 0) {
   return isAboveHorizon(elevationDeg, angularRadiusDeg, horizonDeg) ? 'partial' : 'down';
 }
 
-const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
-/** Azimut (0° = norte, sentido horario) al punto cardinal más cercano de 8. */
+/**
+ * Azimut (0° = norte, sentido horario) al punto cardinal más cercano de 8.
+ * Devuelve una clave neutra ('W' = oeste); el texto sale de compass.<clave> en i18n (#58).
+ */
 export function compassLabel(azimuthDeg) {
   const a = ((azimuthDeg % 360) + 360) % 360;
   return POINTS[Math.round(a / 45) % 8];
