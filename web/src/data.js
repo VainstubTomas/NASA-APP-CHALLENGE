@@ -1,31 +1,15 @@
-import { checkEphemeris, checkHorizon } from './contract.js';
+// Carga de los datos de la web (#32, "primera unión": la web lee datos reales).
+// Uso:
+//   import { loadSite, loadSites } from './data.js';
+//   import { horizonAt } from './horizon.js';
+//   const { ephemeris, horizon } = await loadSite('apollo-11');
+//   horizonAt(horizon, 47.3)   // altura del horizonte en grados hacia el azimut 47,3°
+//   const sites = await loadSites();   // lista de sites.json
+// Cada archivo se descarga una sola vez. Si un archivo no cumple el formato que espera la web,
+// loadSite rechaza con un error que lista los problemas (en vez de mostrar números raros).
+// La lógica está en data-core.js (probada con `npm test`); acá solo se conecta con el navegador.
+import { createFetchJson, createSiteLoader } from './data-core.js';
 
-const base = import.meta.env.BASE_URL;
-const siteCache = new Map();
+const loader = createSiteLoader(createFetchJson(import.meta.env.BASE_URL, (url) => fetch(url)));
 
-async function getJson(path) {
-  const response = await fetch(`${base}${path}`);
-  if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
-  try {
-    return await response.json();
-  } catch (error) {
-    throw new Error(`${path}: respuesta JSON inválida (${error.message})`);
-  }
-}
-
-export function loadSite(siteId) {
-  if (!siteCache.has(siteId)) {
-    const promise = Promise.all([
-      getJson(`sites/${siteId}/ephemeris.json`),
-      getJson(`sites/${siteId}/horizon.json`),
-    ]).then(([ephemeris, horizon]) => ({
-      ephemeris: checkEphemeris(ephemeris, siteId),
-      horizon: checkHorizon(horizon, siteId),
-    })).catch((error) => {
-      siteCache.delete(siteId);
-      throw new Error(`No se pudieron cargar los datos de ${siteId}: ${error.message}`);
-    });
-    siteCache.set(siteId, promise);
-  }
-  return siteCache.get(siteId);
-}
+export const { loadSite, loadSites } = loader;

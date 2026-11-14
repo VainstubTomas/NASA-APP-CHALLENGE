@@ -1,52 +1,58 @@
-const isObject = (value) => value !== null && typeof value === 'object';
-const isFiniteNumber = (value) => typeof value === 'number' && Number.isFinite(value);
+// Revisión en la web del formato de los JSON que genera Python (#32, "primera unión").
+// Es lo mínimo que la web necesita para no dibujar números raros; el esquema completo se valida
+// en Python con tests/test_contract.py. Cada función devuelve una lista de problemas (vacía = OK).
 
-function assert(condition, message) {
-  if (!condition) throw new Error(message);
-}
+const ISO_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+const isNum = (x) => typeof x === 'number' && Number.isFinite(x);
 
-function checkAngles(values, name, min, max, inclusiveMax = true) {
-  assert(Array.isArray(values), `${name} debe ser un arreglo`);
-  values.forEach((value, index) => {
-    assert(isFiniteNumber(value), `${name}[${index}] no es un número`);
-    assert(value >= min && (inclusiveMax ? value <= max : value < max), `${name}[${index}] está fuera de rango`);
-  });
-}
-
-export function checkEphemeris(value, expectedSiteId) {
-  assert(isObject(value), 'ephemeris.json debe ser un objeto');
-  assert(value.schema_version === '1.0', 'ephemeris.json: schema_version debe ser 1.0');
-  assert(value.site_id === expectedSiteId, `ephemeris.json: site_id debe ser ${expectedSiteId}`);
-  assert(isObject(value.time), 'ephemeris.json: falta time');
-  const { start_utc, step_s, count } = value.time;
-  assert(typeof start_utc === 'string' && start_utc.endsWith('Z') && !Number.isNaN(Date.parse(start_utc)),
-    'ephemeris.json: start_utc debe ser una fecha UTC válida');
-  assert(isFiniteNumber(step_s) && step_s > 0, 'ephemeris.json: step_s debe ser positivo');
-  assert(Number.isInteger(count) && count > 0, 'ephemeris.json: count debe ser entero positivo');
-  for (const body of ['sun', 'earth']) {
-    assert(isObject(value[body]), `ephemeris.json: falta ${body}`);
-    checkAngles(value[body].azimuth_deg, `${body}.azimuth_deg`, 0, 360, false);
-    checkAngles(value[body].elevation_deg, `${body}.elevation_deg`, -90, 90);
-    assert(value[body].azimuth_deg.length === count && value[body].elevation_deg.length === count,
-      `ephemeris.json: las series de ${body} deben tener count valores`);
+function checkSeries(problems, name, values, count, min, max, maxExclusive = false) {
+  if (!Array.isArray(values)) {
+    problems.push(`${name} no es una lista`);
+    return;
   }
-  assert(isObject(value.angular_radius_deg), 'ephemeris.json: falta angular_radius_deg');
-  for (const body of ['sun', 'earth']) {
-    assert(isFiniteNumber(value.angular_radius_deg[body]) && value.angular_radius_deg[body] >= 0,
-      `ephemeris.json: radio de ${body} inválido`);
-  }
-  return value;
+  if (values.length !== count) problems.push(`${name} tiene ${values.length} valores y time.count es ${count}`);
+  const bad = values.findIndex((v) => !isNum(v) || v < min || (maxExclusive ? v >= max : v > max));
+  if (bad !== -1) problems.push(`${name}[${bad}] = ${values[bad]} está fuera de [${min}, ${max}${maxExclusive ? ')' : ']'}`);
 }
 
-export function checkHorizon(value, expectedSiteId) {
-  assert(isObject(value), 'horizon.json debe ser un objeto');
-  assert(value.schema_version === '1.0', 'horizon.json: schema_version debe ser 1.0');
-  assert(value.site_id === expectedSiteId, `horizon.json: site_id debe ser ${expectedSiteId}`);
-  assert(isFiniteNumber(value.azimuth_start_deg), 'horizon.json: falta azimuth_start_deg');
-  assert(isFiniteNumber(value.azimuth_step_deg) && value.azimuth_step_deg > 0, 'horizon.json: azimuth_step_deg inválido');
-  checkAngles(value.elevation_deg, 'elevation_deg', -90, 90);
-  assert(value.elevation_deg.length > 1, 'horizon.json: el perfil debe tener al menos dos valores');
-  assert(value.elevation_deg.length * value.azimuth_step_deg >= 360,
-    'horizon.json: el perfil debe cubrir 360 grados');
-  return value;
+/** Problemas de un ephemeris.json respecto de lo que espera la web. */
+export function checkEphemeris(eph, siteId) {
+  const problems = [];
+  if (eph?.schema_version !== '1.0') problems.push(`schema_version es ${eph?.schema_version}, se espera 1.0`);
+  if (eph?.site_id !== siteId) problems.push(`site_id es ${eph?.site_id}, se espera ${siteId}`);
+  const time = eph?.time ?? {};
+  if (!ISO_UTC.test(time.start_utc ?? '')) problems.push(`time.start_utc (${time.start_utc}) no es UTC ISO 8601`);
+  if (!Number.isInteger(time.step_s) || time.step_s < 1) problems.push(`time.step_s (${time.step_s}) no es un entero positivo`);
+  if (!Number.isInteger(time.count) || time.count < 1) problems.push(`time.count (${time.count}) no es un entero positivo`);
+  for (const body of ['sun', 'earth']) {
+    checkSeries(problems, `${body}.azimuth_deg`, eph?.[body]?.azimuth_deg, time.count, 0, 360, true);
+    checkSeries(problems, `${body}.elevation_deg`, eph?.[body]?.elevation_deg, time.count, -90, 90);
+    const r = eph?.angular_radius_deg?.[body];
+    if (!isNum(r) || r <= 0) problems.push(`angular_radius_deg.${body} (${r}) no es un número positivo`);
+  }
+  return problems;
+}
+
+/** Problemas de un horizon.json respecto de lo que espera la web. */
+export function checkHorizon(hor, siteId) {
+  const problems = [];
+  if (hor?.schema_version !== '1.0') problems.push(`schema_version es ${hor?.schema_version}, se espera 1.0`);
+  if (hor?.site_id !== siteId) problems.push(`site_id es ${hor?.site_id}, se espera ${siteId}`);
+  const step = hor?.azimuth_step_deg;
+  const start = hor?.azimuth_start_deg;
+  if (!isNum(start) || start < 0 || start >= 360) {
+    problems.push(`azimuth_start_deg (${start}) no es un número en [0, 360)`);
+  }
+  if (!isNum(step) || step <= 0) problems.push(`azimuth_step_deg (${step}) no es un número positivo`);
+  const values = hor?.elevation_deg;
+  if (!Array.isArray(values)) {
+    problems.push('elevation_deg no es una lista');
+  } else {
+    if (isNum(step) && Math.abs(values.length * step - 360) > 1e-9) {
+      problems.push(`elevation_deg tiene ${values.length} valores con paso ${step}°: no cubre 360°`);
+    }
+    const bad = values.findIndex((v) => !isNum(v) || v < -90 || v > 90);
+    if (bad !== -1) problems.push(`elevation_deg[${bad}] = ${values[bad]} no es una elevación válida`);
+  }
+  return problems;
 }

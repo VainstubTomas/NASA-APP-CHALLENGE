@@ -2,24 +2,19 @@
 // Uso: renderPanel(contenedor, { ephemeris, horizon, utcMs, siteName }).
 // El selector de sitio y fecha (C1-02) solo tiene que volver a llamar a renderPanel.
 import './panel.css';
-import { sampleAt, horizonStatus, compassLabel } from './ephemeris.js';
+import { sampleAt, horizonStatus, compassLabel, elevationDisplay } from './ephemeris.js';
 import { horizonAt } from './horizon.js';
+import { t, locale } from './i18n.js';
 
 const fmtDeg = (value, decimals) => {
   // Evita mostrar "-0,0°": si redondeado da cero, se muestra como cero.
   const rounded = Number(value.toFixed(decimals));
   const shown = rounded === 0 ? 0 : rounded;
-  return `${shown.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`;
-};
-
-const STATUS_TEXT = {
-  up: 'Sobre el horizonte',
-  partial: 'Asomando: se ve parte del disco',
-  down: 'Bajo el horizonte',
+  return `${shown.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`;
 };
 
 const fmtUtc = (utcMs) =>
-  `${new Date(utcMs).toLocaleString('es-AR', {
+  `${new Date(utcMs).toLocaleString(locale, {
     timeZone: 'UTC',
     day: 'numeric',
     month: 'short',
@@ -40,15 +35,19 @@ function bodyCard({ label, icon, position, radiusDeg, horizonDeg, featured }) {
   const card = el('article', `panel-card${featured ? ' panel-card--featured' : ''}`);
 
   const title = el('h3', 'panel-card__title', `${icon} ${label}`);
-  const status = el('span', `panel-status panel-status--${state}`, STATUS_TEXT[state]);
+  const status = el('span', `panel-status panel-status--${state}`, t(`panel.status.${state}`));
   title.append(' ', status);
 
-  const elevation = el('p', 'panel-card__elevation', fmtDeg(position.elevation_deg, 1));
-  const elevationLabel = el('p', 'panel-card__caption', 'de altura sobre el horizonte');
+  const shown = elevationDisplay(position.elevation_deg);
+  const elevation = el('p', 'panel-card__elevation', fmtDeg(shown.value, 1));
+  const elevationLabel = el('p', 'panel-card__caption', t(`panel.elevation.${shown.side}`));
   const azimuth = el(
     'p',
     'panel-card__azimuth',
-    `Mirar hacia ${compassLabel(position.azimuth_deg)} · azimut ${fmtDeg(position.azimuth_deg, 0)}`,
+    t('panel.azimuth', {
+      direction: t(`compass.${compassLabel(position.azimuth_deg)}`),
+      azimuth: fmtDeg(position.azimuth_deg, 0),
+    }),
   );
 
   card.append(title, elevation, elevationLabel, azimuth);
@@ -122,7 +121,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
 
   const sample = sampleAt(ephemeris, utcMs);
   if (!sample) {
-    container.append(el('p', 'panel-empty', 'No hay datos para esa fecha en este sitio.'));
+    container.append(el('p', 'panel-empty', t('panel.noData')));
     return;
   }
 
@@ -135,16 +134,14 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
   container.append(header, horizonChart({ horizon, sample, radius }));
   const cards = el('div', 'panel-cards');
   cards.append(
-    bodyCard({ label: 'Sol', icon: '☀️', position: sample.sun, radiusDeg: radius.sun, horizonDeg: sunHorizon, featured: true }),
-    bodyCard({ label: 'Tierra', icon: '🌍', position: sample.earth, radiusDeg: radius.earth, horizonDeg: earthHorizon }),
+    bodyCard({ label: t('panel.sun'), icon: '☀️', position: sample.sun, radiusDeg: radius.sun, horizonDeg: sunHorizon, featured: true }),
+    bodyCard({ label: t('panel.earth'), icon: '🌍', position: sample.earth, radiusDeg: radius.earth, horizonDeg: earthHorizon }),
   );
 
   const note = el(
     'p',
     'panel-note',
-    horizon.dem
-      ? 'Perfil de horizonte del sitio. La visibilidad usa el borde superior de cada disco.'
-      : 'Horizonte ideal, sin relieve. El resultado es optimista; la visibilidad usa el borde superior de cada disco.',
+    horizon.dem ? 'Perfil de horizonte del sitio. La visibilidad usa el borde superior de cada disco.' : t('panel.note'),
   );
 
   container.append(cards, note);

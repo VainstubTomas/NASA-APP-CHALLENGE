@@ -2,6 +2,7 @@
 import {
   getRange, clampTime, toInputValue, fromInputValue, resolveState, buildSearch,
 } from './state.js';
+import { t, siteName } from './i18n.js';
 
 const base = import.meta.env.BASE_URL;
 
@@ -20,7 +21,7 @@ export async function initSelector({ onChange } = {}) {
   for (const site of sites) {
     const opt = document.createElement('option');
     opt.value = site.id;
-    opt.textContent = site.synthetic ? `${site.name} [datos de prueba]` : site.name;
+    opt.textContent = site.synthetic ? `${siteName(site)} ${t('selector.syntheticTag')}` : siteName(site);
     siteSelect.appendChild(opt);
   }
 
