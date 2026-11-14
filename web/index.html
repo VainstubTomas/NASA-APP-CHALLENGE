@@ -4,12 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lunar Landing Site Navigator</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0 auto; padding: 16px; max-width: 40rem; }
+      label { display: block; margin-top: 12px; font-weight: 600; }
+      select, input { width: 100%; box-sizing: border-box; padding: 8px; font-size: 1rem; margin-top: 4px; }
+      #notice { margin-top: 16px; padding: 8px 12px; background: #fff3cd; border-radius: 4px; }
+    </style>
   </head>
   <body>
     <h1>Lunar Landing Site Navigator</h1>
+    <label for="site">Sitio</label>
+    <select id="site"></select>
+    <label for="time">Fecha y hora (UTC)</label>
+    <input id="time" type="datetime-local" />
+    <p id="notice" hidden></p>
     <section id="panel"></section>
-    <p>Versión de prueba. Sitios leídos desde <code>sites.json</code>:</p>
-    <ul id="sites"></ul>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
