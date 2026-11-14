@@ -1,0 +1,84 @@
+// Panel de números (C1-03): elevación y azimut del Sol y la Tierra en un instante.
+// Uso: renderPanel(contenedor, { ephemeris, utcMs, siteName }).
+// El selector de sitio y fecha (C1-02) solo tiene que volver a llamar a renderPanel.
+import './panel.css';
+import { sampleAt, horizonStatus, compassLabel } from './ephemeris.js';
+
+const fmtDeg = (value, decimals) => {
+  // Evita mostrar "-0,0°": si redondeado da cero, se muestra como cero.
+  const rounded = Number(value.toFixed(decimals));
+  const shown = rounded === 0 ? 0 : rounded;
+  return `${shown.toLocaleString('es-AR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`;
+};
+
+const STATUS_TEXT = {
+  up: 'Sobre el horizonte',
+  partial: 'Asomando: se ve parte del disco',
+  down: 'Bajo el horizonte',
+};
+
+const fmtUtc = (utcMs) =>
+  `${new Date(utcMs).toLocaleString('es-AR', {
+    timeZone: 'UTC',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })} UTC`;
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function bodyCard({ label, icon, position, radiusDeg, featured }) {
+  const state = horizonStatus(position.elevation_deg, radiusDeg);
+  const card = el('article', `panel-card${featured ? ' panel-card--featured' : ''}`);
+
+  const title = el('h3', 'panel-card__title', `${icon} ${label}`);
+  const status = el('span', `panel-status panel-status--${state}`, STATUS_TEXT[state]);
+  title.append(' ', status);
+
+  const elevation = el('p', 'panel-card__elevation', fmtDeg(position.elevation_deg, 1));
+  const elevationLabel = el('p', 'panel-card__caption', 'de altura sobre el horizonte');
+  const azimuth = el(
+    'p',
+    'panel-card__azimuth',
+    `Mirar hacia ${compassLabel(position.azimuth_deg)} · azimut ${fmtDeg(position.azimuth_deg, 0)}`,
+  );
+
+  card.append(title, elevation, elevationLabel, azimuth);
+  return card;
+}
+
+export function renderPanel(container, { ephemeris, utcMs, siteName }) {
+  container.replaceChildren();
+  container.classList.add('panel');
+
+  const sample = sampleAt(ephemeris, utcMs);
+  if (!sample) {
+    container.append(el('p', 'panel-empty', 'No hay datos para esa fecha en este sitio.'));
+    return;
+  }
+
+  const header = el('header', 'panel-header');
+  header.append(el('h2', 'panel-header__site', siteName), el('p', 'panel-header__time', fmtUtc(sample.utcMs)));
+
+  const radius = ephemeris.angular_radius_deg;
+  const cards = el('div', 'panel-cards');
+  cards.append(
+    bodyCard({ label: 'Sol', icon: '☀️', position: sample.sun, radiusDeg: radius.sun, featured: true }),
+    bodyCard({ label: 'Tierra', icon: '🌍', position: sample.earth, radiusDeg: radius.earth }),
+  );
+
+  const note = el(
+    'p',
+    'panel-note',
+    'Horizonte ideal (Luna lisa, sin relieve). La altura es la del centro del disco: la Tierra puede asomar aunque su centro esté un poco por debajo de 0°.',
+  );
+
+  container.append(header, cards, note);
+}
