@@ -10,7 +10,7 @@ Para planificar un aterrizaje cerca del polo sur lunar hay que saber, para un lu
 |---|---|
 | Estudiante o persona curiosa | Entender en 5 segundos si un lugar sirve y por qué |
 | Ingeniero o planificador de misión | Números verificables (elevación, azimut, horas de luz y de contacto) y comparar escenarios |
-| Jurado | Ver una demo clara y creíble, con validación contra fuentes oficiales |
+| Jurado | Ver una demo clara y creíble, con validación contra fuentes oficiales. Apuntamos a Best Use of Data y Best Use of Science (ADR-012) |
 
 ## Propuesta de valor
 Responder una sola pregunta de forma visual y comparable: **¿tengo Sol y puedo hablar con la Tierra en este sitio y en esta fecha?**
@@ -59,6 +59,7 @@ Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje d
 2. La demo cuenta una historia completa en menos de 3 minutos (ver `docs/06-PITCH-DEMO.md`).
 3. Cualquier persona nueva entiende qué muestra la pantalla sin explicación.
 4. El repo corre desde cero siguiendo el README.
+5. Cada número de la pantalla dice de qué dato de NASA sale (Horizons, LRO/LOLA) y la demo muestra la validación contra Horizons (C3-06). Es lo que sostiene Best Use of Data y Best Use of Science (ADR-012).
 
 ## Riesgos principales
 | Riesgo | Mitigación |

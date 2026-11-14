@@ -29,7 +29,7 @@ Tiempo efectivo de trabajo: unas 15 horas (estimación: ~10 en el lugar y ~5 en 
 ## El desafío elegido
 **Lunar Landing Site Navigator**: una herramienta que, dado un sitio de la Luna y una fecha, muestra dónde están el Sol y la Tierra respecto del terreno, y por lo tanto cuánta energía solar y cuánta comunicación directa con la Tierra habrá.
 
-> Texto oficial completo (traducido) en [`docs/07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). **La página del desafío no publica criterios de evaluación**: confirmarlos con los organizadores (C0-11). La página avisa que se pueden sumar recursos antes del hackatón: revisar la pestaña Recursos el sábado a la mañana.
+> Texto oficial completo (traducido) en [`docs/07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). **La página del desafío no publica criterios de evaluación**, pero Space Apps sí publica sus 10 premios globales (ver "Premios" abajo; apuntamos a Best Use of Data, ADR-012). La rúbrica del jurado sigue a confirmar con los organizadores (C0-11). La página avisa que se pueden sumar recursos antes del hackatón: revisar la pestaña Recursos el sábado a la mañana.
 
 ### Qué pide el desafío, traducido
 | Pedido | En la práctica |
@@ -58,6 +58,22 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 | Por qué pequeños cambios de lugar o fecha cambian todo | Capa 5 (C5-01) | Puede ir en los textos y en la demo sin código extra |
 | Útil para planificadores, educadores y el público | Cubierto (PRD, C3-05) | Nada |
 
+## Premios (awards)
+Fuente: https://www.spaceappschallenge.org/awards/ (copiado el 2026-11-14). Son los 10 premios globales de Space Apps. **Apuntamos a Best Use of Data y, en segundo lugar, a Best Use of Science** (ADR-012). No cambia el alcance: cambia cómo lo contamos.
+
+| Premio | Definición oficial (traducida) | Encaje con el proyecto |
+|---|---|---|
+| **Best Use of Data** | El proyecto que mejor hace accesibles los datos espaciales o los aprovecha en una aplicación única | **Principal.** Es nuestra propuesta de valor: datos de Horizons y del LRO, hoy en herramientas complejas, respondidos en una pantalla |
+| **Best Use of Science** | El proyecto que hace el mejor y más válido uso de la ciencia o del método científico | **Secundario.** Validación contra Horizons (C0-05, C3-06) y límites declarados ("horizonte ideal, sin relieve", ADR-011) |
+| Best Use of Storytelling | El proyecto que comunica de forma más creativa el potencial de los datos abiertos a través del arte de contar historias | Ángulo del pitch: la historia "la misión se atrasó" |
+| Best Mission Concept | El proyecto con el concepto y el diseño más plausibles | Ángulo del pitch: planificación de aterrizajes de Artemis. No somos un concepto de misión |
+| Galactic Impact | El proyecto con más potencial de mejorar la vida en la Tierra o en el universo | Bajo: impacto indirecto |
+| Best Use of Technology | El proyecto que ejemplifica el uso más innovador de la tecnología | Bajo: web simple sobre JSON precalculados, a propósito |
+| Most Inspirational | El proyecto que nos gana el corazón | Bajo |
+| Global Connection | El proyecto que mejor conecta a personas de todo el mundo a través de la tecnología | Bajo |
+| Art & Technology | El proyecto que mejor combina habilidades técnicas y creativas | Bajo |
+| Local Impact | El proyecto con mayor potencial de impacto local | Bajo |
+
 ## Por qué importa (para el pitch)
 - Las futuras misiones apuntan al polo sur lunar por el hielo de agua. Ahí el Sol y la Tierra quedan pegados al horizonte y cualquier relieve los tapa.
 - NASA publicó restricciones de aterrizaje para Artemis que incluyen pendiente máxima, comunicación directa con la Tierra e iluminación. Fuente: [Artemis Human Landing System Overview, NASA NTRS 20250009323](https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf).
@@ -83,5 +99,5 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 
 ## Pendientes de confirmar con los organizadores
 1. ¿Se puede llegar con repo, datos y cálculos preparados de antemano, o el código debe escribirse durante el evento? ¿Se pueden usar datos públicos de NASA que no están en la lista de recursos (por ejemplo, el mapa LOLA del PDS)?
-2. Criterios de evaluación y entregables exactos.
+2. Rúbrica del jurado (local y global) y entregables exactos. Los premios ya están publicados (ver "Premios").
 3. Si la presentación es en vivo, cuánto dura y si hay proyector y conexión (C0-11).
