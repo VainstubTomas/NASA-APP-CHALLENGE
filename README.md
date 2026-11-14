@@ -69,6 +69,8 @@ python -m pytest tests/          # incluye tests/test_environment.py, que revisa
 cd web && npm ci && npm run dev   # http://localhost:5173 y /sites.json
 ```
 
+Versión desplegada (Vercel): https://vizcachasfueradeorbita.vercel.app/
+
 Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 
 Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
