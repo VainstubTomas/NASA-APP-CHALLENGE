@@ -17,7 +17,9 @@ Entre corchetes, el premio al que le habla cada bloque.
 5. **Cómo sabemos que está bien** (30 s) [Science]: los datos salen de JPL Horizons, la herramienta oficial de NASA, y verificamos contra su interfaz que los mostramos bien en tres sitios y tres fechas. Decir también el límite: horizonte ideal mientras no haya relieve (ADR-011).
 6. **Qué sigue** (15 s): el relieve real del terreno con LOLA (si no llegó), coordenadas propias, más misiones, mejores ventanas de aterrizaje.
 
-Contexto internacional (opcional): el portal de Exploración lunar de la CSA, recurso oficial del desafío, cuenta el aporte de Canadá a Artemis. Usar 1 o 2 datos con fuente si suman (issue C0-12).
+Contexto internacional (opcional, issue C0-12): el portal de Exploración lunar de la CSA, recurso oficial del desafío, cuenta el aporte de Canadá a Artemis. Datos con fuente:
+- Canadá aporta **Canadarm3**, un sistema robótico para la estación lunar Gateway, que puede ayudar a mantener, reparar e inspeccionar la estación. Fuente: [Canada's role in Moon exploration, CSA](https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/canada-role.asp) (última modificación de la página: 2025-06-05).
+- El astronauta canadiense **Jeremy Hansen** forma parte de la tripulación de Artemis II, la primera misión tripulada a la Luna desde 1972. Fuente: [Canada's role in Moon exploration, CSA](https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/canada-role.asp) (última modificación de la página: 2025-06-05).
 
 ## Guion de la demo (historia)
 "Una misión iba a aterrizar el día X en este sitio. Se atrasó. ¿Qué cambia?"
