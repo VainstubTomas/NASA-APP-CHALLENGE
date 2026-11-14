@@ -1,6 +1,6 @@
-# 03. Contrato de datos (v1.0, propuesta)
+# 03. Contrato de datos (v1.0, aprobado)
 
-Última actualización: 2026-11-13 · Estado: **propuesto**, a validar entre quienes trabajen en Python y en la web en el issue C0-08. Los esquemas ejecutables están en `data/schema/`.
+Última actualización: 2026-11-14 · Estado: **aprobado** por el equipo en el issue C0-08 (ADR-002 aceptado). Los esquemas ejecutables están en `data/schema/`.
 
 Es el acuerdo entre Python y la web. Cambiarlo requiere un ADR y avisar al equipo. Todos los archivos llevan `schema_version`.
 
@@ -58,6 +58,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 - `elevation_deg[i]` es la elevación del horizonte en el azimut `azimuth_start_deg + i * azimuth_step_deg`.
 - La web interpola linealmente entre muestras y cierra el círculo (el azimut 359 conecta con el 0).
+- **Luna lisa (ADR-011)**: hasta que haya relieve, `elevation_deg` son 360 ceros y se omite `dem` (es opcional). Es el mismo formato; la web no distingue y, cuando falta `dem`, muestra el aviso "horizonte ideal, sin relieve".
 - `dem.name` y `dem.pixel_m` describen el mapa realmente usado (la fuente se fija en el ADR-006; el ejemplo muestra el plan B).
 
 ## `ephemeris.json`
@@ -90,7 +91,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 Horas por día UTC con el Sol visible, la Tierra visible y ambos a la vez, calculadas con la regla de visibilidad de abajo. Sirven para cruzar contra lo que calcula la web.
 
-## Regla de visibilidad (provisional, v1)
+## Regla de visibilidad (confirmada, v1)
 Un cuerpo es **visible** en la muestra `i` si el borde superior de su disco está sobre el horizonte en su azimut:
 
 ```
@@ -98,7 +99,7 @@ visible(i) = elevation_deg[i] + angular_radius_deg > horizon(azimuth_deg[i])
 ```
 y **totalmente visible** si `elevation_deg[i] - angular_radius_deg > horizon(azimuth_deg[i])`.
 
-Es provisional: el equipo debe confirmar si la métrica oficial usa el centro, el borde superior o el disco completo, y dejarlo fijado en el ADR-002. Backend y web deben implementar **la misma regla**.
+El equipo confirmó el borde superior como regla oficial (frente al centro y al disco completo); está fijada en el ADR-002. Backend y web deben implementar **la misma regla**.
 
 ## Validación
 - `python -m pytest tests/test_contract.py` valida todo JSON de `data/public/` contra `data/schema/`.
