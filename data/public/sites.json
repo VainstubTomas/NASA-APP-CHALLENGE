@@ -1,56 +1,208 @@
-{"schema_version":"1.0","sites":[{"id":"demo-sintetico","name":"Sitio de demostración (datos sintéticos)","lat_deg":-89.5,"lon_deg":0.0,"source":"Dato inventado para desarrollo","source_url":"","synthetic":true},
-	{
-		"id":"apollo-eleven",
-		"name":"Apollo 11 landing site",
-		"lat_deg":23.46,
-		"lon_deg":0.67,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	},
-	{
-		"id":"apollo-twelve",
-		"name":"Apollo 12 landing site",
-		"lat_deg":-3.009,
-		"lon_deg":-23.437,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	},
-	{
-		"id":"apollo-fourteen",
-		"name":"Apollo 14 landing site",
-		"lat_deg":-3.65,
-		"lon_deg":-17.5,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	},
-	{
-		"id":"apollo-fifteen",
-		"name":"Apollo 15 landing site",
-		"lat_deg":26.13,
-		"lon_deg":3.62,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	},
-	{
-		"id":"apollo-sixteen",
-		"name":"Apollo 16 landing site",
-		"lat_deg":-9.0,
-		"lon_deg":15.29,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	},
-	{
-		"id":"apollo-seventeen",
-		"name":"Apollo 17 landing site",
-		"lat_deg":20.009,
-		"lon_deg":30.356,
-		"source":"Moon trek",
-		"source_url":"https://trek.nasa.gov/moon/",
-		"synthetic":false
-	}
-]}
+{
+  "schema_version": "1.0",
+  "sites": [
+    {
+      "id": "demo-sintetico",
+      "name": "Sitio de demostración (datos sintéticos)",
+      "lat_deg": -89.5,
+      "lon_deg": 0.0,
+      "source": "Dato inventado para desarrollo",
+      "source_url": "",
+      "synthetic": true
+    },
+    {
+      "id": "apollo-11",
+      "name": "Apolo 11 (Mar de la Tranquilidad)",
+      "lat_deg": 0.67416,
+      "lon_deg": 23.47314,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 11",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "apollo-12",
+      "name": "Apolo 12 (Océano de las Tormentas)",
+      "lat_deg": -3.0128,
+      "lon_deg": -23.4219,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 12",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "apollo-14",
+      "name": "Apolo 14 (Fra Mauro)",
+      "lat_deg": -3.64589,
+      "lon_deg": -17.47194,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 14",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "apollo-15",
+      "name": "Apolo 15 (Hadley-Apenino)",
+      "lat_deg": 26.13239,
+      "lon_deg": 3.6333,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 15",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "apollo-16",
+      "name": "Apolo 16 (Descartes)",
+      "lat_deg": -8.9734,
+      "lon_deg": 15.5011,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 16",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "apollo-17",
+      "name": "Apolo 17 (Taurus-Littrow)",
+      "lat_deg": 20.1911,
+      "lon_deg": 30.7723,
+      "source": "NASA NSSDCA, Apollo Landing Site Coordinates (LRO, Wagner et al. 2017)",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
+      "mission": "Apollo 17",
+      "country": "EE. UU.",
+      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "change-3",
+      "name": "Chang'e 3",
+      "lat_deg": 44.1214,
+      "lon_deg": -19.5117,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "Chang'e 3",
+      "country": "China",
+      "notes": "Fuera del mapa del polo sur."
+    },
+    {
+      "id": "change-4",
+      "name": "Chang'e 4 (cara oculta)",
+      "lat_deg": -45.4561,
+      "lon_deg": 177.5885,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "Chang'e 4",
+      "country": "China",
+      "notes": "Cara oculta: la Tierra nunca es visible en línea directa. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "change-6",
+      "name": "Chang'e 6 (cara oculta)",
+      "lat_deg": -41.6385,
+      "lon_deg": -153.9852,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "Chang'e 6",
+      "country": "China",
+      "notes": "Cara oculta. Fuera del mapa del polo sur."
+    },
+    {
+      "id": "chandrayaan-3",
+      "name": "Chandrayaan-3 (Shiv Shakti)",
+      "lat_deg": -69.3741,
+      "lon_deg": 32.32,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "Chandrayaan-3",
+      "country": "India",
+      "notes": "Latitud alta, pero fuera del mapa del polo sur (lat > -80)."
+    },
+    {
+      "id": "slim",
+      "name": "SLIM",
+      "lat_deg": -13.316,
+      "lon_deg": 25.251,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "SLIM",
+      "country": "Japón",
+      "notes": "Fuera del mapa del polo sur."
+    },
+    {
+      "id": "blue-ghost-1",
+      "name": "Blue Ghost Mission 1 (Mare Crisium)",
+      "lat_deg": 18.562,
+      "lon_deg": 61.81,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "Blue Ghost 1 (CLPS)",
+      "country": "EE. UU.",
+      "notes": "Fuera del mapa del polo sur."
+    },
+    {
+      "id": "odysseus-im-1",
+      "name": "Odysseus (IM-1, Malapert A)",
+      "lat_deg": -80.13,
+      "lon_deg": 1.44,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "IM-1 (CLPS)",
+      "country": "EE. UU.",
+      "notes": "Dentro del mapa del polo sur (lat <= -80), en el borde."
+    },
+    {
+      "id": "intuitive-machines-2",
+      "name": "Intuitive Machines 2 (Mons Mouton)",
+      "lat_deg": -84.7906,
+      "lon_deg": 29.1957,
+      "source": "NASA NSSDCA, Lunar Impact/Landing Sites",
+      "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
+      "mission": "IM-2 (CLPS)",
+      "country": "EE. UU.",
+      "notes": "Dentro del mapa del polo sur (lat <= -80)."
+    },
+    {
+      "id": "shackleton-center",
+      "name": "Cráter Shackleton (centro)",
+      "lat_deg": -89.67,
+      "lon_deg": 129.78,
+      "source": "USGS Gazetteer of Planetary Nomenclature, Shackleton",
+      "source_url": "https://planetarynames.wr.usgs.gov/Feature/5450",
+      "country": "Polo sur lunar",
+      "notes": "Centro del cráter, no un punto de aterrizaje. Dentro del mapa del polo sur (lat <= -80). El USGS lista 3 conjuntos de coordenadas; este es el primero y se rotula 'Planetographic, +East'."
+    },
+    {
+      "id": "malapert",
+      "name": "Cráter Malapert (centro)",
+      "lat_deg": -85.0,
+      "lon_deg": 11.4,
+      "source": "USGS Gazetteer of Planetary Nomenclature, Malapert",
+      "source_url": "https://planetarynames.wr.usgs.gov/Feature/3603",
+      "country": "Polo sur lunar",
+      "notes": "Centro del cráter, no un punto de aterrizaje. Dentro del mapa del polo sur (lat <= -80). El USGS lista 3 geometrías; esta es la primera y se rotula 'Planetographic, +East'."
+    },
+    {
+      "id": "faustini",
+      "name": "Cráter Faustini (punto USGS)",
+      "lat_deg": -87.3,
+      "lon_deg": 77.0,
+      "source": "USGS Gazetteer of Planetary Nomenclature, Faustini",
+      "source_url": "https://planetarynames.wr.usgs.gov/Feature/1919",
+      "country": "Polo sur lunar",
+      "notes": "Centro del cráter, no un punto de aterrizaje. Dentro del mapa del polo sur (lat <= -80). Geometría POINT del USGS ('Planetographic, +East'); el polígono da -87.18, 84.31."
+    },
+    {
+      "id": "nobile",
+      "name": "Cráter Nobile (centro)",
+      "lat_deg": -85.28,
+      "lon_deg": 53.27,
+      "source": "USGS Gazetteer of Planetary Nomenclature, Nobile",
+      "source_url": "https://planetarynames.wr.usgs.gov/Feature/4321",
+      "country": "Polo sur lunar",
+      "notes": "Centro del cráter, no un punto de aterrizaje. Dentro del mapa del polo sur (lat <= -80). Geometría MULTIPOLYGON del USGS ('Planetographic, +East'); el punto da -85.20, 53.50."
+    }
+  ]
+}
