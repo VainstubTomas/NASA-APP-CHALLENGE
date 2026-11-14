@@ -24,7 +24,7 @@ export function sampleAt(ephemeris, utcMs) {
 }
 
 /**
- * Regla de visibilidad provisional del contrato: el borde superior del disco
+ * Regla de visibilidad del contrato (ADR-002): el borde superior del disco
  * está sobre el horizonte. Con la Luna lisa (ADR-011) el horizonte es 0°.
  */
 export function isAboveHorizon(elevationDeg, angularRadiusDeg, horizonDeg = 0) {
