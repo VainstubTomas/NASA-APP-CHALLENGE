@@ -7,7 +7,7 @@ y **totalmente visible** si el disco entero lo está:
 La desigualdad es estricta: con el borde justo en el horizonte no es visible.
 
 El horizonte se interpola linealmente entre muestras y cierra el círculo (docs/03-DATA-CONTRACT.md).
-La web implementa lo mismo en web/src/horizon.js; los casos compartidos están en
+La web implementa lo mismo en web/src/visibility.js (horizonAt en web/src/horizon.js); los casos compartidos están en
 tests/fixtures/visibility_cases.json.
 """
 from __future__ import annotations
