@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "validation.schema.json",
+  "title": "validation.json",
+  "type": "object",
+  "required": ["schema_version", "tolerance_deg", "source", "rows"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "$ref": "common.defs.json#/$defs/schema_version" },
+    "tolerance_deg": { "type": "number", "exclusiveMinimum": 0 },
+    "source": { "type": "string", "minLength": 1 },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["site_id", "body", "time_utc", "azimuth_deg", "elevation_deg"],
+        "additionalProperties": false,
+        "properties": {
+          "site_id": { "$ref": "common.defs.json#/$defs/site_id" },
+          "body": { "enum": ["sun", "earth"] },
+          "time_utc": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+          "azimuth_deg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+          "elevation_deg": { "type": "number", "minimum": -90, "maximum": 90 }
+        }
+      }
+    }
+  }
+}
