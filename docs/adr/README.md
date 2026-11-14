@@ -7,7 +7,7 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | ADR | Decisión | Estado |
 |---|---|---|
 | [001](ADR-001-desafio-y-alcance.md) | Desafío y alcance del MVP por capas | Aceptado (prioridad de la capa 4 reemplazada por 009) |
-| [002](ADR-002-contrato-de-datos.md) | Contrato de datos Python a web | Propuesto |
+| [002](ADR-002-contrato-de-datos.md) | Contrato de datos Python a web | Aceptado |
 | [003](ADR-003-minigitflow.md) | MiniGitFlow | Aceptado (en parte reemplazado por 007) |
 | [004](ADR-004-stack.md) | Stack tecnológico | Propuesto (efemérides reemplazadas por 006) |
 | [005](ADR-005-validacion-horizons.md) | Validación contra JPL Horizons | Reemplazado en parte por 006 |
