@@ -71,5 +71,10 @@
   "help.dials.term": "Brújula y regla",
   "help.dials.text": "La brújula (vista desde arriba) dice hacia dónde girar: el norte está arriba. La regla dice a qué altura levantar la vista: 0° es el horizonte y 90° está arriba de tu cabeza.",
   "footer.data": "Posiciones del Sol y la Tierra calculadas con JPL Horizons (NASA/JPL). Proyecto del NASA Space Apps Challenge 2026.",
-  "footer.ai": "Las traducciones al inglés, hindi y chino se hicieron con IA y no fueron revisadas por hablantes nativos."
+  "footer.ai": "Las traducciones al inglés, hindi y chino se hicieron con IA y no fueron revisadas por hablantes nativos.",
+  "timeline.title": "Sol y Tierra en los próximos días",
+  "timeline.aria": "Línea de tiempo de Sol y Tierra: {days} días desde el {start} (UTC)",
+  "timeline.legend": "Color: hay Sol o hay Tierra sobre el horizonte. La línea blanca marca la fecha y hora elegidas. Días en UTC.",
+  "timeline.noData": "No hay datos para dibujar la línea de tiempo en esa fecha.",
+  "timeline.partial": "Solo hay datos para {days} días desde esa fecha."
 }

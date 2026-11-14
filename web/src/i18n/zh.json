@@ -71,5 +71,10 @@
   "help.dials.term": "指南针和标尺",
   "help.dials.text": "指南针（俯视图）告诉你朝哪个方向转身：上方是北。标尺告诉你抬头多高：0° 是地平线，90° 在头顶正上方。",
   "footer.data": "太阳和地球的位置由 JPL Horizons（NASA/JPL）计算。NASA Space Apps Challenge 2026 项目。",
-  "footer.ai": "英文、印地文和中文翻译由 AI 完成，未经母语人士审校。"
+  "footer.ai": "英文、印地文和中文翻译由 AI 完成，未经母语人士审校。",
+  "timeline.title": "未来几天的太阳和地球",
+  "timeline.aria": "太阳和地球时间线：从 {start}（UTC）起 {days} 天",
+  "timeline.legend": "有颜色的部分：太阳或地球在地平线上方。白线标出所选的日期和时间。日期按 UTC 计。",
+  "timeline.noData": "该日期没有可绘制时间线的数据。",
+  "timeline.partial": "从该日期起只有 {days} 天的数据。"
 }

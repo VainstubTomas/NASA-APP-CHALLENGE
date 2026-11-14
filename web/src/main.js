@@ -9,6 +9,7 @@ applyStaticTexts();
 initLangSelect(document.getElementById('lang'));
 
 const panel = document.getElementById('panel');
+const timeline = document.getElementById('timeline');
 const notice = document.getElementById('notice');
 
 // Nombres de los sitios en el idioma actual (sites.json se descarga una sola vez, en data.js).
@@ -21,6 +22,7 @@ initSelector({
   onChange: async ({ site, t, hasData }) => {
     if (!hasData) {
       panel.replaceChildren();
+      timeline.replaceChildren();
       return;
     }
     try {
@@ -29,10 +31,11 @@ initSelector({
       const { ephemeris, horizon } = await loadSite(site);
       renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: await getSiteName(site) });
       // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
-      renderTimeline(document.getElementById('timeline'), ephemeris, horizon, new Date(t).toISOString(), 7);
+      renderTimeline(timeline, ephemeris, horizon, t, 7);
     } catch (err) {
       console.error(err);
       panel.replaceChildren();
+      timeline.replaceChildren();
       notice.hidden = false;
       notice.textContent = i18nT('app.siteError', { error: err.message });
     }
