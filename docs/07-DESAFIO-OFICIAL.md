@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/07-DESAFIO-OFICIAL.md)
+
 # 07. Texto oficial del desafío (traducido)
 
 Fuente: https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ (copiado el 2026-11-13; traducción automática al español). Es referencia: no se edita. El análisis contra nuestro alcance está en `docs/00-CONTEXT.md`.

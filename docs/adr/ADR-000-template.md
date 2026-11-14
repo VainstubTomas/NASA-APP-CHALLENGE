@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-000-template.md)
+
 # ADR-000: Título corto de la decisión
 
 - **Estado**: Propuesto | Aceptado | Reemplazado por ADR-N

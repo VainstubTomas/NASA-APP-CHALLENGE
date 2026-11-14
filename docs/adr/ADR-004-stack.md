@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-004-stack.md)
+
 # ADR-004: Stack tecnológico
 
 - **Estado**: Propuesto (confirmar con todo el equipo). La parte de efemérides fue reemplazada por el ADR-006

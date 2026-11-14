@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-002-data-contract.md)
+
 # ADR-002: Contrato de datos entre Python y la web
 
 - **Estado**: Aceptado (revisado y aprobado en el issue C0-08)

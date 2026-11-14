@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/03-DATA-CONTRACT.md)
+
 # 03. Contrato de datos (v1.0, aprobado)
 
 Última actualización: 2026-11-14 · Estado: **aprobado** por el equipo en el issue C0-08 (ADR-002 aceptado). Los esquemas ejecutables están en `data/schema/`.

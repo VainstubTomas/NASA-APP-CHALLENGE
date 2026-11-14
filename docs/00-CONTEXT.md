@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/00-CONTEXT.md)
+
 # 00. Contexto del evento y del desafío
 
 Última actualización: 2026-11-14

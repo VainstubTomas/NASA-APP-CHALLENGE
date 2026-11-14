@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/04-GIT-WORKFLOW.md)
+
 # 04. Flujo de trabajo en Git: MiniGitFlow
 
 Última actualización: 2026-11-13 · Estado: aceptado por el equipo

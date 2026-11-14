@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-008-epics.md)
+
 # ADR-008: Una épica por capa del MVP, con sus issues como sub-issues
 
 - **Estado**: Propuesto

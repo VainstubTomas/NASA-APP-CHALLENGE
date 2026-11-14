@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](README.en.md)
+
 # Lunar Landing Site Navigator
 
 > NASA Space Apps Challenge 2026. Proyecto en desarrollo.
@@ -66,6 +68,8 @@ python -m pytest tests/          # incluye tests/test_environment.py, que revisa
 # Web (Vite; sirve data/public/ como carpeta estática)
 cd web && npm ci && npm run dev   # http://localhost:5173 y /sites.json
 ```
+
+Versión desplegada (Vercel): https://vizcachasfueradeorbita.vercel.app/
 
 Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 

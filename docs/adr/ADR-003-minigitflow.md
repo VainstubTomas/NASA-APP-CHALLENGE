@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-003-minigitflow.md)
+
 # ADR-003: MiniGitFlow como flujo de ramas
 
 - **Estado**: Aceptado (en parte reemplazado por el ADR-007: formato de commits y protección de `dev`)

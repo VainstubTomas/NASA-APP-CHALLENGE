@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-006-official-resources.md)
+
 # ADR-006: Recursos oficiales: Horizons como fuente de efemérides y mapa de elevación por confirmar
 
 - **Estado**: Aceptado (el uso de la API de Horizons como fuente fue indicado por el organizador del evento; los puntos "a verificar" y la fuente del mapa de elevación se cierran en C0-04 y, para el mapa de elevación, en C5-05, antes C0-03: ADR-011 lo movió al final de la capa 5)

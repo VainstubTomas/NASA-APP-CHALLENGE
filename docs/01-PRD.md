@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](en/01-PRD.md)
+
 # 01. PRD: Lunar Landing Site Navigator
 
 Última actualización: 2026-11-14 · Estado: borrador para validar con el equipo
