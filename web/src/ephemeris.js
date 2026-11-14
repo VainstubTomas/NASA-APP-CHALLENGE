@@ -40,7 +40,17 @@ export function horizonStatus(elevationDeg, angularRadiusDeg, horizonDeg = 0) {
   return isAboveHorizon(elevationDeg, angularRadiusDeg, horizonDeg) ? 'partial' : 'down';
 }
 
-const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+/**
+ * Altura para mostrar: valor sin signo (1 decimal) y de qué lado del horizonte está.
+ * Así el texto acompaña al número ("42,6° bajo el horizonte") en vez de contradecirlo.
+ * Si redondeado da 0,0 se considera "sobre" (no mostrar "0,0° bajo el horizonte").
+ */
+export function elevationDisplay(elevationDeg) {
+  const rounded = Number(elevationDeg.toFixed(1));
+  return { value: Math.abs(rounded), side: rounded < 0 ? 'below' : 'above' };
+}
+
+const POINTS =['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
 /**
  * Azimut (0° = norte, sentido horario) al punto cardinal más cercano de 8.

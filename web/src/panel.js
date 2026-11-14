@@ -2,7 +2,7 @@
 // Uso: renderPanel(contenedor, { ephemeris, utcMs, siteName }).
 // El selector de sitio y fecha (C1-02) solo tiene que volver a llamar a renderPanel.
 import './panel.css';
-import { sampleAt, horizonStatus, compassLabel } from './ephemeris.js';
+import { sampleAt, horizonStatus, compassLabel, elevationDisplay } from './ephemeris.js';
 import { t, locale } from './i18n.js';
 
 const fmtDeg = (value, decimals) => {
@@ -37,8 +37,10 @@ function bodyCard({ label, icon, position, radiusDeg, featured }) {
   const status = el('span', `panel-status panel-status--${state}`, t(`panel.status.${state}`));
   title.append(' ', status);
 
-  const elevation = el('p', 'panel-card__elevation', fmtDeg(position.elevation_deg, 1));
-  const elevationLabel = el('p', 'panel-card__caption', t('panel.elevationCaption'));
+  // Sin signo menos: el texto dice de qué lado del horizonte está ("42,6° bajo el horizonte").
+  const shown = elevationDisplay(position.elevation_deg);
+  const elevation = el('p', 'panel-card__elevation', fmtDeg(shown.value, 1));
+  const elevationLabel = el('p', 'panel-card__caption', t(`panel.elevation.${shown.side}`));
   const azimuth = el(
     'p',
     'panel-card__azimuth',

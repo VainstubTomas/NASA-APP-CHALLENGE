@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { sampleAt, isAboveHorizon, horizonStatus, compassLabel } from './ephemeris.js';
+import { sampleAt, isAboveHorizon, horizonStatus, compassLabel, elevationDisplay } from './ephemeris.js';
 
 const demo = JSON.parse(
   readFileSync(new URL('../../data/public/sites/demo-sintetico/ephemeris.json', import.meta.url), 'utf8'),
@@ -51,6 +51,16 @@ test('estado para el panel: sobre, asomando o bajo el horizonte', () => {
   assert.equal(horizonStatus(-0.03, 1.0), 'partial');
   assert.equal(horizonStatus(0.5, 1.0), 'partial');
   assert.equal(horizonStatus(-1.0, 1.0), 'down');
+});
+
+test('altura para mostrar: sin signo menos y con "sobre" o "bajo" el horizonte', () => {
+  // Antes se veía "−42,6° de altura sobre el horizonte": el texto contradecía al número.
+  assert.deepEqual(elevationDisplay(8.4), { value: 8.4, side: 'above' });
+  assert.deepEqual(elevationDisplay(-42.6), { value: 42.6, side: 'below' });
+  assert.deepEqual(elevationDisplay(0), { value: 0, side: 'above' });
+  // Redondeado a 1 decimal da 0,0: no mostrar "0,0° bajo el horizonte".
+  assert.deepEqual(elevationDisplay(-0.03), { value: 0, side: 'above' });
+  assert.deepEqual(elevationDisplay(-0.06), { value: 0.1, side: 'below' });
 });
 
 test('azimut a punto cardinal: 0° = norte, sentido horario', () => {
