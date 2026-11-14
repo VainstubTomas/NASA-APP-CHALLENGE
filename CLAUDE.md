@@ -5,7 +5,7 @@
 ## Qué estamos construyendo
 Una web que responde una pregunta: **si aterrizo en este lugar de la Luna en esta fecha, ¿voy a tener Sol y voy a poder comunicarme con la Tierra?**
 El usuario elige un sitio (polo sur lunar) y una fecha; la web dibuja el horizonte real del lugar con el Sol y la Tierra encima y muestra horas de luz, horas con Tierra visible y cuenta regresiva hasta que se oculten.
-Proyecto del NASA Space Apps Challenge 2026 (evento presencial, 14 y 15 de noviembre). Entregables: proyecto en GitHub + presentación.
+Proyecto del NASA Space Apps Challenge 2026 (evento presencial, 14 y 15 de noviembre). Entregables: proyecto en GitHub + presentación. Premio objetivo: **Best Use of Data** y, en segundo lugar, Best Use of Science (ADR-012).
 
 ## Arquitectura en 3 piezas (detalle en `docs/02-ARCHITECTURE.md`)
 1. **Efemérides** (Python, offline): azimut y elevación del Sol y la Tierra por sitio y por hora, consultados a la **API de JPL Horizons** (recurso oficial; ADR-006). Carpeta `precompute/ephemeris/`.

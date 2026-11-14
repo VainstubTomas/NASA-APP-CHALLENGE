@@ -2,7 +2,7 @@
 
 Fuente: https://www.spaceappschallenge.org/2026/challenges/lunar-landing-site-navigator/ (copiado el 2026-11-13; traducción automática al español). Es referencia: no se edita. El análisis contra nuestro alcance está en `docs/00-CONTEXT.md`.
 
-**No incluye criterios de evaluación.** Los recursos están en `docs/00-CONTEXT.md` y en el ADR-006.
+**No incluye criterios de evaluación.** Los premios globales de Space Apps y el premio al que apuntamos están en `docs/00-CONTEXT.md`, sección "Premios" (ADR-012). Los recursos están en `docs/00-CONTEXT.md` y en el ADR-006.
 
 ---
 
