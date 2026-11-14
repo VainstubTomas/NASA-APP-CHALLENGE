@@ -1,0 +1,21 @@
+/* Línea de tiempo (C3-03): solo variables de theme.css, sin colores sueltos. */
+#timeline { margin-top: var(--space-6); }
+.timeline__title { margin: 0 0 var(--space-3); font-size: var(--fs-lg); }
+.timeline { display: grid; gap: var(--space-2); }
+.timeline__row { display: grid; grid-template-columns: 4.5rem 1fr; align-items: center; gap: var(--space-3); }
+.timeline__label { font-size: var(--fs-sm); color: var(--color-muted); }
+.timeline__track {
+  position: relative;
+  height: 1.75rem;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.timeline__bar { position: absolute; top: 0; bottom: 0; background: var(--color-sun); }
+.timeline__track--earth .timeline__bar { background: var(--color-earth); }
+/* Instante elegido: línea vertical sobre las dos barras. */
+.timeline__now { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--color-text); }
+.timeline__axis { position: relative; height: 1.25rem; }
+.timeline__tick { position: absolute; top: 0; font-size: var(--fs-xs); color: var(--color-muted); white-space: nowrap; }
+.timeline__note { margin: var(--space-2) 0 0; font-size: var(--fs-sm); color: var(--color-muted); }
