@@ -1,1 +1,56 @@
-{"schema_version":"1.0","sites":[{"id":"demo-sintetico","name":"Sitio de demostración (datos sintéticos)","lat_deg":-89.5,"lon_deg":0.0,"source":"Dato inventado para desarrollo","source_url":"","synthetic":true}]}
+{"schema_version":"1.0","sites":[{"id":"demo-sintetico","name":"Sitio de demostración (datos sintéticos)","lat_deg":-89.5,"lon_deg":0.0,"source":"Dato inventado para desarrollo","source_url":"","synthetic":true},
+	{
+		"id":"apollo-eleven",
+		"name":"Apollo 11 landing site",
+		"lat_deg":23.46,
+		"lon_deg":0.67,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	},
+	{
+		"id":"apollo-twelve",
+		"name":"Apollo 12 landing site",
+		"lat_deg":-3.009,
+		"lon_deg":-23.437,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	},
+	{
+		"id":"apollo-fourteen",
+		"name":"Apollo 14 landing site",
+		"lat_deg":-3.65,
+		"lon_deg":-17.5,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	},
+	{
+		"id":"apollo-fifteen",
+		"name":"Apollo 15 landing site",
+		"lat_deg":26.13,
+		"lon_deg":3.62,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	},
+	{
+		"id":"apollo-sixteen",
+		"name":"Apollo 16 landing site",
+		"lat_deg":-9.0,
+		"lon_deg":15.29,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	},
+	{
+		"id":"apollo-seventeen",
+		"name":"Apollo 17 landing site",
+		"lat_deg":20.009,
+		"lon_deg":30.356,
+		"source":"Moon trek",
+		"source_url":"https://trek.nasa.gov/moon/",
+		"synthetic":false
+	}
+]}
