@@ -12,17 +12,24 @@ async function getJson(path) {
   return res.json(); // si el servidor devuelve HTML (archivo inexistente) esto lanza
 }
 
-// true si el sitio ya tiene efemerides generadas (C1-01).
-async function hasData(siteId) {
-  try {
-    await getJson(`sites/${siteId}/ephemeris.json`);
-    return true;
-  } catch {
-    return false;
+// true si el sitio ya tiene efemerides generadas (C1-01). Se pregunta una sola vez por sitio:
+// con el reproductor (C3-02) el instante cambia cada segundo y no hay que volver a descargar.
+const dataBySite = new Map();
+function hasData(siteId) {
+  if (!dataBySite.has(siteId)) {
+    dataBySite.set(
+      siteId,
+      getJson(`sites/${siteId}/ephemeris.json`).then(() => true, () => false),
+    );
   }
+  return dataBySite.get(siteId);
 }
 
-export async function initSelector({ onChange } = {}) {
+/**
+ * Devuelve { range, getState, setTime }: el reproductor (C3-02) mueve el instante con setTime.
+ * onUserInput se llama cuando la persona cambia sitio o fecha a mano (el reproductor se pausa).
+ */
+export async function initSelector({ onChange, onUserInput } = {}) {
   const siteSelect = document.getElementById('site');
   const timeInput = document.getElementById('time');
   const notice = document.getElementById('notice');
@@ -54,11 +61,13 @@ export async function initSelector({ onChange } = {}) {
   }
 
   siteSelect.addEventListener('change', () => {
+    onUserInput?.();
     state = { ...state, site: siteSelect.value };
     render();
   });
 
   timeInput.addEventListener('change', () => {
+    onUserInput?.();
     const ms = fromInputValue(timeInput.value);
     // Vacio o invalido: se vuelve al valor anterior.
     state = { ...state, t: ms === null ? state.t : clampTime(ms, minMs, maxMs) };
@@ -66,4 +75,13 @@ export async function initSelector({ onChange } = {}) {
   });
 
   await render();
+
+  return {
+    range: { minMs, maxMs },
+    getState: () => state,
+    setTime(ms) {
+      state = { ...state, t: clampTime(ms, minMs, maxMs) };
+      return render();
+    },
+  };
 }
