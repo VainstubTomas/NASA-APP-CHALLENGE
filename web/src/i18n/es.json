@@ -71,5 +71,17 @@
   "help.dials.term": "Brújula y regla",
   "help.dials.text": "La brújula (vista desde arriba) dice hacia dónde girar: el norte está arriba. La regla dice a qué altura levantar la vista: 0° es el horizonte y 90° está arriba de tu cabeza.",
   "footer.data": "Posiciones del Sol y la Tierra calculadas con JPL Horizons (NASA/JPL). Proyecto del NASA Space Apps Challenge 2026.",
-  "footer.ai": "Las traducciones al inglés, hindi y chino se hicieron con IA y no fueron revisadas por hablantes nativos."
+  "footer.ai": "Las traducciones al inglés, hindi y chino se hicieron con IA y no fueron revisadas por hablantes nativos.",
+  "player.title": "Reproductor de tiempo",
+  "player.back1d": "−1 día",
+  "player.back1h": "−1 hora",
+  "player.fwd1h": "+1 hora",
+  "player.fwd1d": "+1 día",
+  "player.play": "Reproducir",
+  "player.pause": "Pausar",
+  "player.slider": "Mover en el tiempo",
+  "player.speed": "Velocidad",
+  "player.speed.hour": "1 hora por segundo",
+  "player.speed.day": "1 día por segundo",
+  "player.end": "Llegaste al final de los datos."
 }

@@ -71,5 +71,17 @@
   "help.dials.term": "Compass and ruler",
   "help.dials.text": "The compass (seen from above) tells you which way to turn: north is up. The ruler tells you how high to look: 0° is the horizon and 90° is straight above your head.",
   "footer.data": "Sun and Earth positions computed with JPL Horizons (NASA/JPL). A NASA Space Apps Challenge 2026 project.",
-  "footer.ai": "The English, Hindi and Chinese translations were made with AI and have not been reviewed by native speakers."
+  "footer.ai": "The English, Hindi and Chinese translations were made with AI and have not been reviewed by native speakers.",
+  "player.title": "Time player",
+  "player.back1d": "−1 day",
+  "player.back1h": "−1 hour",
+  "player.fwd1h": "+1 hour",
+  "player.fwd1d": "+1 day",
+  "player.play": "Play",
+  "player.pause": "Pause",
+  "player.slider": "Move through time",
+  "player.speed": "Speed",
+  "player.speed.hour": "1 hour per second",
+  "player.speed.day": "1 day per second",
+  "player.end": "You reached the end of the data."
 }
