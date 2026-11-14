@@ -11,16 +11,6 @@ async function getJson(path) {
   return res.json(); // si el servidor devuelve HTML (archivo inexistente) esto lanza
 }
 
-// true si el sitio ya tiene efemerides generadas (C1-01).
-async function hasData(siteId) {
-  try {
-    await getJson(`sites/${siteId}/ephemeris.json`);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export async function initSelector({ onChange } = {}) {
   const siteSelect = document.getElementById('site');
   const timeInput = document.getElementById('time');
@@ -46,10 +36,9 @@ export async function initSelector({ onChange } = {}) {
     siteSelect.value = state.site;
     timeInput.value = toInputValue(state.t);
     history.replaceState(null, '', buildSearch(state));
-    const ok = await hasData(state.site);
-    notice.hidden = ok;
-    notice.textContent = ok ? '' : 'Este sitio todavía no tiene datos calculados.';
-    onChange?.({ ...state, hasData: ok });
+    notice.hidden = true;
+    notice.textContent = '';
+    onChange?.({ ...state, hasData: true });
   }
 
   siteSelect.addEventListener('change', () => {

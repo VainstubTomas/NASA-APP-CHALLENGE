@@ -31,6 +31,60 @@
   gap: 1rem;
 }
 
+.horizon-chart {
+  display: block;
+  width: 100%;
+  max-height: 28rem;
+  margin: 0.5rem 0 1rem;
+  overflow: visible;
+  background: #f7f9fc;
+  border: 1px solid var(--panel-border);
+  border-radius: 0.75rem;
+}
+
+.horizon-chart__line {
+  fill: none;
+  stroke: #596579;
+  stroke-width: 3;
+}
+
+.horizon-chart__label,
+.horizon-chart__direction {
+  fill: var(--panel-muted);
+  font-size: 8px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.horizon-chart__body-label--sun,
+.horizon-chart__body-label--earth {
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.horizon-chart__body-label--sun {
+  fill: #9a5c00;
+}
+
+.horizon-chart__body-label--earth {
+  fill: #24528e;
+}
+
+.horizon-chart__body--sun,
+.horizon-chart__body--earth {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.horizon-chart__body--sun {
+  fill: #f3a712;
+}
+
+.horizon-chart__body--earth {
+  fill: #3976c6;
+}
+
 @media (max-width: 36rem) {
   .panel-cards {
     grid-template-columns: 1fr;
