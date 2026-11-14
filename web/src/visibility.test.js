@@ -33,3 +33,8 @@ test('rechaza efemérides y horizonte de sitios distintos', () => {
   const eph = { site_id: 'a', sun: {}, earth: {}, angular_radius_deg: {} };
   assert.throws(() => visibilitySeries(eph, { site_id: 'b' }), /no coincide/);
 });
+
+test('isFullyVisible usa horizonte 0 por defecto', () => {
+  assert.equal(isFullyVisible(0.5, 0.25), true);   // 0.25 > 0
+  assert.equal(isFullyVisible(0.2, 0.25), false);  // -0.05 > 0 falso
+});
