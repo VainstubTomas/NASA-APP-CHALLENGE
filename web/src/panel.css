@@ -111,3 +111,72 @@
 .icon {
   flex: none;
 }
+
+/* Brújula + regla de elevación (#30). */
+.panel-dials {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: var(--space-4);
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+@media (max-width: 36rem) {
+  .panel-dials {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-hint {
+  margin: 0 0 var(--space-4);
+  color: var(--color-muted);
+  font-size: var(--fs-sm);
+}
+
+.dial {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  margin-inline: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+}
+
+.dial__ring { fill: var(--color-surface-2); stroke: var(--color-border); stroke-width: 2; }
+.dial__tick, .dial__grid { stroke: var(--color-muted); stroke-width: 1; }
+.dial__tick--major { stroke-width: 2; }
+.dial__grid { stroke: var(--color-border); stroke-dasharray: 3 4; }
+.dial__center { fill: var(--color-muted); }
+.dial__ground { fill: var(--color-surface-2); }
+.dial__cardinal { fill: var(--color-text); font-size: 15px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+.dial__cardinal--north { fill: var(--color-earth); }
+.dial__scale { fill: var(--color-muted); font-size: 11px; text-anchor: end; dominant-baseline: middle; }
+.dial__edge-label { fill: var(--color-muted); font-size: 10px; text-anchor: end; }
+.dial__bearing { fill: var(--color-text); paint-order: stroke; stroke: var(--color-surface-2); stroke-width: 4px; stroke-linejoin: round; font-size: 11px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+
+.dial__body { --body-color: var(--color-muted); }
+.dial__body--sun { --body-color: var(--color-sun); }
+.dial__body--earth { --body-color: var(--color-earth); }
+.dial__needle { stroke: var(--body-color); stroke-width: 2; stroke-dasharray: 5 4; }
+.dial__skyline { stroke: var(--color-text); stroke-width: 2; stroke-linecap: round; }
+.dial__badge { fill: var(--color-bg); stroke: var(--body-color); stroke-width: 2.5; }
+
+/* Bajo el horizonte: atenuado y con borde punteado (no depende solo del color). */
+.dial__body--down { opacity: 0.8; }
+
+/* Leyendas y fondo lunar de los gráficos (#30). */
+.panel-dial { margin: 0; }
+.panel-dial__caption { margin-top: var(--space-2); color: var(--color-muted); font-size: var(--fs-sm); text-align: center; }
+.dial__sky { fill: url(#dial-sky); }
+.dial__star { fill: #fff; opacity: 0.8; }
+.dial__surface { fill: url(#dial-ground); }
+.dial__crater { fill: #4b4e56; opacity: 0.55; }
+.dial__crater-rim { fill: none; stroke: #c9ccd3; stroke-width: 1; opacity: 0.5; }
+.dial__you { fill: var(--color-muted); font-size: 10px; text-anchor: middle; dominant-baseline: middle; }
+.dial__name { fill: #fff; font-size: 11px; font-weight: 700; dominant-baseline: middle; paint-order: stroke; stroke: #000; stroke-width: 3px; stroke-linejoin: round; }
+.dial__edge-label { fill: #e6e9f2; paint-order: stroke; stroke: #000; stroke-width: 3px; stroke-linejoin: round; }
+.dial__grid { stroke: rgba(255, 255, 255, 0.25); }
+.dial__body--down .dial__badge { stroke-dasharray: 3 3; }
+.dial__body--partial .dial__badge { stroke-dasharray: 6 2; }

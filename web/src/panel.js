@@ -7,6 +7,7 @@ import { sampleAt, compassLabel, elevationDisplay } from './ephemeris.js';
 import { statusAgainstHorizon } from './horizon.js';
 import { t, locale } from './i18n.js';
 import { sunIcon, earthIcon } from './icons.js';
+import { compassChart, elevationRuler } from './dials.js';
 
 const fmtDeg = (value, decimals) => {
   // Evita mostrar "-0,0°": si redondeado da cero, se muestra como cero.
@@ -73,6 +74,18 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
   header.append(el('h2', 'panel-header__site', siteName), el('p', 'panel-header__time', fmtUtc(sample.utcMs)));
 
   const radius = ephemeris.angular_radius_deg;
+  const dials = el('div', 'panel-dials');
+  const figure = (chart, caption) => {
+    const fig = el('figure', 'panel-dial');
+    fig.append(chart, el('figcaption', 'panel-dial__caption', caption));
+    return fig;
+  };
+  dials.append(
+    figure(compassChart({ sample, radius, horizon }), t('dial.compassSub')),
+    figure(elevationRuler({ sample, radius, horizon }), t('dial.rulerSub')),
+  );
+  const hint = el('p', 'panel-hint', t('dial.hint'));
+
   const cards = el('div', 'panel-cards');
   cards.append(
     bodyCard({ body: 'sun', icon: sunIcon(), position: sample.sun, radiusDeg: radius.sun, horizon, featured: true }),
@@ -81,5 +94,5 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
 
   const note = el('p', 'panel-note', t('panel.note'));
 
-  container.append(header, cards, note);
+  container.append(header, dials, hint, cards, note);
 }

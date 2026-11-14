@@ -54,6 +54,18 @@
   "help.horizon.text": "The Sun and the Earth are not points but disks. \"Peeking out\" means only part of the disk is above the horizon.",
   "help.why.term": "Why does it matter?",
   "help.why.text": "At the Moon's south pole the Sun and the Earth stay very close to the horizon: any mountain can hide them. No Sun means no energy, and no Earth in view means no direct communication.",
+  "dial.compassTitle": "Compass: where to look?",
+  "dial.rulerTitle": "Ruler: how high?",
+  "dial.zenith": "Zenith (straight up)",
+  "dial.horizon": "Horizon",
+  "dial.belowHorizon": "Below the horizon",
+  "dial.hint": "Turn toward the compass direction, then raise your eyes to the height the ruler shows.",
+  "dial.you": "You (here)",
+  "dial.compassSub": "View from above: which way to turn?",
+  "dial.rulerSub": "Side view: how high to look?",
+  "dial.surface": "Lunar surface",
+  "help.dials.term": "Compass and ruler",
+  "help.dials.text": "The compass (seen from above) tells you which way to turn: north is up. The ruler tells you how high to look: 0° is the horizon and 90° is straight above your head.",
   "footer.data": "Sun and Earth positions computed with JPL Horizons (NASA/JPL). A NASA Space Apps Challenge 2026 project.",
   "footer.ai": "The English, Hindi and Chinese translations were made with AI and have not been reviewed by native speakers."
 }
