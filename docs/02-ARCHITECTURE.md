@@ -38,7 +38,7 @@ El problema se divide en **tres piezas independientes**. Las dos primeras corren
 - Cuidados: convertir lat/lon a píxel con la librería, unidades (metros vs kilómetros), curvatura lunar, memoria (resolución media o recorte).
 
 ## Pieza 3: qué se ve
-- Para un instante, el cuerpo es visible si su elevación supera la del horizonte en su azimut (regla exacta y provisional en `docs/03-DATA-CONTRACT.md`).
+- Para un instante, el cuerpo es visible si su elevación supera la del horizonte en su azimut (regla exacta en `docs/03-DATA-CONTRACT.md` y ADR-002; implementada en `precompute/ephemeris/visibility.py` y `web/src/horizon.js`).
 - La web calcula la visibilidad hora por hora combinando ambos JSON, dibuja el panorama y deriva horas de luz, horas con Tierra y cuenta regresiva.
 - `metrics.json` (Python) trae los mismos números precalculados para **cruzar resultados**: si la web y Python no coinciden, hay un bug.
 

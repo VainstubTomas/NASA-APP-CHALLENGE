@@ -76,5 +76,5 @@ Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje d
 
 ## Preguntas abiertas
 - Coordenadas personalizadas: ¿grilla de puntos precalculada o un servidor pequeño? (decidir en un ADR; por defecto, solo sitios de la lista).
-- Regla de visibilidad: ¿el cuerpo cuenta como visible con el centro o con el borde sobre el horizonte? (ver `docs/03-DATA-CONTRACT.md`, regla provisional).
+- Regla de visibilidad: resuelta en el ADR-002 (borde superior del disco sobre el horizonte; ver `docs/03-DATA-CONTRACT.md`).
 - Rango temporal de los datos (por defecto, desde noviembre de 2026, resolución horaria).
