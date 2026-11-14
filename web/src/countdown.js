@@ -4,30 +4,11 @@
 import './countdown.css';
 import { nextVisibilityChange } from './ephemeris.js';
 import { horizonAt } from './horizon.js';
+import { t, locale } from './i18n.js';
 
 const BODIES = [
-  {
-    key: 'sun',
-    label: 'Sol',
-    icon: '☀️',
-    visibleTitle: 'Luz solar restante',
-    hiddenTitle: 'Sin Sol por ahora: sale en',
-    doneSets: 'El Sol se oculta ahora',
-    doneRises: 'El Sol sale ahora',
-    noSet: 'Sin puesta en los datos disponibles: el Sol sigue visible.',
-    noRise: 'El Sol no sale en los datos disponibles: sigue oculto.',
-  },
-  {
-    key: 'earth',
-    label: 'Tierra',
-    icon: '🌍',
-    visibleTitle: 'Contacto con la Tierra restante',
-    hiddenTitle: 'Sin Tierra por ahora: sale en',
-    doneSets: 'La Tierra se oculta ahora',
-    doneRises: 'La Tierra sale ahora',
-    noSet: 'Sin puesta en los datos disponibles: la Tierra sigue visible.',
-    noRise: 'La Tierra no sale en los datos disponibles: sigue oculta.',
-  },
+  { key: 'sun', label: 'panel.sun', icon: '☀️' },
+  { key: 'earth', label: 'panel.earth', icon: '🌍' },
 ];
 
 let timer = null;
@@ -56,7 +37,7 @@ export function splitDuration(ms) {
 }
 
 const fmtUtcShort = (ms) =>
-  `${new Date(ms).toLocaleString('es-AR', { timeZone: 'UTC', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} UTC`;
+  `${new Date(ms).toLocaleString(locale, { timeZone: 'UTC', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} UTC`;
 
 function unit(value, caption) {
   const box = el('div', 'countdown-unit');
@@ -67,27 +48,34 @@ function unit(value, caption) {
 
 // Una card por cuerpo: con el cuerpo visible cuenta lo que le queda; si no, cuánto falta para que salga.
 function bodyCountdown(body, change) {
+  const label = t(body.label);
   const card = el('section', `countdown countdown--${body.key}`);
-  card.setAttribute('aria-label', `Cuenta regresiva: ${body.label}`);
+  card.setAttribute('aria-label', t('countdown.aria', { body: label }));
   const hasEvent = change && change.event;
   const title = hasEvent
     ? change.event === 'sets'
-      ? body.visibleTitle
-      : body.hiddenTitle
-    : body.label;
+      ? t(`countdown.${body.key}.visible`)
+      : t(`countdown.${body.key}.hidden`)
+    : label;
   const heading = el('h3', 'countdown__title', `${body.icon} ${title}`);
   card.append(heading);
 
   if (!hasEvent) {
-    card.append(el('p', 'countdown__none', change?.visible ? body.noSet : body.noRise));
+    card.append(el('p', 'countdown__none', t(`countdown.${body.key}.${change?.visible ? 'noSet' : 'noRise'}`)));
     return { card, tick: null };
   }
 
-  const units = { d: unit('0', 'días'), h: unit('00', 'horas'), m: unit('00', 'min'), s: unit('00', 'seg') };
+  const units = {
+    d: unit('0', t('countdown.days')),
+    h: unit('00', t('countdown.hours')),
+    m: unit('00', t('countdown.minutes')),
+    s: unit('00', t('countdown.seconds')),
+  };
   const digits = el('div', 'countdown-digits');
   digits.append(units.d.box, units.h.box, units.m.box, units.s.box);
   const totalHours = el('p', 'countdown__total');
-  const when = el('p', 'countdown__when', `${change.event === 'sets' ? 'Puesta' : 'Salida'} estimada: ${fmtUtcShort(change.crossMs)}`);
+  const eventName = change.event === 'sets' ? t('countdown.sets') : t('countdown.rises');
+  const when = el('p', 'countdown__when', t('countdown.estimated', { event: eventName, time: fmtUtcShort(change.crossMs) }));
   card.append(digits, totalHours, when);
 
   const tick = (simNowMs) => {
@@ -98,10 +86,11 @@ function bodyCountdown(body, change) {
     units.m.number.textContent = pad(m);
     units.s.number.textContent = pad(s);
     units.d.box.hidden = d === 0;
-    totalHours.textContent = `≈ ${(Math.max(0, left) / 3600000).toLocaleString('es-AR', { maximumFractionDigits: 1 })} horas en total`;
+    const hours = (Math.max(0, left) / 3600000).toLocaleString(locale, { maximumFractionDigits: 1 });
+    totalHours.textContent = t('countdown.totalHours', { hours });
     const done = left <= 0;
     card.classList.toggle('countdown--done', done);
-    if (done) heading.textContent = `${body.icon} ${change.event === 'sets' ? body.doneSets : body.doneRises}`;
+    if (done) heading.textContent = `${body.icon} ${t(`countdown.${body.key}.${change.event === 'sets' ? 'setsNow' : 'risesNow'}`)}`;
     return !done;
   };
   return { card, tick };
@@ -119,19 +108,12 @@ export function renderCountdown(container, { ephemeris, horizon, utcMs }) {
     grid.append(card);
     if (tick) ticks.push(tick);
   }
-  container.append(
-    grid,
-    el(
-      'p',
-      'countdown__note',
-      'Los contadores avanzan en tiempo real desde la fecha elegida. Los datos son horarios: el momento exacto es una estimación (±unos minutos).',
-    ),
-  );
+  container.append(grid, el('p', 'countdown__note', t('countdown.note')));
 
   const startedAt = Date.now();
   const update = () => {
     const simNow = utcMs + (Date.now() - startedAt);
-    const running = ticks.map((t) => t(simNow)).some(Boolean);
+    const running = ticks.map((tk) => tk(simNow)).some(Boolean);
     if (!running) stopCountdown();
   };
   update();
