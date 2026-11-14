@@ -66,3 +66,15 @@ test('horizon: azimuth_start_deg tiene que estar en [0, 360) como pide el esquem
   ok.azimuth_start_deg = 359.5;
   assert.deepEqual(checkHorizon(ok, 'apollo-11'), []);
 });
+
+test('ephemeris: detecta una serie que no es una lista', () => {
+  const eph = clone(read(siteIds[0], 'ephemeris.json'));
+  eph.sun.elevation_deg = 'no es lista';
+  assert.ok(checkEphemeris(eph, siteIds[0]).some((p) => p.includes('sun.elevation_deg no es una lista')));
+});
+
+test('horizon: detecta elevation_deg que no es una lista', () => {
+  const hor = clone(read(siteIds[0], 'horizon.json'));
+  hor.elevation_deg = 0;
+  assert.ok(checkHorizon(hor, siteIds[0]).some((p) => p.includes('elevation_deg no es una lista')));
+});
