@@ -1,0 +1,3031 @@
+{
+  "schema_version": "1.0",
+  "tolerance_deg": 0.1,
+  "source": "JPL Horizons API (https://ssd.jpl.nasa.gov/api/horizons.api), tabla de observador QUANTITIES=4 (azimut y elevación aparentes, AIRLESS), respuestas guardadas en tests/reference/raw/, descargadas entre 2026-11-14T15:30:38Z y 2026-11-14T15:30:50Z",
+  "rows": [
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 98.280788,
+      "elevation_deg": -59.703498
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 98.131456,
+      "elevation_deg": -59.20153
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 97.986682,
+      "elevation_deg": -58.699386
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 97.846252,
+      "elevation_deg": -58.197077
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 97.709963,
+      "elevation_deg": -57.69461
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 97.577626,
+      "elevation_deg": -57.191993
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 97.449062,
+      "elevation_deg": -56.689233
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 97.324103,
+      "elevation_deg": -56.186338
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 97.202592,
+      "elevation_deg": -55.683313
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 97.084378,
+      "elevation_deg": -55.180164
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 96.969321,
+      "elevation_deg": -54.676898
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 96.857288,
+      "elevation_deg": -54.17352
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 96.748153,
+      "elevation_deg": -53.670035
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 96.641797,
+      "elevation_deg": -53.166447
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 96.538107,
+      "elevation_deg": -52.662762
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 96.436977,
+      "elevation_deg": -52.158984
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 96.338306,
+      "elevation_deg": -51.655116
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 96.241997,
+      "elevation_deg": -51.151163
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 96.14796,
+      "elevation_deg": -50.647129
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 96.056108,
+      "elevation_deg": -50.143016
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 95.966359,
+      "elevation_deg": -49.638829
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 95.878634,
+      "elevation_deg": -49.134571
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 95.792859,
+      "elevation_deg": -48.630244
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 95.708962,
+      "elevation_deg": -48.125852
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 71.612788,
+      "elevation_deg": 66.517633
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 71.668959,
+      "elevation_deg": 66.585687
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 71.726148,
+      "elevation_deg": 66.653889
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 71.784361,
+      "elevation_deg": 66.722232
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 71.843604,
+      "elevation_deg": 66.790711
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 71.903885,
+      "elevation_deg": 66.859318
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 71.965211,
+      "elevation_deg": 66.928047
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 72.027589,
+      "elevation_deg": 66.996892
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 72.091026,
+      "elevation_deg": 67.065844
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 72.15553,
+      "elevation_deg": 67.134898
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 72.221107,
+      "elevation_deg": 67.204046
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 72.287765,
+      "elevation_deg": 67.273281
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 72.355512,
+      "elevation_deg": 67.342597
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 72.424355,
+      "elevation_deg": 67.411986
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 72.494302,
+      "elevation_deg": 67.48144
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 72.56536,
+      "elevation_deg": 67.550954
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 72.637538,
+      "elevation_deg": 67.620518
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 72.710842,
+      "elevation_deg": 67.690126
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 72.785282,
+      "elevation_deg": 67.759771
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 72.860864,
+      "elevation_deg": 67.829444
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 72.937598,
+      "elevation_deg": 67.899138
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 73.01549,
+      "elevation_deg": 67.968846
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 73.094549,
+      "elevation_deg": 68.038559
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 73.174782,
+      "elevation_deg": 68.10827
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 86.886975,
+      "elevation_deg": 32.544966
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 86.840965,
+      "elevation_deg": 33.049838
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 86.794331,
+      "elevation_deg": 33.554681
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 86.747056,
+      "elevation_deg": 34.059495
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 86.699121,
+      "elevation_deg": 34.564279
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 86.650505,
+      "elevation_deg": 35.069033
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 86.60119,
+      "elevation_deg": 35.573755
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 86.551153,
+      "elevation_deg": 36.078446
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 86.500374,
+      "elevation_deg": 36.583104
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 86.448829,
+      "elevation_deg": 37.087729
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 86.396495,
+      "elevation_deg": 37.592321
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 86.343348,
+      "elevation_deg": 38.096877
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 86.289363,
+      "elevation_deg": 38.601398
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 86.234513,
+      "elevation_deg": 39.105883
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 86.178772,
+      "elevation_deg": 39.610331
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 86.12211,
+      "elevation_deg": 40.114741
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 86.0645,
+      "elevation_deg": 40.619112
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 86.005909,
+      "elevation_deg": 41.123442
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 85.946307,
+      "elevation_deg": 41.627732
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 85.88566,
+      "elevation_deg": 42.13198
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 85.823933,
+      "elevation_deg": 42.636185
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 85.761091,
+      "elevation_deg": 43.140345
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 85.697096,
+      "elevation_deg": 43.644459
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 85.631909,
+      "elevation_deg": 44.148527
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 81.622705,
+      "elevation_deg": 64.724901
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 81.478109,
+      "elevation_deg": 64.664065
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 81.334391,
+      "elevation_deg": 64.603176
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 81.191561,
+      "elevation_deg": 64.542243
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 81.04963,
+      "elevation_deg": 64.481274
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 80.90861,
+      "elevation_deg": 64.420278
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 80.768509,
+      "elevation_deg": 64.359263
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 80.629339,
+      "elevation_deg": 64.298239
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 80.491109,
+      "elevation_deg": 64.237213
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 80.353828,
+      "elevation_deg": 64.176195
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 80.217506,
+      "elevation_deg": 64.115193
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 80.082151,
+      "elevation_deg": 64.054217
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 79.947772,
+      "elevation_deg": 63.993275
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 79.814377,
+      "elevation_deg": 63.932377
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 79.681974,
+      "elevation_deg": 63.871532
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 79.55057,
+      "elevation_deg": 63.810749
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 79.420173,
+      "elevation_deg": 63.750037
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 79.29079,
+      "elevation_deg": 63.689405
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 79.162427,
+      "elevation_deg": 63.628863
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 79.035091,
+      "elevation_deg": 63.56842
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 78.908787,
+      "elevation_deg": 63.508086
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 78.783523,
+      "elevation_deg": 63.447869
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 78.659302,
+      "elevation_deg": 63.38778
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 78.536131,
+      "elevation_deg": 63.327828
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 30.176962,
+      "elevation_deg": 85.244701
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 24.598663,
+      "elevation_deg": 85.479165
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 18.476079,
+      "elevation_deg": 85.666511
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 11.883634,
+      "elevation_deg": 85.800429
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 4.955522,
+      "elevation_deg": 85.875708
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 357.877273,
+      "elevation_deg": 85.889125
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 350.859828,
+      "elevation_deg": 85.840078
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 344.103652,
+      "elevation_deg": 85.730719
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 337.767049,
+      "elevation_deg": 85.565506
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 331.949971,
+      "elevation_deg": 85.350388
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 326.695081,
+      "elevation_deg": 85.09192
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 321.999985,
+      "elevation_deg": 84.796558
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 317.832869,
+      "elevation_deg": 84.470208
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 314.146273,
+      "elevation_deg": 84.118025
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 310.887024,
+      "elevation_deg": 83.744369
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 308.002403,
+      "elevation_deg": 83.352859
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 305.443451,
+      "elevation_deg": 82.946467
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 303.166416,
+      "elevation_deg": 82.527619
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 301.133083,
+      "elevation_deg": 82.098295
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 299.310533,
+      "elevation_deg": 81.660111
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 297.670627,
+      "elevation_deg": 81.214392
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 296.189407,
+      "elevation_deg": 80.762228
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 294.846499,
+      "elevation_deg": 80.304519
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "sun",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 293.62457,
+      "elevation_deg": 79.842015
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 77.448617,
+      "elevation_deg": 65.230016
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 77.545838,
+      "elevation_deg": 65.296747
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 77.643855,
+      "elevation_deg": 65.363615
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 77.74267,
+      "elevation_deg": 65.430614
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 77.842283,
+      "elevation_deg": 65.49774
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 77.942696,
+      "elevation_deg": 65.564987
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 78.043908,
+      "elevation_deg": 65.632349
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 78.145921,
+      "elevation_deg": 65.699821
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 78.248735,
+      "elevation_deg": 65.767398
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 78.352351,
+      "elevation_deg": 65.835073
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 78.45677,
+      "elevation_deg": 65.902842
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 78.561993,
+      "elevation_deg": 65.970698
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 78.66802,
+      "elevation_deg": 66.038636
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 78.774853,
+      "elevation_deg": 66.106651
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 78.88249,
+      "elevation_deg": 66.174736
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 78.990934,
+      "elevation_deg": 66.242885
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 79.100185,
+      "elevation_deg": 66.311094
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 79.210243,
+      "elevation_deg": 66.379356
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 79.321109,
+      "elevation_deg": 66.447665
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 79.432783,
+      "elevation_deg": 66.516015
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 79.545266,
+      "elevation_deg": 66.584401
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 79.658558,
+      "elevation_deg": 66.652817
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 79.772659,
+      "elevation_deg": 66.721256
+    },
+    {
+      "site_id": "apollo-12",
+      "body": "earth",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 79.887569,
+      "elevation_deg": 66.789712
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 75.599841,
+      "elevation_deg": -30.036743
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 75.887886,
+      "elevation_deg": -29.594841
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 76.173531,
+      "elevation_deg": -29.152389
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 76.456839,
+      "elevation_deg": -28.709403
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 76.73787,
+      "elevation_deg": -28.265898
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 77.016684,
+      "elevation_deg": -27.821889
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 77.29334,
+      "elevation_deg": -27.377392
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 77.567893,
+      "elevation_deg": -26.932419
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 77.8404,
+      "elevation_deg": -26.486984
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 78.110916,
+      "elevation_deg": -26.041103
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 78.379493,
+      "elevation_deg": -25.594787
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 78.646184,
+      "elevation_deg": -25.148049
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 78.911041,
+      "elevation_deg": -24.700903
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 79.174114,
+      "elevation_deg": -24.253361
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 79.435452,
+      "elevation_deg": -23.805434
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 79.695104,
+      "elevation_deg": -23.357136
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 79.953117,
+      "elevation_deg": -22.908477
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 80.209537,
+      "elevation_deg": -22.459469
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 80.464411,
+      "elevation_deg": -22.010123
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 80.717783,
+      "elevation_deg": -21.56045
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 80.969698,
+      "elevation_deg": -21.110461
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 81.220198,
+      "elevation_deg": -20.660167
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 81.469327,
+      "elevation_deg": -20.209577
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 81.717125,
+      "elevation_deg": -19.758703
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 192.907996,
+      "elevation_deg": 67.68516
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 193.034261,
+      "elevation_deg": 67.631978
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 193.159975,
+      "elevation_deg": 67.578372
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 193.285124,
+      "elevation_deg": 67.524344
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 193.409694,
+      "elevation_deg": 67.4699
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 193.533673,
+      "elevation_deg": 67.415044
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 193.657049,
+      "elevation_deg": 67.359781
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 193.779807,
+      "elevation_deg": 67.304115
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 193.901935,
+      "elevation_deg": 67.248051
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 194.023422,
+      "elevation_deg": 67.191594
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 194.144254,
+      "elevation_deg": 67.134748
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 194.26442,
+      "elevation_deg": 67.077519
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 194.383907,
+      "elevation_deg": 67.019911
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 194.502704,
+      "elevation_deg": 66.96193
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 194.620799,
+      "elevation_deg": 66.903579
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 194.73818,
+      "elevation_deg": 66.844865
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 194.854836,
+      "elevation_deg": 66.785792
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 194.970755,
+      "elevation_deg": 66.726365
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 195.085926,
+      "elevation_deg": 66.66659
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 195.200339,
+      "elevation_deg": 66.606471
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 195.313983,
+      "elevation_deg": 66.546015
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 195.426846,
+      "elevation_deg": 66.485226
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 195.538918,
+      "elevation_deg": 66.42411
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 195.650189,
+      "elevation_deg": 66.362672
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 125.876893,
+      "elevation_deg": 51.52227
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 126.438151,
+      "elevation_deg": 51.890272
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 127.008545,
+      "elevation_deg": 52.255611
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 127.588279,
+      "elevation_deg": 52.618205
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 128.17756,
+      "elevation_deg": 52.977974
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 128.776597,
+      "elevation_deg": 53.334833
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 129.3856,
+      "elevation_deg": 53.688693
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 130.004782,
+      "elevation_deg": 54.039465
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 130.634356,
+      "elevation_deg": 54.387056
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 131.274536,
+      "elevation_deg": 54.731371
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 131.925536,
+      "elevation_deg": 55.07231
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 132.587569,
+      "elevation_deg": 55.409774
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 133.260849,
+      "elevation_deg": 55.743657
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 133.945588,
+      "elevation_deg": 56.073852
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 134.641994,
+      "elevation_deg": 56.40025
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 135.350276,
+      "elevation_deg": 56.722737
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 136.070637,
+      "elevation_deg": 57.041198
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 136.803276,
+      "elevation_deg": 57.355512
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 137.548387,
+      "elevation_deg": 57.665557
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 138.30616,
+      "elevation_deg": 57.971209
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 139.076776,
+      "elevation_deg": 58.272339
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 139.860407,
+      "elevation_deg": 58.568816
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 140.657218,
+      "elevation_deg": 58.860506
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 141.467363,
+      "elevation_deg": 59.147271
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 185.087253,
+      "elevation_deg": 64.481984
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 184.983099,
+      "elevation_deg": 64.556257
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 184.87852,
+      "elevation_deg": 64.630342
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 184.773526,
+      "elevation_deg": 64.704229
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 184.668126,
+      "elevation_deg": 64.777909
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 184.562329,
+      "elevation_deg": 64.851372
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 184.456147,
+      "elevation_deg": 64.924611
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 184.349589,
+      "elevation_deg": 64.997615
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 184.242667,
+      "elevation_deg": 65.070376
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 184.135392,
+      "elevation_deg": 65.142885
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 184.027776,
+      "elevation_deg": 65.215133
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 183.91983,
+      "elevation_deg": 65.287111
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 183.811568,
+      "elevation_deg": 65.358812
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 183.703003,
+      "elevation_deg": 65.430225
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 183.594146,
+      "elevation_deg": 65.501343
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 183.485013,
+      "elevation_deg": 65.572157
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 183.375616,
+      "elevation_deg": 65.642659
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 183.265971,
+      "elevation_deg": 65.71284
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 183.156091,
+      "elevation_deg": 65.782692
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 183.045993,
+      "elevation_deg": 65.852208
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 182.935691,
+      "elevation_deg": 65.921379
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 182.825202,
+      "elevation_deg": 65.990197
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 182.714541,
+      "elevation_deg": 66.058654
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 182.603725,
+      "elevation_deg": 66.126743
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 227.45449,
+      "elevation_deg": 55.503
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 228.120579,
+      "elevation_deg": 55.164463
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 228.7755,
+      "elevation_deg": 54.822415
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 229.419469,
+      "elevation_deg": 54.47696
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 230.052704,
+      "elevation_deg": 54.128197
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 230.675423,
+      "elevation_deg": 53.776225
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 231.287843,
+      "elevation_deg": 53.421137
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 231.890179,
+      "elevation_deg": 53.063024
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 232.482647,
+      "elevation_deg": 52.701976
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 233.065458,
+      "elevation_deg": 52.338078
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 233.638823,
+      "elevation_deg": 51.971415
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 234.20295,
+      "elevation_deg": 51.602066
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 234.758046,
+      "elevation_deg": 51.23011
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 235.304313,
+      "elevation_deg": 50.855623
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 235.841952,
+      "elevation_deg": 50.47868
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 236.371158,
+      "elevation_deg": 50.099351
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 236.892128,
+      "elevation_deg": 49.717706
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 237.40505,
+      "elevation_deg": 49.333811
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 237.910113,
+      "elevation_deg": 48.947732
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 238.407501,
+      "elevation_deg": 48.559532
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 238.897393,
+      "elevation_deg": 48.169271
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 239.379968,
+      "elevation_deg": 47.777008
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 239.855399,
+      "elevation_deg": 47.382801
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "sun",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 240.323856,
+      "elevation_deg": 46.986706
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 187.409324,
+      "elevation_deg": 66.047413
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 187.531077,
+      "elevation_deg": 65.986942
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 187.652613,
+      "elevation_deg": 65.926189
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 187.773924,
+      "elevation_deg": 65.865159
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 187.895001,
+      "elevation_deg": 65.803856
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 188.015836,
+      "elevation_deg": 65.742284
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 188.136418,
+      "elevation_deg": 65.680447
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 188.25674,
+      "elevation_deg": 65.61835
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 188.376793,
+      "elevation_deg": 65.555997
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 188.496568,
+      "elevation_deg": 65.493391
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 188.616057,
+      "elevation_deg": 65.430538
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 188.735251,
+      "elevation_deg": 65.367443
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 188.854143,
+      "elevation_deg": 65.304108
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 188.972724,
+      "elevation_deg": 65.240539
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 189.090985,
+      "elevation_deg": 65.17674
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 189.208919,
+      "elevation_deg": 65.112717
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 189.326518,
+      "elevation_deg": 65.048472
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 189.443774,
+      "elevation_deg": 64.984011
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 189.560678,
+      "elevation_deg": 64.919339
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 189.677224,
+      "elevation_deg": 64.85446
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 189.793404,
+      "elevation_deg": 64.789378
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 189.909209,
+      "elevation_deg": 64.724099
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 190.024634,
+      "elevation_deg": 64.658626
+    },
+    {
+      "site_id": "apollo-15",
+      "body": "earth",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 190.139669,
+      "elevation_deg": 64.592966
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 95.087282,
+      "elevation_deg": -20.578724
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 94.991753,
+      "elevation_deg": -20.079013
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 94.896958,
+      "elevation_deg": -19.579238
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 94.802877,
+      "elevation_deg": -19.079402
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 94.709488,
+      "elevation_deg": -18.579508
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 94.616772,
+      "elevation_deg": -18.079555
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 94.524709,
+      "elevation_deg": -17.579547
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 94.433279,
+      "elevation_deg": -17.079485
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 94.342464,
+      "elevation_deg": -16.579372
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 94.252244,
+      "elevation_deg": -16.079208
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 94.162603,
+      "elevation_deg": -15.578995
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 94.073521,
+      "elevation_deg": -15.078735
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 93.984982,
+      "elevation_deg": -14.57843
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 93.896968,
+      "elevation_deg": -14.07808
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 93.809463,
+      "elevation_deg": -13.577689
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 93.72245,
+      "elevation_deg": -13.077257
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 93.635912,
+      "elevation_deg": -12.576785
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 93.549834,
+      "elevation_deg": -12.076275
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 93.464201,
+      "elevation_deg": -11.575729
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 93.378996,
+      "elevation_deg": -11.075148
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 93.294205,
+      "elevation_deg": -10.574533
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 93.209812,
+      "elevation_deg": -10.073886
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 93.125803,
+      "elevation_deg": -9.573208
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 93.042164,
+      "elevation_deg": -9.0725
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T00:00:00Z",
+      "azimuth_deg": 308.069132,
+      "elevation_deg": 68.531209
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T01:00:00Z",
+      "azimuth_deg": 307.88021,
+      "elevation_deg": 68.512578
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T02:00:00Z",
+      "azimuth_deg": 307.690795,
+      "elevation_deg": 68.493874
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T03:00:00Z",
+      "azimuth_deg": 307.500903,
+      "elevation_deg": 68.475098
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T04:00:00Z",
+      "azimuth_deg": 307.310549,
+      "elevation_deg": 68.45625
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T05:00:00Z",
+      "azimuth_deg": 307.119748,
+      "elevation_deg": 68.43733
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T06:00:00Z",
+      "azimuth_deg": 306.928517,
+      "elevation_deg": 68.418338
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T07:00:00Z",
+      "azimuth_deg": 306.73687,
+      "elevation_deg": 68.399274
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T08:00:00Z",
+      "azimuth_deg": 306.544824,
+      "elevation_deg": 68.38014
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T09:00:00Z",
+      "azimuth_deg": 306.352393,
+      "elevation_deg": 68.360935
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T10:00:00Z",
+      "azimuth_deg": 306.159594,
+      "elevation_deg": 68.34166
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T11:00:00Z",
+      "azimuth_deg": 305.966442,
+      "elevation_deg": 68.322317
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T12:00:00Z",
+      "azimuth_deg": 305.772953,
+      "elevation_deg": 68.302905
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T13:00:00Z",
+      "azimuth_deg": 305.579141,
+      "elevation_deg": 68.283426
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T14:00:00Z",
+      "azimuth_deg": 305.385024,
+      "elevation_deg": 68.26388
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T15:00:00Z",
+      "azimuth_deg": 305.190615,
+      "elevation_deg": 68.244269
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T16:00:00Z",
+      "azimuth_deg": 304.995932,
+      "elevation_deg": 68.224595
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T17:00:00Z",
+      "azimuth_deg": 304.800989,
+      "elevation_deg": 68.204858
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T18:00:00Z",
+      "azimuth_deg": 304.605801,
+      "elevation_deg": 68.18506
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T19:00:00Z",
+      "azimuth_deg": 304.410384,
+      "elevation_deg": 68.165202
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T20:00:00Z",
+      "azimuth_deg": 304.214754,
+      "elevation_deg": 68.145286
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T21:00:00Z",
+      "azimuth_deg": 304.018925,
+      "elevation_deg": 68.125314
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T22:00:00Z",
+      "azimuth_deg": 303.822914,
+      "elevation_deg": 68.105288
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2026-11-14T23:00:00Z",
+      "azimuth_deg": 303.626734,
+      "elevation_deg": 68.08521
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 62.38703,
+      "elevation_deg": 69.119957
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 61.682653,
+      "elevation_deg": 69.561141
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 60.948468,
+      "elevation_deg": 69.999327
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 60.182694,
+      "elevation_deg": 70.434314
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 59.38343,
+      "elevation_deg": 70.865886
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 58.548648,
+      "elevation_deg": 71.293805
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 57.676186,
+      "elevation_deg": 71.717816
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 56.763743,
+      "elevation_deg": 72.137641
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 55.808869,
+      "elevation_deg": 72.552977
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 54.808969,
+      "elevation_deg": 72.963497
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 53.76129,
+      "elevation_deg": 73.368844
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 52.662926,
+      "elevation_deg": 73.768632
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 51.51082,
+      "elevation_deg": 74.162439
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 50.301766,
+      "elevation_deg": 74.549808
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 49.03242,
+      "elevation_deg": 74.930244
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 47.699319,
+      "elevation_deg": 75.303209
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 46.298901,
+      "elevation_deg": 75.668118
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 44.827538,
+      "elevation_deg": 76.024343
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 43.281583,
+      "elevation_deg": 76.371201
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 41.657424,
+      "elevation_deg": 76.707961
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 39.951553,
+      "elevation_deg": 77.033835
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 38.160661,
+      "elevation_deg": 77.347983
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 36.281744,
+      "elevation_deg": 77.64951
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 34.312225,
+      "elevation_deg": 77.93747
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T00:00:00Z",
+      "azimuth_deg": 304.273727,
+      "elevation_deg": 72.839833
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T01:00:00Z",
+      "azimuth_deg": 304.567765,
+      "elevation_deg": 72.84015
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T02:00:00Z",
+      "azimuth_deg": 304.861363,
+      "elevation_deg": 72.840049
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T03:00:00Z",
+      "azimuth_deg": 305.154473,
+      "elevation_deg": 72.839534
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T04:00:00Z",
+      "azimuth_deg": 305.447047,
+      "elevation_deg": 72.838606
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T05:00:00Z",
+      "azimuth_deg": 305.739038,
+      "elevation_deg": 72.837269
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T06:00:00Z",
+      "azimuth_deg": 306.030398,
+      "elevation_deg": 72.835525
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T07:00:00Z",
+      "azimuth_deg": 306.321081,
+      "elevation_deg": 72.833378
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T08:00:00Z",
+      "azimuth_deg": 306.61104,
+      "elevation_deg": 72.830832
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T09:00:00Z",
+      "azimuth_deg": 306.900229,
+      "elevation_deg": 72.82789
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T10:00:00Z",
+      "azimuth_deg": 307.188601,
+      "elevation_deg": 72.824556
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T11:00:00Z",
+      "azimuth_deg": 307.47611,
+      "elevation_deg": 72.820834
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T12:00:00Z",
+      "azimuth_deg": 307.762712,
+      "elevation_deg": 72.816727
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T13:00:00Z",
+      "azimuth_deg": 308.048361,
+      "elevation_deg": 72.812241
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T14:00:00Z",
+      "azimuth_deg": 308.333012,
+      "elevation_deg": 72.807379
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T15:00:00Z",
+      "azimuth_deg": 308.61662,
+      "elevation_deg": 72.802147
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T16:00:00Z",
+      "azimuth_deg": 308.899143,
+      "elevation_deg": 72.796548
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T17:00:00Z",
+      "azimuth_deg": 309.180535,
+      "elevation_deg": 72.790589
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T18:00:00Z",
+      "azimuth_deg": 309.460755,
+      "elevation_deg": 72.784273
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T19:00:00Z",
+      "azimuth_deg": 309.739759,
+      "elevation_deg": 72.777607
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T20:00:00Z",
+      "azimuth_deg": 310.017505,
+      "elevation_deg": 72.770594
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T21:00:00Z",
+      "azimuth_deg": 310.293951,
+      "elevation_deg": 72.763242
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T22:00:00Z",
+      "azimuth_deg": 310.569057,
+      "elevation_deg": 72.755555
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-03-20T23:00:00Z",
+      "azimuth_deg": 310.842781,
+      "elevation_deg": 72.747539
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 283.623981,
+      "elevation_deg": 52.23446
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 283.393383,
+      "elevation_deg": 51.746626
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 283.167842,
+      "elevation_deg": 51.258324
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 282.94717,
+      "elevation_deg": 50.76957
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 282.731189,
+      "elevation_deg": 50.280381
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 282.519729,
+      "elevation_deg": 49.790774
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 282.312624,
+      "elevation_deg": 49.300764
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 282.109722,
+      "elevation_deg": 48.810364
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 281.910871,
+      "elevation_deg": 48.319589
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 281.715931,
+      "elevation_deg": 47.828451
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 281.524765,
+      "elevation_deg": 47.336964
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 281.337244,
+      "elevation_deg": 46.845139
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 281.153242,
+      "elevation_deg": 46.352988
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 280.97264,
+      "elevation_deg": 45.860522
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 280.795325,
+      "elevation_deg": 45.367751
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 280.621186,
+      "elevation_deg": 44.874686
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 280.450119,
+      "elevation_deg": 44.381335
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 280.282022,
+      "elevation_deg": 43.887708
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 280.1168,
+      "elevation_deg": 43.393814
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 279.954359,
+      "elevation_deg": 42.899662
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 279.79461,
+      "elevation_deg": 42.405259
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 279.637467,
+      "elevation_deg": 41.910613
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 279.482848,
+      "elevation_deg": 41.415732
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "sun",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 279.330674,
+      "elevation_deg": 40.920623
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T00:00:00Z",
+      "azimuth_deg": 306.975582,
+      "elevation_deg": 71.214464
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T01:00:00Z",
+      "azimuth_deg": 306.735477,
+      "elevation_deg": 71.203208
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T02:00:00Z",
+      "azimuth_deg": 306.494926,
+      "elevation_deg": 71.191614
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T03:00:00Z",
+      "azimuth_deg": 306.253954,
+      "elevation_deg": 71.179678
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T04:00:00Z",
+      "azimuth_deg": 306.012587,
+      "elevation_deg": 71.167399
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T05:00:00Z",
+      "azimuth_deg": 305.770851,
+      "elevation_deg": 71.154775
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T06:00:00Z",
+      "azimuth_deg": 305.528772,
+      "elevation_deg": 71.141806
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T07:00:00Z",
+      "azimuth_deg": 305.286375,
+      "elevation_deg": 71.12849
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T08:00:00Z",
+      "azimuth_deg": 305.043688,
+      "elevation_deg": 71.114825
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T09:00:00Z",
+      "azimuth_deg": 304.800735,
+      "elevation_deg": 71.100811
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T10:00:00Z",
+      "azimuth_deg": 304.557543,
+      "elevation_deg": 71.086448
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T11:00:00Z",
+      "azimuth_deg": 304.314138,
+      "elevation_deg": 71.071733
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T12:00:00Z",
+      "azimuth_deg": 304.070546,
+      "elevation_deg": 71.056667
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T13:00:00Z",
+      "azimuth_deg": 303.826794,
+      "elevation_deg": 71.04125
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T14:00:00Z",
+      "azimuth_deg": 303.582906,
+      "elevation_deg": 71.02548
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T15:00:00Z",
+      "azimuth_deg": 303.33891,
+      "elevation_deg": 71.009358
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T16:00:00Z",
+      "azimuth_deg": 303.094832,
+      "elevation_deg": 70.992884
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T17:00:00Z",
+      "azimuth_deg": 302.850697,
+      "elevation_deg": 70.976058
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T18:00:00Z",
+      "azimuth_deg": 302.606531,
+      "elevation_deg": 70.95888
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T19:00:00Z",
+      "azimuth_deg": 302.36236,
+      "elevation_deg": 70.941351
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T20:00:00Z",
+      "azimuth_deg": 302.11821,
+      "elevation_deg": 70.92347
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T21:00:00Z",
+      "azimuth_deg": 301.874107,
+      "elevation_deg": 70.90524
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T22:00:00Z",
+      "azimuth_deg": 301.630076,
+      "elevation_deg": 70.88666
+    },
+    {
+      "site_id": "apollo-16",
+      "body": "earth",
+      "time_utc": "2027-06-21T23:00:00Z",
+      "azimuth_deg": 301.386143,
+      "elevation_deg": 70.867732
+    }
+  ]
+}
