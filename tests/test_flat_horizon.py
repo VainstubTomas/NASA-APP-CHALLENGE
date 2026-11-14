@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from precompute.terrain import flat_horizon as fh
-from tests.test_contract import PUBLIC, _assert_valid
+from tests.helpers import PUBLIC, _assert_valid
 
 
 def _sitio(id_, synthetic=False):
