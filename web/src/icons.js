@@ -31,6 +31,17 @@ export function sunIcon(size = 24) {
   return svg(size, [['circle', { cx: '12', cy: '12', r: '5', fill: 'var(--color-sun)' }], ...rays]);
 }
 
+// La Luna (el sitio de aterrizaje): disco gris con cráteres. Colores propios, no cambian con el tema.
+export function moonIcon(size = 24) {
+  return svg(size, [
+    ['circle', { cx: '12', cy: '12', r: '10', fill: '#b9bcc4' }],
+    ['circle', { cx: '8', cy: '9', r: '2.4', fill: '#8f929b' }],
+    ['circle', { cx: '15.5', cy: '14.5', r: '3', fill: '#8f929b' }],
+    ['circle', { cx: '14', cy: '7', r: '1.3', fill: '#8f929b' }],
+    ['circle', { cx: '8.5', cy: '16', r: '1.4', fill: '#8f929b' }],
+  ]);
+}
+
 export function earthIcon(size = 24) {
   return svg(size, [
     ['circle', { cx: '12', cy: '12', r: '10', fill: 'var(--color-earth)' }],
