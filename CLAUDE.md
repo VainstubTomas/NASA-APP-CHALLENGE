@@ -34,7 +34,7 @@ CLAUDE.md            este archivo
 docs/                contexto, PRD, arquitectura, contrato, workflow, roadmap, pitch, adr/
 precompute/          Python offline (ephemeris/, terrain/), requirements.txt
 tests/               pytest: contrato y validación contra Horizons
-web/                 frontend (Vite)
+web/                 web (Vite)
 data/raw/            datos pesados (mapa de elevación, caché de Horizons). NO se commitea
 data/public/         JSON que consume la web. Se commitea
 data/schema/         JSON Schema del contrato
@@ -42,13 +42,14 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 ```
 
 ## Flujo de Git: MiniGitFlow (detalle en `docs/04-GIT-WORKFLOW.md`)
-- `main` (demoable, protegida: el hook `pre-commit` bloquea commits directos) y `develop` (integración, es el arenero del equipo: sin protección técnica). **Nunca** se commitea directo en ninguna de las dos: todo entra por PR.
-- Un issue, una rama: `feature/<n>-<slug>` o `fix/<n>-<slug>`, creada desde `develop`.
-- PR hacia `develop`, 1 aprobación de otra persona, merge por squash (recomendado, no obligatorio: GitHub permite los tres métodos). Las ramas mergeadas no se borran (nos sirven de historial durante el hackatón).
+- `main` (demoable, protegida: el hook `pre-commit` bloquea commits directos) y `dev` (integración, es el arenero del equipo: sin protección técnica). **Nunca** se commitea directo en ninguna de las dos: todo entra por PR.
+- Un issue, una rama: `feature/<n>-<slug>` o `fix/<n>-<slug>`, creada desde `dev`.
+- Cada capa del MVP es una **épica** (issue padre con título `[EPICA] ...` y etiqueta `tipo:epica`); sus issues cuelgan como sub-issues. Las épicas no se trabajan directo: sin rama ni PR (ADR-008).
+- PR hacia `dev`, 1 aprobación de otra persona, merge por squash (recomendado, no obligatorio: GitHub permite los tres métodos). Las ramas mergeadas no se borran (nos sirven de historial durante el hackatón).
 - Commits (los valida el hook `commit-msg`): la primera línea debe tener **10 palabras o más**; el hook no exige otro formato, así que sirven los mensajes generados por el IDE. Por convención van en inglés y, si se puede, con el formato sugerido `tipo(scope): descripción` (tipos `feat`, `fix`, `docs`, `test`, `chore`; scopes `web`, `ephemeris`, `terrain`, `data`, `tests`, `docs`, `scripts`). Ejemplo: `feat(web): add site and date selector to the main map screen of the app`.
 - El título del PR también debe ser descriptivo, de 10 palabras o más (si se mergea por squash, GitHub no pasa por el hook y ese título se vuelve el commit).
 - Activar los hooks una vez por clon: `git config core.hooksPath .githooks`. `--no-verify` los saltea; no usarlo salvo emergencia.
-- Si necesitás algo de otra rama, traelo desde `develop` o avisá en el PR.
+- Si necesitás algo de otra rama, traelo desde `dev` o avisá en el PR.
 - No commitear: mapa de elevación (`*.tif`), caché de Horizons (`data/raw/`), `.venv`, `node_modules`, notebooks. Scripts `.py`, no `.ipynb`.
 
 ## Cómo trabajar con Claude en este repo
@@ -62,7 +63,7 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 
 ## Capas del MVP (cada una es una demo completa)
 0. Base: repo, contrato, datos de prueba, deploy, tests contra Horizons. 1. Elegir sitio y fecha; ver az/el del Sol y la Tierra. 2. Horizonte real con Sol y Tierra encima. 3. Línea de tiempo y cuenta regresiva. 4. Comparación de escenarios. 5. Extras.
-Objetivo realista: capas 1 a 3. **Recortar, no estirar.** Features congeladas el domingo 15 a las 12:30.
+Objetivo: capas 1 a 4 (la 4 es obligatoria desde el ADR-009). **Recortar, no estirar.** Features congeladas el domingo 15 a las 12:30.
 
 ## Equipo
 Equipo multirubro: no hay roles fijos. Todos trabajan en cualquier área (Python, web, producto y demo) y toman los issues que sigan en el tablero.

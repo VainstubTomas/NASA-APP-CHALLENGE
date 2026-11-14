@@ -3,7 +3,7 @@
 Última actualización: 2026-11-13
 
 ## Idea central
-El problema se divide en **tres piezas independientes**. Las dos primeras corren en Python **antes** de la demo y producen archivos JSON. La tercera es una web estática que lee esos archivos y compara. Así la web es rápida, no depende de internet durante la demo y nadie bloquea a nadie: el frontend arranca con datos sintéticos mientras el backend calcula los reales.
+El problema se divide en **tres piezas independientes**. Las dos primeras corren en Python **antes** de la demo y producen archivos JSON. La tercera es una web estática que lee esos archivos y compara. Así la web es rápida, no depende de internet durante la demo y nadie bloquea a nadie: la web arranca con datos sintéticos mientras Python calcula los reales.
 
 ```
    API Horizons ───► [1. Efemérides] ──► ephemeris.json ─┐
@@ -34,7 +34,7 @@ El problema se divide en **tres piezas independientes**. Las dos primeras corren
 ## Pieza 3: qué se ve
 - Para un instante, el cuerpo es visible si su elevación supera la del horizonte en su azimut (regla exacta y provisional en `docs/03-DATA-CONTRACT.md`).
 - La web calcula la visibilidad hora por hora combinando ambos JSON, dibuja el panorama y deriva horas de luz, horas con Tierra y cuenta regresiva.
-- `metrics.json` (backend) trae los mismos números precalculados para **cruzar resultados**: si web y backend no coinciden, hay un bug.
+- `metrics.json` (Python) trae los mismos números precalculados para **cruzar resultados**: si la web y Python no coinciden, hay un bug.
 
 ## Estructura de datos en el repo
 ```
@@ -45,7 +45,7 @@ data/schema/*.schema.json      esquemas del contrato
 ```
 La web sirve `data/public/` como carpeta estática (Vite `publicDir`), así que no hay copia intermedia. Detalle del formato en `docs/03-DATA-CONTRACT.md`.
 
-## Frontend
+## Web
 - Vite + JavaScript, sin framework pesado. Dibujo del horizonte en SVG o canvas (ver ADR-004).
 - Estado en la URL (`?site=...&t=...`) para poder compartir.
 - Funciona sin conexión durante la demo (todo estático).
