@@ -1,8 +1,10 @@
 // Panel de números (C1-03): elevación y azimut del Sol y la Tierra en un instante.
-// Uso: renderPanel(contenedor, { ephemeris, utcMs, siteName }).
+// Uso: renderPanel(contenedor, { ephemeris, horizon, utcMs, siteName }).
+// Con `horizon` (horizon.json) los estados se calculan contra el horizonte real (#32).
 // El selector de sitio y fecha (C1-02) solo tiene que volver a llamar a renderPanel.
 import './panel.css';
-import { sampleAt, horizonStatus, compassLabel, elevationDisplay } from './ephemeris.js';
+import { sampleAt, compassLabel, elevationDisplay } from './ephemeris.js';
+import { statusAgainstHorizon } from './horizon.js';
 import { t, locale } from './i18n.js';
 import { sunIcon, earthIcon } from './icons.js';
 
@@ -30,8 +32,8 @@ function el(tag, className, text) {
   return node;
 }
 
-function bodyCard({ body, icon, position, radiusDeg, featured }) {
-  const state = horizonStatus(position.elevation_deg, radiusDeg);
+function bodyCard({ body, icon, position, radiusDeg, horizon, featured }) {
+  const state = statusAgainstHorizon(position, radiusDeg, horizon);
   const card = el('article', `panel-card panel-card--${body}${featured ? ' panel-card--featured' : ''}`);
 
   const title = el('h3', 'panel-card__title');
@@ -57,7 +59,7 @@ function bodyCard({ body, icon, position, radiusDeg, featured }) {
   return card;
 }
 
-export function renderPanel(container, { ephemeris, utcMs, siteName }) {
+export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) {
   container.replaceChildren();
   container.classList.add('panel');
 
@@ -73,8 +75,8 @@ export function renderPanel(container, { ephemeris, utcMs, siteName }) {
   const radius = ephemeris.angular_radius_deg;
   const cards = el('div', 'panel-cards');
   cards.append(
-    bodyCard({ body: 'sun', icon: sunIcon(), position: sample.sun, radiusDeg: radius.sun, featured: true }),
-    bodyCard({ body: 'earth', icon: earthIcon(), position: sample.earth, radiusDeg: radius.earth }),
+    bodyCard({ body: 'sun', icon: sunIcon(), position: sample.sun, radiusDeg: radius.sun, horizon, featured: true }),
+    bodyCard({ body: 'earth', icon: earthIcon(), position: sample.earth, radiusDeg: radius.earth, horizon }),
   );
 
   const note = el('p', 'panel-note', t('panel.note'));
