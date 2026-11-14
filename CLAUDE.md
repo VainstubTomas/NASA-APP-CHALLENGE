@@ -1,6 +1,6 @@
 # Lunar Landing Site Navigator: contexto para Claude
 
-> Léelo completo antes de tocar código. Última actualización: 2026-11-13. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
+> Léelo completo antes de tocar código. Última actualización: 2026-11-14. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
 
 ## Qué estamos construyendo
 Una web que responde una pregunta: **si aterrizo en este lugar de la Luna en esta fecha, ¿voy a tener Sol y voy a poder comunicarme con la Tierra?**
@@ -9,7 +9,7 @@ Proyecto del NASA Space Apps Challenge 2026 (evento presencial, 14 y 15 de novie
 
 ## Arquitectura en 3 piezas (detalle en `docs/02-ARCHITECTURE.md`)
 1. **Efemérides** (Python, offline): azimut y elevación del Sol y la Tierra por sitio y por hora, consultados a la **API de JPL Horizons** (recurso oficial; ADR-006). Carpeta `precompute/ephemeris/`.
-2. **Terreno** (Python, offline): perfil de horizonte de 360 valores por sitio desde un mapa de elevación LOLA (fuente según ADR-006: Moon Trek/Quickmap o, como plan B, PDS). Carpeta `precompute/terrain/`.
+2. **Terreno** (Python, offline): perfil de horizonte de 360 valores por sitio. **Primero Luna lisa** (360 ceros, sin relieve, capas 1 a 4); el relieve desde un mapa de elevación LOLA (fuente según ADR-006: Moon Trek/Quickmap o, como plan B, PDS) va **al final, en la capa 5** (ADR-011). Carpeta `precompute/terrain/`.
 3. **Web** (JS): lee los JSON precalculados y compara elevación del cuerpo contra horizonte. Carpeta `web/`.
 Python y la web **solo se hablan por los JSON** de `data/public/`. El contrato está en `docs/03-DATA-CONTRACT.md` y los esquemas en `data/schema/`.
 
@@ -62,7 +62,7 @@ scripts/             utilidades (labels, issues, datos sintéticos)
 7. Cambios chicos y PRs chicos. Si un issue pasa de ~4 horas, partirlo.
 
 ## Capas del MVP (cada una es una demo completa)
-0. Base: repo, contrato, datos de prueba, deploy, tests contra Horizons. 1. Elegir sitio y fecha; ver az/el del Sol y la Tierra. 2. Horizonte real con Sol y Tierra encima. 3. Línea de tiempo y cuenta regresiva. 4. Comparación de escenarios. 5. Extras.
+0. Base: repo, contrato, datos de prueba, deploy, tests contra Horizons. 1. Elegir sitio y fecha (desde la primera pantalla); ver az/el del Sol y la Tierra. 2. Horizonte liso (Luna esfera sin relieve, 0°) con Sol y Tierra encima. 3. Línea de tiempo y cuenta regresiva. 4. Comparación de escenarios. 5. Extras y, último de todo, relieve real. Mientras no haya relieve, la web avisa "horizonte ideal, sin relieve".
 Objetivo: capas 1 a 4 (la 4 es obligatoria desde el ADR-009). **Recortar, no estirar.** Features congeladas el domingo 15 a las 12:30.
 
 ## Equipo

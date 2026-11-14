@@ -20,21 +20,19 @@ El trabajo se divide en capas (fases). Cada capa es una **épica** en el tablero
 flowchart TD
     subgraph C0["Capa 0 · Base · viernes 13"]
         H["Horizons descargado<br/>y validado"]
-        M["Mapa de elevación<br/>del polo sur"]
         S["Sitios con<br/>coordenadas verificadas"]
         W["Web con Vite<br/>y deploy de prueba"]
     end
-    C1["Capa 1 · Elegir sitio y fecha; ver el Sol y la Tierra<br/>sábado, antes de las 12:30"]
-    C2["Capa 2 · Horizonte real con el Sol y la Tierra<br/>demo mínima, sábado 14:30"]
+    C1["Capa 1 · Elegir sitio y fecha (desde la primera pantalla); ver el Sol y la Tierra<br/>sábado, antes de las 12:30"]
+    C2["Capa 2 · Horizonte liso (Luna sin relieve) con el Sol y la Tierra<br/>demo mínima, sábado 14:30"]
     C3["Capa 3 · Línea de tiempo, cuenta regresiva y validación<br/>sábado a la noche"]
     C4["Capa 4 · Comparación de escenarios<br/>sábado a la noche"]
-    C5["Capa 5 · Extras<br/>solo si sobra tiempo"]
+    C5["Capa 5 · Extras y, al final, relieve real (mapa de elevación)<br/>solo si sobra tiempo"]
     E["Entrega · README, demo y presentación<br/>features congeladas dom 12:30 · subida 14:30"]
 
     H --> C1
     S --> C1
     W --> C1
-    M --> C2
     C1 --> C2 --> C3 --> C4 --> E
     C4 -.-> C5 -.-> E
 ```

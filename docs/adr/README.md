@@ -17,4 +17,6 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | [009](ADR-009-capa-4-obligatoria.md) | La comparación de escenarios (capa 4) pasa a obligatoria | Propuesto |
 | [010](ADR-010-automatizacion-cierre-issues.md) | Action post-merge que cierra issues y seguimiento entre los proyectos "Hackaton" y "Main migrate" | Propuesto |
 
+| [011](ADR-011-luna-lisa-fecha-relieve-al-final.md) | Luna lisa primero, fecha desde el inicio y relieve al final (capa 5) | Propuesto |
+
 Estados: Propuesto, Aceptado, Reemplazado.
