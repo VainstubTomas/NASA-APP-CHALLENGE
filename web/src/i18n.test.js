@@ -70,7 +70,22 @@ test('cada sitio de sites.json tiene su nombre traducido (site.<id>)', () => {
     assert.ok(dicts.es[`site.${site.id}`], `falta site.${site.id} en los JSON de idiomas`);
   }
   assert.equal(dicts.en['site.change-6'], "Chang'e 6 (far side)");
-  assert.equal(dicts.zh['site.change-6'], '嫦娥六号（月球背面）');
+  assert.equal(dicts.zh['site.change-6'], "Chang'e 6（月球背面）");
+});
+
+test('los nombres propios de las misiones no se traducen: mismo nombre original en los 4 idiomas', () => {
+  const missions = {
+    'apollo-11': 'Apollo 11', 'apollo-12': 'Apollo 12', 'apollo-14': 'Apollo 14',
+    'apollo-15': 'Apollo 15', 'apollo-16': 'Apollo 16', 'apollo-17': 'Apollo 17',
+    'change-3': "Chang'e 3", 'change-4': "Chang'e 4", 'change-6': "Chang'e 6",
+    'chandrayaan-3': 'Chandrayaan-3', slim: 'SLIM', 'blue-ghost-1': 'Blue Ghost Mission 1',
+    'odysseus-im-1': 'Odysseus', 'intuitive-machines-2': 'Intuitive Machines 2',
+  };
+  for (const lang of LANGS) {
+    for (const [id, mission] of Object.entries(missions)) {
+      assert.ok(dicts[lang][`site.${id}`].startsWith(mission), `${lang}: site.${id} debe empezar con "${mission}"`);
+    }
+  }
 });
 
 test('siteLabel usa la traducción por id y, si no existe, el nombre de sites.json', () => {

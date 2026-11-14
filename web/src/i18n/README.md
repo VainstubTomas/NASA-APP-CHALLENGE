@@ -12,9 +12,11 @@ Cada idioma es un archivo JSON con pares `"clave": "texto"`; las claves son las 
 | Hindi | `hi.json` | **Traducido con IA** (Claude, 2026-11-14) | **No**: nadie del equipo habla hindi |
 | Chino simplificado | `zh.json` | **Traducido con IA** (Claude, 2026-11-14) | **No**: nadie del equipo habla chino |
 
-Incluye los nombres de los sitios (`site.<id>`): en español son los de `data/public/sites.json`; en los
-otros idiomas son traducciones con IA de los nombres de misiones y lugares (por ejemplo, 嫦娥六号 para
-Chang'e 6 o शांति सागर para el Mar de la Tranquilidad), sin verificar contra fuentes oficiales en esos idiomas.
+Incluye los nombres de los sitios (`site.<id>`). Regla única para los 4 idiomas: el **nombre propio de la
+misión se conserva en su denominación original** (`Apollo 11`, `Chang'e 6`, `Chandrayaan-3`…) y solo se
+traduce el accidente geográfico entre paréntesis (por ejemplo, `Apollo 11 (शांति सागर)` o `Apollo 11（静海）`
+para el Mar de la Tranquilidad). Los accidentes geográficos traducidos con IA no se verificaron contra fuentes
+oficiales en esos idiomas. `npm test` comprueba que cada etiqueta empiece con el nombre original de la misión.
 
 **En la presentación y el README final hay que decir que las traducciones al inglés, hindi y chino se
 hicieron con IA y no fueron revisadas por hablantes nativos.** Si alguien las revisa, actualizar esta tabla.
