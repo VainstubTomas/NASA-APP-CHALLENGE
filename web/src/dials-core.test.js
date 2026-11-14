@@ -37,3 +37,15 @@ test('regla: bajo el horizonte queda debajo de la línea y no se sale del dibujo
   assert.ok(rulerY(-500) <= RULER.height);
   assert.equal(rulerY(500), RULER.yTop);
 });
+
+import { directionFromAzEl } from './dials-core.js';
+
+test('3D: norte = -z, este = +x, cenit = +y (azimut 0° al norte, horario)', () => {
+  const close = (v, [x, y, z]) => ['x', 'y', 'z'].forEach((k, i) => near(v[k], [x, y, z][i], k));
+  close(directionFromAzEl(0, 0), [0, 0, -1]);
+  close(directionFromAzEl(90, 0), [1, 0, 0]);
+  close(directionFromAzEl(180, 0), [0, 0, 1]);
+  close(directionFromAzEl(270, 0), [-1, 0, 0]);
+  close(directionFromAzEl(123, 90), [0, 1, 0]);
+  close(directionFromAzEl(0, -90), [0, -1, 0]);
+});

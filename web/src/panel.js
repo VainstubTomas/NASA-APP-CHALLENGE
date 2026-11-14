@@ -60,6 +60,22 @@ function bodyCard({ body, icon, position, radiusDeg, horizon, featured }) {
   return card;
 }
 
+// Un solo visor 3D para toda la sesión (un solo contexto WebGL); null si no se pudo crear.
+let viewer = null;
+let viewerPromise = null;
+function loadViewer() {
+  viewerPromise ??= import('./scene3d.js')
+    .then((m) => {
+      viewer = m.createViewer();
+      return viewer;
+    })
+    .catch((error) => {
+      console.warn('Vista 3D no disponible, se usa la brújula y la regla en 2D:', error);
+      return null;
+    });
+  return viewerPromise;
+}
+
 export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) {
   container.replaceChildren();
   container.classList.add('panel');
@@ -85,6 +101,23 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
     figure(elevationRuler({ sample, radius, horizon }), t('dial.rulerSub')),
   );
   const hint = el('p', 'panel-hint', t('dial.hint'));
+
+  // Vista 3D (three.js, carga diferida). Mientras carga, o si el navegador no tiene WebGL,
+  // queda la brújula + regla en 2D.
+  const data = { sample, radius, horizon };
+  if (viewer) {
+    dials.replaceChildren(viewer.element);
+    hint.textContent = t('view3d.hint');
+    viewer.update(data);
+  } else {
+    loadViewer().then((v) => {
+      if (v && dials.isConnected) {
+        dials.replaceChildren(v.element);
+        hint.textContent = t('view3d.hint');
+        v.update(data);
+      }
+    });
+  }
 
   const cards = el('div', 'panel-cards');
   cards.append(

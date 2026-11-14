@@ -23,3 +23,13 @@ export function rulerY(elevationDeg) {
 export function rulerRadius(radiusDeg, minPx = 7) {
   return Math.max(minPx, radiusDeg * PX_PER_DEG);
 }
+
+/**
+ * Vector unitario {x, y, z} hacia (azimut, elevación) para la vista 3D:
+ * norte = -z, este = +x, arriba = +y (sistema de three.js, y hacia arriba).
+ */
+export function directionFromAzEl(azimuthDeg, elevationDeg) {
+  const az = (azimuthDeg * Math.PI) / 180;
+  const el = (elevationDeg * Math.PI) / 180;
+  return { x: Math.sin(az) * Math.cos(el), y: Math.sin(el), z: -Math.cos(az) * Math.cos(el) };
+}
