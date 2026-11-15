@@ -16,7 +16,7 @@ const NOW = Date.UTC(2026, 10, 14, 15, 42); // 2026-11-14T15:42Z
 test('el rango empieza al inicio del dia UTC actual y termina con los datos', () => {
   assert.equal(startOfUtcDay(NOW), Date.UTC(2026, 10, 14));
   assert.deepEqual(getRange(NOW), { minMs: Date.UTC(2026, 10, 14), maxMs: DATA_END_MS });
-  assert.equal(formatT(DATA_END_MS), '2027-02-28T23:00Z');
+  assert.equal(formatT(DATA_END_MS), '2027-12-31T23:00Z');
 });
 
 test('formatT y parseT son inversos y aceptan segundos', () => {

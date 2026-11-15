@@ -24,8 +24,8 @@ From the **repo root**:
 |---|---|---|
 | `lat` | planetocentric latitude, degrees | -90 to 90 |
 | `lon` | east-positive longitude, degrees | -180 to 180 |
-| `start` | start, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 to 2027-02-28 |
-| `days` | window length in days, 1-hour step (default 7) | 1 to 14; trimmed if it goes past 2027-02-28 |
+| `start` | start, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 to 2027-12-31 |
+| `days` | window length in days, 1-hour step (default 7) | 1 to 14; trimmed if it goes past 2027-12-31 |
 
 | Code | When |
 |---|---|

@@ -24,8 +24,8 @@ Desde la **raíz del repo**:
 |---|---|---|
 | `lat` | latitud planetocéntrica, grados | -90 a 90 |
 | `lon` | longitud este-positiva, grados | -180 a 180 |
-| `start` | inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-02-28 |
-| `days` | días de la ventana, paso de 1 h (por defecto 7) | 1 a 14; si pasa del 2027-02-28 se recorta |
+| `start` | inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-12-31 |
+| `days` | días de la ventana, paso de 1 h (por defecto 7) | 1 a 14; si pasa del 2027-12-31 se recorta |
 
 | Código | Cuándo |
 |---|---|

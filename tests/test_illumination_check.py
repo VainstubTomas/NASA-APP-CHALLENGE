@@ -69,7 +69,7 @@ def test_longitud_cero_va_hacia_arriba_y_90_este_hacia_la_derecha():
 def test_nuestros_porcentajes_coinciden_con_la_iluminacion_media_de_lola():
     """Validación a grandes rasgos (C5-07): mismo orden de magnitud que Mazarico et al. 2011.
 
-    No es el mismo número: nuestro período es de 120 días y el de LOLA, 2009-2013; nuestro horizonte
+    No es el mismo número: nuestro período es de 426 días y el de LOLA, 2009-2013; nuestro horizonte
     llega a 20 km. Tolerancia: 10 puntos porcentuales contra cualquiera de los mapas que cubren el sitio.
     """
     ref = json.loads((ic.REFERENCE_PATH).read_text(encoding="utf-8"))

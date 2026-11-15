@@ -29,8 +29,8 @@ python -m uvicorn data.api.main:app --reload --port 8000
 |---|---|---|
 | `lat` | Latitud planetocéntrica, grados | -90 a 90 |
 | `lon` | Longitud este-positiva, grados | -180 a 180 |
-| `start` | Inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-02-28 |
-| `days` | Días de la ventana, una muestra por hora. Por defecto 7 | 1 a 14. Si pasa del 2027-02-28 se recorta |
+| `start` | Inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-12-31 |
+| `days` | Días de la ventana, una muestra por hora. Por defecto 7 | 1 a 14. Si pasa del 2027-12-31 se recorta |
 
 Convenciones: azimut en grados con 0° = norte y sentido horario; elevación en grados sobre el horizonte; tiempo en UTC; marco topocéntrico (desde el punto elegido). Son las mismas del resto del proyecto.
 

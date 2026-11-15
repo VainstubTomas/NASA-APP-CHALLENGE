@@ -102,9 +102,9 @@ def get_ephemeris(
     lon: float = Query(..., ge=-180, le=180, description="Longitud este-positiva en grados, [-180, 180]",
                        examples=[30]),
     start: str = Query(..., description="Inicio en UTC, ISO 8601 (YYYY-MM-DDTHH:MM:SSZ), entre 2026-11-01 y "
-                                        "2027-02-28", examples=["2026-11-30T06:00:00Z"]),
+                                        "2027-12-31", examples=["2026-11-30T06:00:00Z"]),
     days: int = Query(service.DEFAULT_DAYS, ge=service.MIN_DAYS, le=service.MAX_DAYS,
-                      description="Días de la ventana, de 1 a 14 (si pasa del 2027-02-28 se recorta)"),
+                      description="Días de la ventana, de 1 a 14 (si pasa del 2027-12-31 se recorta)"),
     session=Depends(get_session),
     cache_dir: Path = Depends(get_cache_dir),
 ):

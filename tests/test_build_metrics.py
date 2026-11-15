@@ -95,7 +95,7 @@ def test_escribe_un_archivo_valido_por_sitio_y_omite_el_sintetico(tmp_path):
     errors = list(_validator("metrics.schema.json").iter_errors(doc))
     assert errors == [], [e.message for e in errors[:3]]
     assert doc["site_id"] == "apollo-11"
-    assert doc["time"]["count"] == 120
+    assert doc["time"]["count"] == 426  # días del 2026-11-01 al 2027-12-31
     for sun, earth, both in zip(*doc["daily"].values()):
         assert both <= min(sun, earth)
 
