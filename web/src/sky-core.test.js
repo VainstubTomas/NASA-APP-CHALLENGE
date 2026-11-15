@@ -212,9 +212,9 @@ test('countdownAction: clic en un cuerpo oculto que sale salta a su salida', () 
   assert.deepEqual(countdownAction(change), { type: 'jump', ms: 1_700_000_000_000 });
 });
 
-test('countdownAction: cuerpo visible solo gira la vista (no cambia la fecha)', () => {
-  const change = { visible: true, event: 'sets', atMs: 1_700_000_000_000, crossMs: 1_700_000_000_000 };
-  assert.deepEqual(countdownAction(change), { type: 'look' });
+test('countdownAction: clic en un cuerpo visible que se pone salta a su puesta', () => {
+  const change = { visible: true, event: 'sets', atMs: 1_700_000_000_000, crossMs: 1_699_999_000_000 };
+  assert.deepEqual(countdownAction(change), { type: 'jump', ms: 1_700_000_000_000 });
 });
 
 test('countdownAction: sin cruce en los datos solo gira la vista', () => {

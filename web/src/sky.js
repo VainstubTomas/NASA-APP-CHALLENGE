@@ -532,7 +532,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     if (!data?.sample) return;
     const rows = ['sun', 'earth'].map((key) => {
       const change = nextVisibilityChange(data.ephemeris, data.utcMs, key, horizonFn());
-      // Cada fila es un botón: salta a la salida del cuerpo (si está oculto) o gira la vista hacia él.
+      // Cada fila es un botón: salta a la salida o a la puesta del cuerpo, o gira la vista hacia él si no hay cruce.
       const row = el('button', `sky-cd sky-cd--${key}`);
       row.type = 'button';
       const text = el('span', 'sky-cd__text');
