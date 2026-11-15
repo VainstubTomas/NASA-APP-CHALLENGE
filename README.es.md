@@ -94,7 +94,7 @@ Usamos herramientas de IA, como permiten las reglas de Space Apps, y decimos dó
 - **Código, tests y documentación**: escritos con ayuda de Claude (Anthropic), usado como asistente de programación dentro de nuestro flujo de Git. Los commits en los que participó llevan la línea `Co-Authored-By: Claude`, y cada cambio pasó por un pull request revisado por alguien del equipo. La guía que le damos está en [`CLAUDE.md`](CLAUDE.md).
 - **Traducciones**: los textos de la web en inglés, hindi y chino simplificado se tradujeron con IA y no los revisaron hablantes nativos (ver [`web/src/i18n/README.md`](web/src/i18n/README.md)). La web también lo dice en el pie.
 - **Lo que no generó la IA**: los números. Las posiciones del Sol y la Tierra salen de JPL Horizons y se comparan contra respuestas guardadas de Horizons con tests automáticos (ADR-005, ADR-013).
-- **Imágenes**: el logo del equipo (`logo-vizcachas.svg` y el favicon) se generó con una herramienta de IA para imágenes. Las demás imágenes de la web (superficie lunar, Sol, Tierra, mapas polares, íconos de la interfaz) no son de IA: salen de archivos y proyectos públicos de Figma (ver Créditos).
+- **Imágenes**: el logo del equipo (`logo-vizcachas.svg` y el favicon) se generó con ChatGPT (OpenAI). Las demás imágenes de la web (superficie lunar, Sol, Tierra, mapas polares, íconos de la interfaz) no son de IA: salen de archivos y proyectos públicos de Figma (ver Créditos).
 - Ningún video ni audio del proyecto se generó con IA.
 
 ## Créditos y referencias
