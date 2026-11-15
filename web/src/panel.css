@@ -10,6 +10,7 @@
 
 .info-table {
   width: 100%;
+  margin-top: var(--space-4); /* aire entre tablas y lo que va antes */
   border-collapse: collapse;
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
@@ -50,6 +51,9 @@
 
 .info-note,
 .info-empty { margin: 0; font-size: var(--fs-xs); color: var(--color-muted); }
+/* Notas que siguen a una tabla o a otra nota: separadas, no pegadas */
+.info-table + .info-note,
+.info-note + .info-note { margin-top: var(--space-3); }
 
 /* Comparación de escenarios dentro del cajón (rediseño #99): tabla, formulario compacto, sin tarjetas */
 .compare-table { margin-top: var(--space-3); }

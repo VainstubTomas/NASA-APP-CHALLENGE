@@ -173,8 +173,6 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
   const hp = (n) => ({ text: `${n} h · ${pct(n, sum.samples)}`, className: 'info-num' });
   const periodFrom = fmtUtc(first).slice(0, 10);
   const periodTo = fmtUtc(last).slice(0, 10);
-  // Origen del resumen: sale de todo el archivo de efemérides, no de la fecha elegida.
-  const periodSource = el('p', 'info-note', t('info.periodSource', { from: periodFrom, to: periodTo, hours: sum.samples }));
   const summary = table(
     t('info.period', { from: periodFrom, to: periodTo, hours: sum.samples }),
     ['', t('info.value')],
@@ -188,9 +186,12 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
       [label('info.longestNoBoth'), { text: duration(sum.longestNoBoth), className: 'info-num' }],
     ],
   );
-
-  const note = el('p', 'info-note', t(hasRelief(horizon) ? 'info.noteRelief' : 'info.note'));
-  container.append(header, position, windowsTable, summary, periodSource, note);
+  // Origen del resumen: sale de todo el archivo de efemérides, no de la fecha elegida. Va debajo de la tabla.
+  const periodSource = el('p', 'info-note', t('info.periodSource', { from: periodFrom, to: periodTo, hours: sum.samples }));
+  // Horizonte (ideal o con relieve LOLA) y lectura de la visibilidad: en párrafos separados.
+  const horizonNote = el('p', 'info-note', t(hasRelief(horizon) ? 'info.horizonRelief' : 'info.horizonIdeal'));
+  const note = el('p', 'info-note', t('info.note'));
+  container.append(header, position, windowsTable, summary, periodSource, horizonNote, note);
 
   // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza
   // con el reloj real.
