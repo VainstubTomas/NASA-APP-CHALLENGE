@@ -191,6 +191,7 @@
 }
 
 .compare-summary--tie,
+.compare-summary--same,
 .compare-summary--only,
 .compare-summary--none {
   border-left-color: var(--color-muted);

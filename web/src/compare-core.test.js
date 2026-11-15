@@ -1,7 +1,8 @@
 // Pruebas del núcleo de comparación (C4-01a, #91). Correr con: npm test (dentro de web/).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { summarizeScenario, pickBest } from './compare-core.js';
+import { summarizeScenario, pickBest, groupScenarios } from './compare-core.js';
+import { HOUR_MS } from './state.js';
 
 // Efeméride hecha a mano, 1 muestra por hora desde 2026-11-01T00:00Z (ver ephemeris.test.js).
 // Sol (radio 0,25°), horizonte plano 0°: visible en 0,1,2,3 y 7 -> 5 horas.
@@ -50,4 +51,49 @@ test('elegir: ignora escenarios sin datos y devuelve null si no queda ninguno', 
   assert.equal(pickBest([{ id: 'a', summary: null }]), null);
   const b = { id: 'b', summary: { sunHours: 1, earthHours: 0 } };
   assert.deepEqual(pickBest([{ id: 'a', summary: null }, b]), { id: 'b', tie: false });
+});
+
+// ---- Agrupar escenarios duplicados (#107) ----
+// Un item es lo que devuelve summarizeAll: { id, n, site, t, name, summary } (summary null = sin datos).
+const item = (n, site, t, summary = { sunHours: 10, earthHours: 5 }) => ({ id: `s${n}`, n, site, t, name: site, summary });
+const H = Date.parse('2026-11-20T00:00:00Z');
+
+test('agrupar: tres escenarios iguales forman un solo grupo', () => {
+  const groups = groupScenarios([item(1, 'apollo-11', H), item(2, 'apollo-11', H), item(3, 'apollo-11', H)]);
+  assert.equal(groups.length, 1);
+  assert.deepEqual(groups[0].ns, [1, 2, 3]);
+  assert.equal(groups[0].id, 's1'); // el grupo toma los datos del primero
+});
+
+test('agrupar: dos de tres iguales dan el grupo y el distinto, en el orden de la lista', () => {
+  const groups = groupScenarios([item(1, 'apollo-11', H), item(2, 'slim', H), item(3, 'apollo-11', H)]);
+  assert.deepEqual(groups.map((g) => g.ns), [[1, 3], [2]]);
+  assert.deepEqual(groups.map((g) => g.id), ['s1', 's2']);
+});
+
+test('agrupar: mismo sitio con otra hora, o misma hora con otro sitio, no es duplicado', () => {
+  assert.equal(groupScenarios([item(1, 'apollo-11', H), item(2, 'apollo-11', H + HOUR_MS)]).length, 2);
+  assert.equal(groupScenarios([item(1, 'apollo-11', H), item(2, 'slim', H)]).length, 2);
+});
+
+test('agrupar: la hora se compara por hora entera (Math.floor(t / HOUR_MS))', () => {
+  assert.equal(groupScenarios([item(1, 'slim', H), item(2, 'slim', H + 30 * 60 * 1000)]).length, 1);
+});
+
+test('agrupar: un escenario sin datos no entra a ningún grupo y queda como está', () => {
+  const groups = groupScenarios([item(1, 'apollo-11', H), item(2, 'apollo-11', H, null), item(3, 'apollo-11', H)]);
+  assert.deepEqual(groups.map((g) => g.ns), [[1, 3], [2]]);
+  assert.equal(groups[1].summary, null);
+});
+
+test('agrupar: dos escenarios sin datos iguales tampoco se juntan', () => {
+  const groups = groupScenarios([item(1, 'slim', H, null), item(2, 'slim', H, null)]);
+  assert.deepEqual(groups.map((g) => g.ns), [[1], [2]]);
+});
+
+test('agrupar: no modifica los items de entrada', () => {
+  const input = [item(1, 'slim', H), item(2, 'slim', H)];
+  groupScenarios(input);
+  assert.equal(input[0].ns, undefined);
+  assert.equal(input.length, 2);
 });

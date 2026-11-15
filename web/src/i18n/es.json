@@ -134,6 +134,7 @@
   "compare.title": "Comparar escenarios",
   "compare.intro": "Elegí 2 o 3 combinaciones de sitio y fecha para ver cuál conviene: el mismo sitio en otra fecha, u otro sitio.",
   "compare.scenario": "Escenario {n}",
+  "compare.group.header": "Escenarios {list}: mismo sitio y fecha",
   "compare.add": "Agregar escenario",
   "compare.remove": "Quitar",
   "compare.removeAria": "Quitar el escenario {n}",
@@ -164,10 +165,12 @@
   "compare.best.title": "¿Cuál conviene?",
   "compare.best.badge": "Conviene",
   "compare.best.label": "el escenario {n} ({site})",
+  "compare.best.labelGroup": "el grupo de escenarios {list} ({site})",
   "compare.best.sun": "Conviene {scenario}: tiene más horas de Sol ({hours} h contra {other} h del que le sigue).",
   "compare.best.earth": "Conviene {scenario}: hay empate en horas de Sol ({sun} h), pero tiene más horas con la Tierra visible ({hours} h contra {other} h).",
   "compare.best.tie": "Empate: los escenarios {list} tienen las mismas horas de Sol ({sun} h) y de Tierra visible ({earth} h). No hay diferencia entre ellos.",
   "compare.best.only": "Solo {scenario} tiene datos: no hay con qué compararlo.",
+  "compare.best.same": "Misma fecha y lugar: los escenarios {list} son el mismo caso, así que no hay ganador. Cambiá el sitio o la fecha de alguno para compararlos.",
   "compare.best.none": "Ningún escenario tiene datos para comparar.",
   "compare.best.rule": "Criterio: gana el que tiene más horas de Sol (energía); si empatan, el que tiene más horas con la Tierra visible (comunicación)."
 }

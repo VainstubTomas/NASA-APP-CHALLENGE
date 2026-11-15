@@ -4,6 +4,7 @@ import { timelineWindow } from './timeline-core.js';
 import { visibilitySeries } from './visibility.js';
 import { nextVisibilityChange } from './ephemeris.js';
 import { horizonAt } from './horizon.js';
+import { HOUR_MS } from './state.js';
 
 /**
  * Resumen de un escenario: horas de Sol y de Tierra visible en `days` días desde utcMs,
@@ -43,4 +44,33 @@ export function pickBest(scenarios) {
   const [best, second] = sorted;
   const tie = second !== undefined && cmp(best, second) === 0;
   return { id: best.id, tie };
+}
+
+/**
+ * Agrupa los escenarios repetidos (mismo sitio y misma hora UTC) para no mostrarlos dos veces (#107).
+ * Cada elemento devuelto es el primer escenario del grupo más `ns`: los números de escenario del grupo.
+ * Un escenario sin datos (summary null) no entra a ningún grupo: queda solo, como estaba.
+ * Mantiene el orden de la lista y no modifica los items recibidos.
+ * @param {{id: string, n: number, site: string, t: number, summary: object|null}[]} items resultado de summarizeAll
+ * @returns {({id: string, n: number, site: string, t: number, summary: object|null} & {ns: number[]})[]}
+ */
+export function groupScenarios(items) {
+  const groups = [];
+  const byKey = new Map();
+  for (const item of items) {
+    if (item.summary === null) {
+      groups.push({ ...item, ns: [item.n] });
+      continue;
+    }
+    const key = `${item.site}|${Math.floor(item.t / HOUR_MS)}`;
+    const group = byKey.get(key);
+    if (group) {
+      group.ns.push(item.n);
+    } else {
+      const created = { ...item, ns: [item.n] };
+      byKey.set(key, created);
+      groups.push(created);
+    }
+  }
+  return groups;
 }

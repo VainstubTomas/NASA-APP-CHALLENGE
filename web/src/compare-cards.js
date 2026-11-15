@@ -1,7 +1,8 @@
 // Tarjetas de la comparación de escenarios (C4-01c, #93): una por escenario, lado a lado y con la misma
 // estructura para compararlas a simple vista. Los números salen de summarizeScenario (compare-core.js, #91).
 // C4-01d (#94): arriba de las tarjetas, un resumen dice cuál conviene (criterio de ADR-014) y se destaca su tarjeta.
-import { summarizeScenario } from './compare-core.js';
+// #107: los escenarios repetidos (mismo sitio y hora) se juntan en una sola tarjeta (groupScenarios).
+import { summarizeScenario, groupScenarios } from './compare-core.js';
 import { explainBest } from './compare-summary-core.js';
 import { loadSite, loadSites } from './data.js';
 import { t, locale, siteName } from './i18n.js';
@@ -21,6 +22,10 @@ const fmtUtc = (ms) =>
     timeZone: 'UTC', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
   })} UTC`;
 const fmtNum = (n) => n.toLocaleString(locale, { maximumFractionDigits: 1 });
+// "1 y 3", "1, 2 y 3" según el idioma.
+const fmtList = (ns) => new Intl.ListFormat(locale, { type: 'conjunction' }).format(ns.map(String));
+// Los items sin `ns` (no agrupados) cuentan como un grupo de un solo escenario.
+const numbers = (item) => item.ns ?? [item.n];
 
 /** Carga los datos de cada escenario y calcula su resumen. Un escenario sin datos queda con summary null. */
 export async function summarizeAll(scenarios) {
@@ -63,7 +68,9 @@ function card(item, bestId) {
     node.append(el('p', 'compare-card__badge', t('compare.best.badge')));
   }
   node.append(
-    el('p', 'compare-card__name', t('compare.scenario', { n: item.n })),
+    el('p', 'compare-card__name', numbers(item).length > 1
+      ? t('compare.group.header', { list: fmtList(numbers(item)) })
+      : t('compare.scenario', { n: item.n })),
     el('h3', 'panel-card__title', item.name),
     el('p', 'panel-card__caption', fmtUtc(item.t)),
   );
@@ -85,7 +92,12 @@ function card(item, bestId) {
 /** Frase del resumen en lenguaje simple (claves compare.best.*). */
 export function summaryText(result, items) {
   const byId = (id) => items.find((i) => i.id === id);
-  const label = (id) => t('compare.best.label', { n: byId(id).n, site: byId(id).name });
+  const label = (id) => {
+    const item = byId(id);
+    return numbers(item).length > 1
+      ? t('compare.best.labelGroup', { list: fmtList(numbers(item)), site: item.name })
+      : t('compare.best.label', { n: item.n, site: item.name });
+  };
   switch (result.kind) {
     case 'sun':
       return t('compare.best.sun', { scenario: label(result.id), hours: fmtNum(result.hours), other: fmtNum(result.otherHours) });
@@ -94,9 +106,12 @@ export function summaryText(result, items) {
         scenario: label(result.id), sun: fmtNum(result.sunHours), hours: fmtNum(result.hours), other: fmtNum(result.otherHours),
       });
     case 'tie': {
-      const list = new Intl.ListFormat(locale, { type: 'conjunction' }).format(result.ids.map((id) => String(byId(id).n)));
+      // Números de todos los escenarios de los grupos empatados, en el orden de la lista.
+      const list = fmtList(result.ids.flatMap((id) => numbers(byId(id))).sort((a, b) => a - b));
       return t('compare.best.tie', { list, sun: fmtNum(result.sunHours), earth: fmtNum(result.earthHours) });
     }
+    case 'same':
+      return t('compare.best.same', { list: fmtList(result.ns) });
     case 'only':
       return t('compare.best.only', { scenario: label(result.id) });
     default:
@@ -120,13 +135,14 @@ function summaryBox(result, items) {
  * @param {object[]} items resultado de summarizeAll
  */
 export function renderCompareCards(container, items) {
-  const result = explainBest(items);
+  const groups = groupScenarios(items); // una tarjeta por escenario distinto (#107)
+  const result = explainBest(groups);
   const bestId = result.kind === 'sun' || result.kind === 'earth' ? result.id : null;
   const grid = el('div', 'compare-cards');
-  grid.style.setProperty('--compare-cols', String(items.length));
-  grid.append(...items.map((item) => card(item, bestId)));
+  grid.style.setProperty('--compare-cols', String(groups.length));
+  grid.append(...groups.map((group) => card(group, bestId)));
   container.append(
-    summaryBox(result, items),
+    summaryBox(result, groups),
     grid,
     el('p', 'compare__window', t('compare.window', { days: WINDOW_DAYS })),
     el('p', 'compare__flat', t('compare.flatNote')),
