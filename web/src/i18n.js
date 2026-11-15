@@ -7,6 +7,7 @@ import en from './i18n/en.json';
 import hi from './i18n/hi.json';
 import zh from './i18n/zh.json';
 import { LANGS, LOCALES, detectLang, langFromSearch, createTranslator, siteLabel } from './i18n-core.js';
+import { LANG_FLAGS } from './lang-flags.js';
 
 const STORAGE_KEY = 'llsn.lang';
 const dicts = { es, en, hi, zh };
@@ -39,23 +40,50 @@ export function applyStaticTexts(root = document) {
  * Llena el selector de idioma. Al cambiarlo guarda la elección y recarga la página:
  * el sitio y la fecha están en la URL, así que se conservan.
  */
-export function initLangSelect(select) {
-  for (const code of LANGS) {
-    const opt = document.createElement('option');
-    opt.value = code;
-    opt.textContent = dicts[code]['lang.name'];
-    select.appendChild(opt);
-  }
-  select.value = lang;
-  select.addEventListener('change', () => {
+// Botón con la bandera del idioma actual + menú con las 4 opciones (banderas en lang-flags.js).
+export function initLangMenu(button, menu) {
+  const switchTo = (code) => {
     try {
-      localStorage.setItem(STORAGE_KEY, select.value);
+      localStorage.setItem(STORAGE_KEY, code);
     } catch {
       // sin almacenamiento la elección dura solo esta carga
     }
     // También va en la URL: así un `?lang=` anterior no pisa la elección, y funciona sin localStorage.
     const url = new URL(window.location.href);
-    url.searchParams.set('lang', select.value);
+    url.searchParams.set('lang', code);
     window.location.replace(url);
+  };
+  const currentName = dicts[lang]['lang.name'];
+  button.innerHTML = LANG_FLAGS[lang];
+  button.setAttribute('aria-label', `${dicts[lang]['lang.label']}: ${currentName}`);
+  button.title = `${dicts[lang]['lang.label']}: ${currentName}`;
+  for (const code of LANGS) {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'sky-langmenu__item';
+    item.lang = code;
+    item.setAttribute('aria-current', String(code === lang));
+    item.innerHTML = `<span class="sky-langmenu__flag">${LANG_FLAGS[code]}</span><span>${dicts[code]['lang.name']}</span>`;
+    item.addEventListener('click', () => switchTo(code));
+    const li = document.createElement('li');
+    li.append(item);
+    menu.appendChild(li);
+  }
+  const setOpen = (open) => {
+    menu.hidden = !open;
+    button.setAttribute('aria-expanded', String(open));
+  };
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(menu.hidden);
+  });
+  document.addEventListener('click', (event) => {
+    if (!menu.hidden && !menu.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !menu.hidden) {
+      setOpen(false);
+      button.focus();
+    }
   });
 }

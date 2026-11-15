@@ -57,7 +57,10 @@ export async function initSelector({ onChange, onUserInput, onRange } = {}) {
   let state = resolveState(window.location.search, sites, nowMs);
   let active = { minMs, maxMs, mission: false }; // rango que rige ahora (se calcula en render)
 
+  // Cada render tiene número: si llega otro (arrastrar el deslizador) antes de que termine el de sitio sin datos, se descarta.
+  let renderSeq = 0;
   async function render() {
+    const id = ++renderSeq;
     const next = rangeFor(siteById(state.site), state.t, nowMs);
     const changed = next.minMs !== active.minMs || next.maxMs !== active.maxMs || next.mission !== active.mission;
     active = next;
@@ -82,6 +85,7 @@ export async function initSelector({ onChange, onUserInput, onRange } = {}) {
 
     history.replaceState(null, '', `?${search}`);
     const ok = await hasData(state.site, active.mission);
+    if (id !== renderSeq) return;
     notice.hidden = ok;
     notice.textContent = ok ? '' : t('selector.noData');
     onChange?.({ ...state, hasData: ok, mission: active.mission });

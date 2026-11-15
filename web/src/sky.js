@@ -165,7 +165,16 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   const full = el('button', 'sky-full');
   full.type = 'button';
   const brandRow = el('div', 'sky-brand');
-  brandRow.append(logo, search, full);
+  // Idioma: botón cuadrado con bandera, junto a pantalla completa. initLangMenu (main.js) lo llena y lo conecta.
+  const langBtn = el('button', 'sky-langbtn');
+  langBtn.id = 'lang-btn';
+  langBtn.type = 'button';
+  langBtn.setAttribute('aria-haspopup', 'true');
+  langBtn.setAttribute('aria-expanded', 'false');
+  const langMenu = el('ul', 'sky-langmenu');
+  langMenu.id = 'lang-menu';
+  langMenu.hidden = true;
+  brandRow.append(logo, search, full, langBtn, langMenu);
 
   const time = el('div', 'sky-time');
   const timeLabel = el('label', 'sky-time__label');

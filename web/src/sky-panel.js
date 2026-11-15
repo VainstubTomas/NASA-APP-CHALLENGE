@@ -23,6 +23,8 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   const site = panel.querySelector('#sky-site');
   const time = panel.querySelector('#sky-time');
   const modes = [...panel.querySelectorAll('[data-mode]')];
+  // Sin API en vivo, el mapa no puede aplicar nada: se oculta en vez de dejar un modo sin salida.
+  if (!liveEnabled) panel.querySelector('[data-mode="map"]')?.toggleAttribute('hidden', true);
   const panes = [...panel.querySelectorAll('[data-pane]')];
   const apply = panel.querySelector('[data-sky-apply]');
   const missionBox = panel.querySelector('[data-mission]');
@@ -237,8 +239,9 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     runApply();
   }, true);
 
-  panel.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') close();
+  // Escape cierra desde cualquier foco dentro de la página (también el botón de búsqueda), mientras esté abierto.
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !panel.hidden) close();
   });
 
   // Clic afuera: se cierra sin aplicar.
