@@ -37,7 +37,7 @@ test('dayStartMs: inicio del día UTC', () => {
 test('buildLiveUrl: arma la consulta a la API con fecha UTC sin milisegundos', () => {
   assert.equal(
     buildLiveUrl('http://localhost:8000/', 0, 30, dayStartMs(T)),
-    'http://localhost:8000/ephemeris?lat=0&lon=30&start=2026-11-30T00%3A00%3A00Z&days=7',
+    'http://localhost:8000/ephemeris?lat=0&lon=30&start=2026-11-30T00%3A00%3A00Z&days=14',
   );
 });
 

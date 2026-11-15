@@ -1,42 +1,44 @@
-// Resumen "cuál conviene" (C4-01d, #94), sin DOM. Aplica el criterio de ADR-014 con pickBest (compare-core.js):
-// 1) más horas de Sol; 2) en empate, más horas de Tierra visible; 3) si también empatan, no elige.
-// Si recibe grupos de escenarios repetidos (groupScenarios, #107), cada grupo cuenta una vez; si todos los
-// escenarios con datos son el mismo caso, no hay ganador ni empate: kind 'same'.
-// Devuelve los datos para armar la frase; los textos están en i18n (compare.best.*).
-import { pickBest } from './compare-core.js';
+// Resumen de la comparación (#94, sin DOM). Decisión del equipo (ADR-017): la herramienta NO dice cuál escenario
+// "conviene". Por cada métrica (horas de Sol y horas de Tierra visible) marca cuál tiene más horas, en forma
+// independiente, y deja que la persona decida según los requisitos de su misión (energía, comunicación o equilibrio).
+// Regla matemática: un escenario "tiene más" si supera en esa métrica a cada uno de los otros; si hay varios al tope
+// empatados, se marcan todos; si todos tienen lo mismo, es igual. No hay umbral ni puntaje combinado.
+// Devuelve los datos para armar la frase; los textos están en i18n (compare.summary.*).
 
 /**
+ * Compara una métrica entre los escenarios con datos.
+ * @returns {{kind: 'more', ids: string[], hours: number, otherHours: number} | {kind: 'equal', hours: number}}
+ *   `ids` son los escenarios con más horas (en el orden de la lista), `hours` las suyas y `otherHours` las del
+ *   siguiente (el mejor de los demás).
+ */
+function compareMetric(valid, metric) {
+  const top = Math.max(...valid.map((s) => s.summary[metric]));
+  const leaders = valid.filter((s) => s.summary[metric] === top);
+  if (leaders.length === valid.length) return { kind: 'equal', hours: top };
+  const rest = valid.filter((s) => s.summary[metric] !== top);
+  return {
+    kind: 'more',
+    ids: leaders.map((s) => s.id),
+    hours: top,
+    otherHours: Math.max(...rest.map((s) => s.summary[metric])),
+  };
+}
+
+/**
+ * Si recibe grupos de escenarios repetidos (groupScenarios, #107), cada grupo cuenta una vez; si todos los
+ * escenarios con datos son el mismo caso, no hay nada que comparar: kind 'same'.
  * @param {{id: string, ns?: number[], summary: {sunHours: number, earthHours: number}|null}[]} scenarios
- * @returns {{kind: 'sun', id: string, hours: number, otherHours: number}
- *         | {kind: 'earth', id: string, sunHours: number, hours: number, otherHours: number}
- *         | {kind: 'tie', ids: string[], sunHours: number, earthHours: number}
+ * @returns {{kind: 'metrics', sun: object, earth: object}
  *         | {kind: 'same', id: string, ns: number[]}
  *         | {kind: 'only', id: string}
  *         | {kind: 'none'}}
  */
-export function explainBest(scenarios) {
+export function compareMetrics(scenarios) {
   const valid = scenarios.filter((s) => s.summary !== null);
   if (valid.length === 0) return { kind: 'none' };
-  const best = pickBest(valid);
   if (valid.length === 1) {
     const ns = valid[0].ns ?? [];
-    return ns.length > 1 ? { kind: 'same', id: best.id, ns } : { kind: 'only', id: best.id };
+    return ns.length > 1 ? { kind: 'same', id: valid[0].id, ns } : { kind: 'only', id: valid[0].id };
   }
-
-  const top = valid.find((s) => s.id === best.id).summary;
-  const sameSun = (s) => s.summary.sunHours === top.sunHours;
-  const sameEarth = (s) => sameSun(s) && s.summary.earthHours === top.earthHours;
-  const others = valid.filter((s) => s.id !== best.id);
-
-  if (best.tie) {
-    // En el orden de la lista (escenario 1, 2, 3), no en el del ranking.
-    return { kind: 'tie', ids: valid.filter(sameEarth).map((s) => s.id), sunHours: top.sunHours, earthHours: top.earthHours };
-  }
-  const sunTied = others.filter(sameSun);
-  if (sunTied.length > 0) {
-    const otherHours = Math.max(...sunTied.map((s) => s.summary.earthHours));
-    return { kind: 'earth', id: best.id, sunHours: top.sunHours, hours: top.earthHours, otherHours };
-  }
-  const otherHours = Math.max(...others.map((s) => s.summary.sunHours));
-  return { kind: 'sun', id: best.id, hours: top.sunHours, otherHours };
+  return { kind: 'metrics', sun: compareMetric(valid, 'sunHours'), earth: compareMetric(valid, 'earthHours') };
 }

@@ -15,12 +15,13 @@ import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
 import { sampleAt, nextVisibilityChange, elevationDisplay, compassLabel } from './ephemeris.js';
-import { horizonAt } from './horizon.js';
+import { horizonAt, hasRelief, visibilityState } from './horizon.js';
+import { skylinePoints, chartProfile, skylineLight, skylineEdge, lightColor } from './sky-skyline-core.js';
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
-  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
-  normAz, relAz, rotate, tiltMax, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
+  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter,
 } from './sky-core.js';
 
@@ -32,6 +33,8 @@ const SUN_DISC_FRACTION = 0.75;
 const EARTH_DISC_FRACTION = 0.89;
 // Un arrastre menor a esto es un clic (fija o suelta el detalle del cuerpo).
 const CLICK_SLOP_PX = 4;
+// Al hacer clic en un cuerpo se centra y la vista se acerca hasta este campo de visión (°).
+const ZOOM_ON_BODY_FOV = 45;
 // Estrellas decorativas (sky-core.js): fijas en el cielo del sitio, giran con la vista.
 const STARS = makeStars(1400, 2026);
 // Flechas del centro: a qué distancia del centro se dibuja cada una. Radios distintos para que
@@ -79,11 +82,12 @@ function createBody(key) {
  * @param {object} opts
  * @param {{minMs:number, maxMs:number}} opts.range rango de fechas del selector
  * @param {(ms:number) => void} opts.onTime el deslizador pide un instante nuevo
+ * @param {() => boolean} [opts.isLive] hay una posición libre (API): el deslizador pide recién al soltarse
  * @param {() => void} [opts.onUserInput] la persona tocó la fecha (pausar el reproductor)
  * @param {HTMLElement} [opts.drawer] cajón "Más información" (Figma frame 2)
  * @param {boolean} [opts.liveEnabled] hay API en vivo (ubicación específica)
  */
-export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false }) {
+export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
   const panelEl = root.querySelector('#sky-panel');
 
   // --- Escenario: cielo, suelo, horizonte ---
@@ -105,7 +109,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const bodies = [earth, sun];
   const stars = el('canvas', 'sky-stars');
   stars.setAttribute('aria-hidden', 'true');
-  air.append(stars, earth.disc, sun.disc);
+  // Silueta del relieve real (C5-08): se dibuja encima de los discos, así lo que el terreno tapa no se ve.
+  const skyline = el('canvas', 'sky-skyline');
+  skyline.setAttribute('aria-hidden', 'true');
+  air.append(stars, earth.disc, sun.disc, skyline);
   overlay.append(earth.ghost, sun.ghost, earth.stem, sun.stem, earth.name, sun.name, earth.label, sun.label);
 
 
@@ -120,6 +127,16 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     pointerFor[key] = b;
     pointers.append(b);
   }
+
+  // Cargando (consulta a la API): círculo blanco en el centro; el overlay bloquea la interacción.
+  const loading = el('div', 'sky-loading');
+  loading.hidden = true;
+  loading.setAttribute('role', 'status');
+  loading.setAttribute('aria-label', t('live.loading'));
+  const loadingBox = el('div', 'sky-loading__box');
+  loadingBox.append(el('div', 'sky-loading__ring'), el('p', 'sky-loading__text', t('live.loadingCloud')));
+  loading.append(loadingBox);
+  root.append(loading);
 
   stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
 
@@ -204,6 +221,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     return tiltMax(v.horizonY, pxPerDeg(v.width, fov));
   }
 
+  // Hasta dónde se puede bajar la mirada (negativo): se ve el piso y el recorrido bajo el horizonte.
+  function minTilt() {
+    const v = view();
+    return nadirTilt(v, pxPerDeg(v.width, fov));
+  }
+  // Se puede bajar hasta ver el nadir (−90°) en el borde de abajo: todo el recorrido bajo el horizonte.
+  const nadirTilt = (v, k) => tiltMin(v.horizonY, k, v.height - 90 * k);
+
   // --- Dibujo de la vista ---
   function drawStage() {
     const v = view();
@@ -211,13 +236,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const hy = v.horizonY + tilt * k; // horizonte en pantalla (baja al mirar hacia arriba)
     air.style.height = `${Math.max(0, hy)}px`;
     drawStars(v, k, hy);
+    drawSkyline(v, k, hy);
     scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
     for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
     const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
     ground.style.backgroundSize = `${tileW}px auto`;
     ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
     drawGround(v, k, hy);
-    root.classList.toggle('is-tilted', tilt > 0);
+    root.classList.toggle('is-tilted', tilt !== 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
 
     // Brújula sobre la línea
@@ -306,6 +332,53 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     ctx.globalAlpha = 1;
   }
 
+  // Silueta del relieve (C5-08, #52): las montañas y bordes de cráter del horizon.json sobre el suelo plano.
+  // Solo con relieve real (campo `dem`); con Luna lisa el canvas queda vacío. Reacciona a la luz como el suelo:
+  // cada tramo se ilumina según dónde están el Sol y la Tierra ahora (skylineLight) y el borde se aviva donde el Sol
+  // está justo detrás de la cresta (skylineEdge). Se redibuja con cada cambio de hora, rumbo, zoom o inclinación.
+  function drawSkyline(v, k, hy) {
+    const dpr = window.devicePixelRatio || 1;
+    const h = Math.max(0, Math.round(hy));
+    const w = Math.round(v.width);
+    if (skyline.width !== w * dpr || skyline.height !== h * dpr) {
+      skyline.width = w * dpr;
+      skyline.height = h * dpr;
+      skyline.style.width = `${w}px`;
+      skyline.style.height = `${h}px`;
+    }
+    const ctx = skyline.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    if (!hasRelief(data?.horizon) || h === 0) return;
+    const pts = skylinePoints(data.horizon, { heading, width: v.width, k, hy });
+    const sample = data.sample;
+    const light = sample ? { sun: sample.sun, earth: sample.earth } : null;
+    const radii = data.ephemeris.angular_radius_deg;
+    const azAt = (x) => heading + (x - v.width / 2) / k;
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < pts.length - 1; i += 1) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      const az = azAt((a.x + b.x) / 2);
+      // Relleno del tramo hasta el horizonte plano (0,5 px de más para que no queden costuras entre tramos).
+      ctx.beginPath();
+      ctx.moveTo(a.x, hy);
+      ctx.lineTo(a.x, a.y);
+      ctx.lineTo(b.x + 0.5, b.y);
+      ctx.lineTo(b.x + 0.5, hy);
+      ctx.closePath();
+      ctx.fillStyle = lightColor(skylineLight(az, light, radii));
+      ctx.fill();
+      // Borde del tramo: más brillante donde el Sol está detrás de la cresta.
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${(0.7 * skylineEdge(az, light, radii)).toFixed(3)})`;
+      ctx.stroke();
+    }
+  }
+
   // Flecha del centro hacia un cuerpo. Se atenúa si el cuerpo ya se ve en pantalla y se
   // desvanece si además está bastante centrado (ya no hace falta), o pegado al centro.
   // Discos en pantalla de este dibujo, para que una flecha no quede encima de un cuerpo.
@@ -368,7 +441,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const stemHeight = above ? hy - (p.y + r) : Math.max(0, p.y - r - hy);
     Object.assign(b.stem.style, { left: `${p.x}px`, top: `${stemTop}px`, height: `${stemHeight}px` });
     const { value, side } = elevationDisplay(pos.elevation_deg);
-    b.label.textContent = t(side === 'below' ? 'sky.below' : 'sky.above', { value: fmt1(value) });
+    // Con relieve, un cuerpo sobre 0° puede estar tapado por el terreno: la etiqueta lo dice (C5-08).
+    const blocked = visibilityState(pos, radiusDeg, data.horizon) === 'blocked';
+    b.label.textContent = t(side === 'below' ? 'sky.below' : blocked ? 'sky.blocked' : 'sky.above', { value: fmt1(value) });
+    b.label.classList.toggle('is-blocked', blocked);
     Object.assign(b.label.style, { left: `${p.x + Math.max(box / 2, 14) + 14}px`, top: `${p.y}px` });
   }
 
@@ -380,7 +456,13 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const Y0 = 14;
     const Y1 = 160;
     const sample = data?.sample;
-    const { min, max } = chartRange(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]);
+    const relief = hasRelief(data?.horizon);
+    const profile = relief ? chartProfile(data.horizon) : null;
+    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
+    const { min, max } = chartRange([
+      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
+      ...(profile ? profile.map((p) => p.elevation) : []),
+    ]);
     const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
     const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
     const step = max <= 15 ? 5 : max <= 45 ? 10 : 15;
@@ -390,8 +472,16 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       svg('line', { x1: X0, x2: X1, y1: ay(v), y2: ay(v), class: 'sky-chart__grid' }, chart);
       svg('text', { x: X0 - 6, y: ay(v) + 4, 'text-anchor': 'end' }, chart).textContent = `${v}°`;
     }
-    svg('rect', { x: X0, y: ay(0), width: X1 - X0, height: Y1 - ay(0), class: 'sky-chart__ground' }, chart);
-    svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__horizon' }, chart);
+    if (profile) {
+      // Silueta real del sitio (LOLA): el suelo sigue el perfil de 360° y el 0° queda como referencia.
+      const line = profile.map((p) => `${ax(p.az === 360 ? 360 : p.az)},${ay(p.elevation)}`);
+      svg('polygon', { points: `${X0},${Y1} ${line.join(' ')} ${X1},${Y1}`, class: 'sky-chart__ground' }, chart);
+      svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__grid' }, chart);
+      svg('polyline', { points: line.join(' '), class: 'sky-chart__horizon sky-chart__profile' }, chart);
+    } else {
+      svg('rect', { x: X0, y: ay(0), width: X1 - X0, height: Y1 - ay(0), class: 'sky-chart__ground' }, chart);
+      svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__horizon' }, chart);
+    }
     svg('text', { x: X0 - 6, y: ay(0) + 4, 'text-anchor': 'end' }, chart).textContent = '0°';
     for (let i = 0; i <= 8; i += 1) {
       const a = i * 45;
@@ -400,7 +490,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       const lbl = `${t(`compass.${compassLabel(a)}`)} ${a}°`;
       svg('text', { x, y: 190, 'text-anchor': i === 0 ? 'start' : i === 8 ? 'end' : 'middle' }, chart).textContent = lbl;
     }
-    svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
+    if (!relief) svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
 
     // Recuadro de lo que muestra la vista (puede cruzar el norte: dos rectángulos)
     const from = normAz(heading - fov / 2);
@@ -417,7 +507,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       const pos = sample[key];
       const x = ax(pos.azimuth_deg);
       const y = ay(pos.elevation_deg);
-      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}` }, chart);
+      // Si el relieve lo tapa o está bajo el horizonte, el punto se dibuja hueco (no se ve desde el sitio).
+      const state = visibilityState(pos, data.ephemeris.angular_radius_deg[key], data.horizon);
+      const hidden = state === 'blocked' || state === 'down' ? ' is-hidden' : '';
+      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}${hidden}` }, chart);
       svg('text', { x, y: y - 11, 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart)
         .textContent = bodyName(key);
     }
@@ -437,7 +530,9 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       row.append(el('span', 'sky-cd__dot'), text, value);
       countdown.append(row);
       if (!change?.event) {
-        text.textContent = t(`sky.cd.${key}None`);
+        // Sin cruce del horizonte en los datos: queda siempre visible o nunca, según el estado de ahora.
+        text.textContent = t(`sky.cd.${key}${change?.visible ? 'Always' : 'Never'}`);
+        row.classList.toggle('is-visible', Boolean(change?.visible));
         return null;
       }
       text.textContent = t(`sky.cd.${key}${change.event === 'sets' ? 'Sets' : 'Rises'}`);
@@ -469,39 +564,67 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   }
 
   // --- Interacción ---
-  function animateTo(target) {
+  // Gira hasta `target`; opcionalmente también acerca (fovTo) y mueve la mirada vertical (tiltTo).
+  function animateTo(target, { fovTo = fov, tiltTo = tilt } = {}) {
     if (anim) cancelAnimationFrame(anim);
     const start = heading;
+    const fov0 = fov;
+    const tilt0 = tilt;
     const delta = relAz(target, start);
     const t0 = performance.now();
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const dur = reduce ? 0 : 350;
     const step = (now) => {
       const f = dur ? Math.min(1, (now - t0) / dur) : 1;
-      heading = normAz(start + delta * (1 - (1 - f) ** 3));
+      const e = 1 - (1 - f) ** 3;
+      heading = normAz(start + delta * e);
+      fov = fov0 + (fovTo - fov0) * e;
+      tilt = clampTilt(tilt0 + (tiltTo - tilt0) * e, maxTilt(), minTilt());
       draw();
       anim = f < 1 ? requestAnimationFrame(step) : null;
+      if (f >= 1) refreshHover();
     };
     anim = requestAnimationFrame(step);
   }
   const turn = (delta) => animateTo(rotate(heading, delta));
-  const setTilt = (value) => { tilt = value; draw(); };
+  const setTilt = (value) => { tilt = clampTilt(value, maxTilt(), minTilt()); draw(); };
 
   // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
   // ecuador), también sube la mirada para que entre.
-  function lookAt(key) {
+  // `zoom`: además acerca un poco (clic en el cuerpo); nunca más cerca que ZOOM_ON_BODY_FOV.
+  // Al terminar de moverse la vista, el cuerpo o la flecha pueden haber salido de debajo del cursor sin
+  // que el navegador avise: el resaltado solo queda si el cursor realmente está encima.
+  function refreshHover() {
+    for (const b of bodies) setDetail(b.key, b.disc.matches(':hover') || b.ghost.matches(':hover'));
+    for (const [key, btn] of Object.entries(pointerFor)) {
+      if (!btn.matches(':hover')) root.classList.remove(`is-pointing-${key}`);
+    }
+  }
+
+  function lookAt(key, zoom = false) {
     if (!data?.sample) return;
     const pos = data.sample[key];
     const v = view();
-    const visibleDeg = (v.horizonY - 60) / pxPerDeg(v.width, fov);
-    if (pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
-      tilt = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxTilt());
+    const fovTo = zoom ? Math.max(FOV_MIN_DEG, Math.min(fov, ZOOM_ON_BODY_FOV)) : fov;
+    const k = pxPerDeg(v.width, fovTo);
+    const maxT = tiltMax(v.horizonY, k);
+    const minT = nadirTilt(v, k);
+    const visibleDeg = (v.horizonY - 60) / k;
+    let tiltTo = tilt;
+    if (pos.elevation_deg < 0) {
+      // Bajo el horizonte: baja la mirada para verlo sobre el piso, a media pantalla.
+      tiltTo = clampTilt(pos.elevation_deg + (v.height / 2 - v.horizonY) / k, maxT, minT);
+    } else if (zoom || pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
+      tiltTo = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxT, minT);
     }
-    animateTo(normAz(pos.azimuth_deg));
+    animateTo(normAz(pos.azimuth_deg), { fovTo, tiltTo });
   }
 
   for (const [key, b] of Object.entries(pointerFor)) {
-    b.addEventListener('click', () => lookAt(key));
+    b.addEventListener('click', () => {
+      root.classList.remove(`is-pointing-${key}`);
+      lookAt(key, true);
+    });
     // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
     b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
     b.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
@@ -522,7 +645,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   let drag = null;
   stage.addEventListener('pointerdown', (e) => {
     if (e.target.closest('button')) return;
-    drag = { x: e.clientX, y: e.clientY, heading, tilt, moved: false, body: e.target.closest('.sky-body, .sky-ghost') };
+    drag = { x: e.clientX, y: e.clientY, heading, tilt, moved: false, touch: e.pointerType !== 'mouse', body: e.target.closest('.sky-body, .sky-ghost') };
     stage.setPointerCapture(e.pointerId);
   });
   stage.addEventListener('pointermove', (e) => {
@@ -535,15 +658,19 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (anim) cancelAnimationFrame(anim);
     const k = pxPerDeg(stage.clientWidth, fov);
     heading = normAz(drag.heading - dx / k);
-    tilt = clampTilt(drag.tilt + dy / k, maxTilt());
+    tilt = clampTilt(drag.tilt + dy / k, maxTilt(), minTilt());
     draw();
   });
   const endDrag = () => {
     if (drag && !drag.moved && drag.body) {
       // Clic sobre un cuerpo: fija o suelta su detalle (sirve también en pantallas táctiles).
       const key = drag.body.classList.contains('sky-body--sun') || drag.body.classList.contains('sky-ghost--sun') ? 'sun' : 'earth';
-      if (pinned.has(key)) pinned.delete(key); else pinned.add(key);
-      setDetail(key, pinned.has(key));
+      // El detalle se fija solo con toque (no hay hover); con mouse queda el hover normal, sin clavarse.
+      if (drag.touch) {
+        if (pinned.has(key)) pinned.delete(key); else pinned.add(key);
+        setDetail(key, pinned.has(key));
+      }
+      lookAt(key, true);
     }
     drag = null;
     stage.classList.remove('is-dragging');
@@ -569,7 +696,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const k1 = pxPerDeg(v.width, fov);
     if (anim) cancelAnimationFrame(anim);
     heading = normAz(azCursor - (mx - v.width / 2) / k1);
-    tilt = clampTilt(elCursor - (v.horizonY - my) / k1, maxTilt());
+    tilt = clampTilt(elCursor - (v.horizonY - my) / k1, maxTilt(), minTilt());
     draw();
   }, { passive: false });
 
@@ -579,7 +706,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (e.key === 'ArrowLeft') turn(-ROTATE_STEP_DEG);
     else if (e.key === 'ArrowRight') turn(ROTATE_STEP_DEG);
     else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt, maxTilt()));
-    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt));
+    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt, minTilt()));
     else if ((e.key === 'f' || e.key === 'F') && canFullscreen && !e.metaKey && !e.ctrlKey) toggleFullscreen();
     else return;
     e.preventDefault();
@@ -587,9 +714,19 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   stage.tabIndex = 0;
   stage.setAttribute('aria-label', t('sky.aria'));
 
+  // Con una posición libre (API en vivo) cada instante nuevo es una consulta: mientras se arrastra
+  // solo se actualiza la fecha en pantalla y se pide una vez, al soltar.
   slider.addEventListener('input', () => {
     onUserInput?.();
-    onTime(sliderToTime(slider.value, range.minMs, range.maxMs));
+    const ms = sliderToTime(slider.value, range.minMs, range.maxMs);
+    if (isLive()) {
+      when.textContent = fmtUtc(ms);
+      return;
+    }
+    onTime(ms);
+  });
+  slider.addEventListener('change', () => {
+    if (isLive()) onTime(sliderToTime(slider.value, range.minMs, range.maxMs));
   });
 
   search.addEventListener('click', () => panel?.toggle());
@@ -641,6 +778,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     update({ ephemeris, horizon: hz, utcMs, siteName, key }) {
       const sample = sampleAt(ephemeris, utcMs);
       data = { ephemeris, horizon: hz, utcMs, siteName, sample };
+      // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
+      smooth.style.display = hasRelief(hz) ? 'none' : '';
       if (key !== siteKey && sample) {
         siteKey = key;
         const radii = ephemeris.angular_radius_deg;
@@ -651,6 +790,12 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       drawTime();
       drawCountdown();
       draw();
+    },
+    /** Loader central mientras se consulta la API: bloquea la vista y el deslizador. */
+    setLoading(on) {
+      loading.hidden = !on;
+      slider.disabled = on;
+      root.classList.toggle('is-loading', on);
     },
     /** Sin datos para mostrar: el cielo queda vacío (se conserva el sitio y la fecha). */
     clear({ siteName = data?.siteName ?? '', utcMs = data?.utcMs ?? null } = {}) {

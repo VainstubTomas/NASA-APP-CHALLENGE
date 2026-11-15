@@ -6,12 +6,18 @@
 
 **If I land at this place on the Moon on this date, will I have Sun and will I be able to talk to Earth?**
 
-Near the lunar south pole the Sun and the Earth barely peek above the horizon, and any mountain hides them. This tool takes a site and a date, finds where the Sun and the Earth are, draws them over the horizon of the place, and shows when there is energy and when there is communication. For now the horizon is ideal (a smooth Moon, no terrain), and the app says so; real terrain from LOLA is the next step (ADR-011).
+Near the lunar south pole the Sun and the Earth barely peek above the horizon, and any mountain hides them. This tool takes a site and a date, finds where the Sun and the Earth are, draws them over the horizon of the place, and shows when there is energy and when there is communication. The horizon uses real terrain from LOLA for the sites with elevation data, so a mountain can hide the Sun or the Earth; sites without that data (for example a free latitude and longitude from the live API) keep an ideal horizon (a smooth Moon, no terrain), and the app says so (ADR-011).
 
 ## How it works
 1. **Ephemerides** (Python + JPL Horizons API): azimuth and elevation of the Sun and the Earth per site and per hour.
-2. **Terrain** (Python): horizon profile of 360 directions per site. Today it is flat (0°); the LOLA elevation map comes last (ADR-011).
+2. **Terrain** (Python): horizon profile of 360 directions per site. It comes from the LOLA elevation map for the sites it covers and stays flat (0°) for the rest (ADR-011).
 3. **Web**: reads that precalculated data and compares each body against the horizon.
+
+In addition, a **live API** (FastAPI, [`data/api/`](data/api/)) lets the user pick any latitude and longitude on the Moon: it queries Horizons and answers in the same format. It is optional; without it the web app uses only the precomputed sites. Guide: [`docs/en/09-API.md`](docs/en/09-API.md).
+
+In the sky view, the silhouette of the horizon is real terrain (LOLA) for the sites with elevation data, and it is lit by the Sun and the Earth at the chosen time. The ground drawn below the horizon (craters and texture) is **illustrative**, not real topography (ADR-016).
+
+**The scenario comparison does not pick a winner.** It puts 2 or 3 site-date scenarios side by side and, for each metric separately, marks which one has more hours of Sun (power) and which has more hours of Earth in view (communication). Which one is better depends on the requirements of the mission, so that decision is left to the user (ADR-017).
 
 The positions of the Sun and the Earth come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); the sites and the terrain are explored with Quickmap and Moon Trek, the official resources of the challenge.
 
@@ -48,6 +54,7 @@ Mandatory: layers 0 to 4. Optional: layer 5. The issues of each layer, the sched
 | `precompute/` | Python scripts that generate the data (`ephemeris/`, `terrain/`) |
 | `web/` | Web app (Vite) |
 | `data/public/` | Precalculated JSON files consumed by the web app |
+| `data/api/` | Live API (FastAPI): ephemerides for a free position on the Moon (ADR-015) |
 | `data/schema/` | JSON schemas of the data contract |
 | `tests/` | Contract tests and validation against Horizons |
 
@@ -67,6 +74,10 @@ python -m pytest tests/          # includes tests/test_environment.py, which che
 
 # Web (Vite; serves data/public/ as a static folder)
 cd web && npm ci && npm run dev   # http://localhost:5173 and /sites.json
+
+# Live API (optional, from the repo root): Swagger at http://localhost:8000/docs
+python -m uvicorn data.api.main:app --reload --port 8000
+# For the web app to use it: create web/.env.local with VITE_API_URL=http://localhost:8000
 ```
 
 Deployed version (Vercel): https://vizcachasfueradeorbita.vercel.app/
@@ -76,7 +87,7 @@ Test version deployed (GitHub Pages, from `main`): https://vainstubtomas.github.
 The heavy data (elevation map and Horizons query cache) is not in the repo. See `docs/en/02-ARCHITECTURE.md` and ADR-006 to learn where it comes from.
 
 ## Documentation
-Start with [`docs/en/00-CONTEXT.md`](docs/en/00-CONTEXT.md). Spanish originals are in [`docs/`](docs/) (start with [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md)). To work with Claude, see [`CLAUDE.md`](CLAUDE.md). The Space Apps submission form draft is in [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md).
+Start with [`docs/en/00-CONTEXT.md`](docs/en/00-CONTEXT.md). Spanish originals are in [`docs/`](docs/) (start with [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md)). To work with Claude, see [`CLAUDE.md`](CLAUDE.md). The Space Apps submission form draft is in [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md). The live API is explained in [`docs/en/09-API.md`](docs/en/09-API.md).
 
 ## Use of AI
 We used AI tools, as the Space Apps rules allow, and we say where:

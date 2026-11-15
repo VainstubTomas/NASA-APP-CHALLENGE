@@ -2,7 +2,7 @@
 
 # ADR-014: "Which one is better" criterion in the scenario comparison
 
-- **Status**: Proposed
+- **Status**: Replaced in the web comparison by [ADR-017](ADR-017-comparison-without-verdict.md). Still the ordering used by the landing window finder (C5-03)
 - **Date**: 2026-11-14
 - **Decided by**: pending team confirmation (see #95)
 

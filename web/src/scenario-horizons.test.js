@@ -8,8 +8,11 @@ import { summarizeScenario } from './compare-core.js';
 
 const SITES = new URL('../../data/public/sites/', import.meta.url);
 const read = (siteId, file) => JSON.parse(readFileSync(new URL(`${siteId}/${file}`, SITES), 'utf8'));
+// Los valores de Horizons de abajo se comprobaron contra un horizonte ideal (0°, Luna lisa, ADR-011):
+// se compara contra ese horizonte, no contra el relieve LOLA publicado en horizon.json.
+const flat = (h) => ({ ...h, elevation_deg: h.elevation_deg.map(() => 0) });
 const scenario = (siteId, startUtc, days = 7) =>
-  summarizeScenario(read(siteId, 'ephemeris.json'), read(siteId, 'horizon.json'), Date.parse(startUtc), days);
+  summarizeScenario(read(siteId, 'ephemeris.json'), flat(read(siteId, 'horizon.json')), Date.parse(startUtc), days);
 
 // Tolerancia de un minuto: la web muestra el cruce del horizonte al minuto, Horizons lo da por hora.
 const MINUTE_MS = 60_000;

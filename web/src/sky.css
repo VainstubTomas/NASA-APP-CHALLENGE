@@ -56,15 +56,15 @@
   left: 0;
   right: 0;
   height: 0;
-  border-top: 4px solid var(--sky-horizon);
-  transform: translateY(-2px);
-  /* brillo hacia el cielo y un borde oscuro fino para que se lea sobre el suelo iluminado */
-  box-shadow: 0 0 12px var(--sky-horizon-glow), 0 2px 3px rgba(0, 0, 0, 0.75);
+  /* Sin línea sólida: el horizonte lo marca el borde del suelo y las marcas de la brújula van arriba */
+  border-top: 0;
+  pointer-events: none;
 }
 .sky-ticks { position: absolute; left: 0; right: 0; height: 0; pointer-events: none; }
 .sky-tick {
   position: absolute;
-  top: 2px;
+  /* La brújula va sobre el horizonte, separada de la línea blanca */
+  bottom: 48px;
   width: 2px;
   height: 7px;
   margin-left: -1px;
@@ -88,7 +88,7 @@
   position: absolute;
   left: 50%;
   margin: 0;
-  transform: translate(-50%, calc(-100% - 6px));
+  transform: translate(-50%, calc(-100% - 84px));
   color: var(--sky-horizon);
   font-size: clamp(18px, 1.5vw, 26px);
   font-weight: 600;
@@ -230,6 +230,7 @@
   pointer-events: none;
   text-shadow: 0 0 6px #000;
 }
+.sky-label.is-blocked { font-style: italic; }
 .sky-label--sun { color: var(--color-sun); }
 .sky-label--earth { color: var(--sky-earth); }
 
@@ -410,11 +411,13 @@
   font-size: 13px;
   color: var(--sky-text-dim);
 }
-.sky-cd { margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.sky-cd { margin: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; }
 .sky-cd__dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; opacity: 0.45; }
 .sky-cd.is-visible .sky-cd__dot { opacity: 1; }
 .sky-cd--sun .sky-cd__dot { background: var(--color-sun); }
 .sky-cd--earth .sky-cd__dot { background: var(--sky-earth); }
+/* Filas sin cuenta (siempre visible / no sale): sin hueco vacío a la derecha, el texto queda en el margen */
+.sky-cd__value:empty { display: none; }
 .sky-cd__value {
   min-width: 9.5em;
   text-align: right;
@@ -426,7 +429,7 @@
 /* Horizonte de 360° abajo a la izquierda: recuadro con borde blanco difuminado */
 .sky-chart {
   position: absolute;
-  left: clamp(64px, 5vw, 121px);
+  left: 20px; /* alineado con el bloque del slider (.sky-topleft) */
   bottom: 10px;
   height: calc(20% - 22px); /* entra en el suelo, debajo del horizonte */
   max-width: calc(100% - 140px);
@@ -444,6 +447,12 @@
 .sky-chart__horizon { stroke: var(--sky-text); stroke-width: 1.5; }
 .sky-chart__tick { stroke: var(--sky-text-dim); }
 .sky-chart__view { fill: var(--sky-view-fill); stroke: var(--sky-edge); stroke-width: 1; }
+/* Silueta del relieve (C5-08): canvas encima de los discos, dentro de .sky-air */
+.sky-skyline { position: absolute; top: 0; left: 0; pointer-events: none; }
+.sky-chart__profile { fill: none; }
+.sky-chart__body.is-hidden { fill: none; stroke-width: 2; stroke-dasharray: 3 2; }
+.sky-chart__body--sun.is-hidden { stroke: var(--color-sun); }
+.sky-chart__body--earth.is-hidden { stroke: var(--sky-earth); }
 .sky-chart__body--sun { fill: var(--color-sun); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart__body--earth { fill: var(--sky-earth); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart text.sky-chart__name--sun { fill: var(--color-sun); }
@@ -539,9 +548,36 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1;
-  object-fit: contain;
+  user-select: none;
 }
+/* El puntero se ubica en % del tamaño de la imagen: sigue al mapa si se redimensiona */
+.sky-map__stage { position: relative; cursor: crosshair; touch-action: manipulation; }
+.sky-map__marker {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #e5202a;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 10px 2px rgba(229, 32, 42, 0.8);
+  pointer-events: none;
+  animation: sky-map-drop 0.25s ease-out;
+}
+.sky-map__marker::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 2px solid #e5202a;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sky-map-pulse 1.8s ease-out infinite;
+}
+.sky-map__marker[hidden] { display: none; }
+@keyframes sky-map-drop { from { transform: scale(2.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes sky-map-pulse { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sky-map__marker, .sky-map__marker::after { animation: none; } }
+.sky-map__coords { margin: 0; min-height: 2.4em; font-size: 14px; font-variant-numeric: tabular-nums; color: #000; }
 .sky-map__image[hidden] { display: none; }
 .sky-map__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sky-map__label { margin: 0; font-size: 15px; }
@@ -599,7 +635,7 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 
 /* Pantallas angostas: el gráfico y la cuenta regresiva se acomodan */
 @media (max-width: 760px) {
-  .sky-chart { left: 8px; max-width: calc(100% - 16px); }
+  .sky-chart { left: 20px; max-width: calc(100% - 16px); }
   .sky-topright { top: auto; bottom: calc(20% + 56px); }
   .sky-countdown { font-size: 12px; }
   .sky-more { top: 30%; }
@@ -670,3 +706,32 @@ body.is-drawer-open .sky-drawer {
 @media (prefers-reduced-motion: reduce) {
   .sky-drawer, .sky-more, .sky-body__glow, .sky-stem, .sky-label, .sky-pointer { transition: none; }
 }
+
+/* Loader no invasivo: círculo blanco girando en el centro; bloquea el movimiento mientras carga */
+.sky-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  cursor: progress;
+}
+.sky-loading[hidden] { display: none; }
+.sky-loading__box { display: grid; justify-items: center; gap: 12px; }
+.sky-loading__text {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 0 0 6px #000;
+}
+.sky-loading__ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  animation: sky-loading-spin 0.9s linear infinite;
+}
+@keyframes sky-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .sky-loading__ring { animation-duration: 2.4s; } }

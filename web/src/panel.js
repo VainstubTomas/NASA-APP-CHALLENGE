@@ -5,7 +5,7 @@
 // contra horizon.json (#32) con la regla del contrato; las horas, con visibilitySeries.
 import './panel.css';
 import { sampleAt, compassLabel, nextVisibilityChange } from './ephemeris.js';
-import { horizonAt, statusAgainstHorizon } from './horizon.js';
+import { horizonAt, visibilityState, hasRelief } from './horizon.js';
 import { visibilitySeries } from './visibility.js';
 import { windowHours, periodSummary } from './info-core.js';
 import { t, locale } from './i18n.js';
@@ -45,6 +45,21 @@ function clock(ms) {
   return d > 0 ? `${d} d ${rest}` : rest;
 }
 
+let tipSeq = 0;
+/** Signo de pregunta en un círculo: al pasar el mouse o enfocarlo con el teclado muestra la aclaración. */
+function helpTip(text) {
+  const wrap = el('span', 'info-help');
+  const btn = el('button', 'info-help__btn', '?');
+  btn.type = 'button';
+  const tip = el('span', 'info-help__tip', text);
+  tip.id = `info-help-${tipSeq += 1}`;
+  tip.setAttribute('role', 'tooltip');
+  btn.setAttribute('aria-label', text);
+  btn.setAttribute('aria-describedby', tip.id);
+  wrap.append(btn, tip);
+  return wrap;
+}
+
 /** Tabla con encabezado; `rows` = [[th, ...celdas]], cada celda texto o { text, className }. */
 function table(caption, head, rows, className = '') {
   const tbl = el('table', `info-table ${className}`.trim());
@@ -60,7 +75,16 @@ function table(caption, head, rows, className = '') {
   const tbody = el('tbody');
   for (const [key, ...cells] of rows) {
     const tr = el('tr');
-    const th = el('th', 'info-table__key', key);
+    const th = el('th', 'info-table__key');
+    if (typeof key === 'object' && key.help) {
+      // Texto a la izquierda y "?" fijo a la derecha de la celda: quedan alineados en todas las filas.
+      th.classList.add('info-table__key--help');
+      const inner = el('div', 'info-table__keyrow');
+      inner.append(el('span', 'info-table__label', key.text), helpTip(key.help));
+      th.append(inner);
+    } else {
+      th.textContent = typeof key === 'object' ? key.text : key;
+    }
     th.scope = 'row';
     tr.append(th);
     for (const c of cells) {
@@ -109,21 +133,26 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
 
   // 1) Posición ahora
   const changes = Object.fromEntries(BODIES.map((b) => [b, nextVisibilityChange(ephemeris, sample.utcMs, b, horizonFn)]));
-  const row = (key, fn) => [t(key), ...BODIES.map(fn)];
+  const label = (key) => ({ text: t(key), help: t(`${key}Help`) });
+  const row = (key, fn) => [label(key), ...BODIES.map(fn)];
   const position = table(t('info.now'), ['', t('panel.sun'), t('panel.earth')], [
     row('info.azimuth', (b) => `${num(sample[b].azimuth_deg, 2)}° ${t(`compass.${compassLabel(sample[b].azimuth_deg)}`)}`),
     row('info.elevation', (b) => signedDeg(sample[b].elevation_deg)),
     row('info.state', (b) => {
-      const s = statusAgainstHorizon(sample[b], radius[b], horizon);
+      const s = visibilityState(sample[b], radius[b], horizon);
       return { text: t(`panel.status.${s}`), className: `info-state info-state--${s}` };
     }),
     row('info.next', (b) => {
       const c = changes[b];
-      if (!c?.event) return t('info.noChange');
+      if (!c?.event) {
+        // Sin cruce del horizonte en toda la ventana: dice si el cuerpo queda siempre visible o nunca (la Tierra
+        // está fija en el cielo de la cara visible, y no sale en la oculta; solo sube y baja cerca del borde).
+        return t(['up', 'partial'].includes(visibilityState(sample[b], radius[b], horizon)) ? 'info.alwaysUp' : 'info.alwaysDown');
+      }
       return `${t(c.event === 'sets' ? 'info.sets' : 'info.rises')} · ${fmtUtc(c.crossMs)}`;
     }),
     row('info.countdown', (b) => ({ text: changes[b]?.event ? '' : '—', className: 'info-num info-countdown' })),
-    row('info.radius', (b) => `${num(radius[b], 2)}°`),
+    [label('info.radius'), ...BODIES.map((b) => `${num(radius[b], 2)}°`)],
   ], 'info-table--bodies');
 
   // 2) Horas con visibilidad desde la fecha elegida
@@ -132,7 +161,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
   const windows = [[24, 'info.next24h'], [24 * 7, 'info.next7d'], [24 * 30, 'info.next30d']].map(([hours, key]) => {
     const w = windowHours(vis, sample.index, hours);
     const cell = (n) => ({ text: `${n} h`, className: 'info-num' });
-    return [t(key), cell(w.sun), cell(w.earth), cell(w.both)];
+    return [label(key), cell(w.sun), cell(w.earth), cell(w.both)];
   });
   const windowsTable = table(t('info.windows'), ['', t('panel.sun'), t('panel.earth'), t('info.both')], windows);
 
@@ -145,17 +174,17 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
     t('info.period', { from: fmtUtc(first).slice(0, 10), to: fmtUtc(last).slice(0, 10), hours: sum.samples }),
     ['', t('info.value')],
     [
-      [t('info.sunVisible'), hp(sum.sun)],
-      [t('info.earthVisible'), hp(sum.earth)],
-      [t('info.bothVisible'), hp(sum.both)],
-      [t('info.noneVisible'), hp(sum.none)],
-      [t('info.longestNoSun'), { text: duration(sum.longestNoSun), className: 'info-num' }],
-      [t('info.longestNoEarth'), { text: duration(sum.longestNoEarth), className: 'info-num' }],
-      [t('info.longestNoBoth'), { text: duration(sum.longestNoBoth), className: 'info-num' }],
+      [label('info.sunVisible'), hp(sum.sun)],
+      [label('info.earthVisible'), hp(sum.earth)],
+      [label('info.bothVisible'), hp(sum.both)],
+      [label('info.noneVisible'), hp(sum.none)],
+      [label('info.longestNoSun'), { text: duration(sum.longestNoSun), className: 'info-num' }],
+      [label('info.longestNoEarth'), { text: duration(sum.longestNoEarth), className: 'info-num' }],
+      [label('info.longestNoBoth'), { text: duration(sum.longestNoBoth), className: 'info-num' }],
     ],
   );
 
-  const note = el('p', 'info-note', t('info.note'));
+  const note = el('p', 'info-note', t(hasRelief(horizon) ? 'info.noteRelief' : 'info.note'));
   container.append(header, position, windowsTable, summary, note);
 
   // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza

@@ -67,10 +67,13 @@ REALES = [s["id"] for s in json.loads((PUBLIC / "sites.json").read_text(encoding
 
 
 @pytest.mark.parametrize("site_id", REALES)
-def test_cada_sitio_real_tiene_horizonte_plano(site_id):
+def test_cada_sitio_real_tiene_horizonte_valido(site_id):
+    # Desde C5-05 (#13) los sitios reales traen relieve LOLA: ya no son planos.
+    # La forma (360 valores, schema) sigue igual; el contenido lo verifica tests/test_lola_horizon.py.
     path = PUBLIC / "sites" / site_id / "horizon.json"
-    assert path.exists(), f"falta {path}: correr python -m precompute.terrain.flat_horizon"
+    assert path.exists(), f"falta {path}: correr python -m precompute.terrain.lola_horizon"
     _assert_valid("horizon.schema.json", path)
     doc = json.loads(path.read_text(encoding="utf-8"))
-    assert doc["elevation_deg"] == [0] * 360
-    assert "dem" not in doc
+    assert len(doc["elevation_deg"]) == 360
+    # Polo sur (#16): mapa polar de 30 m; el resto, el global de 128 ppd.
+    assert doc["dem"]["name"] in ("LRO_LOLA_DEM_Global_128ppd_v04", "LRO_LOLA_DEM_SPole75_30mp_v04")

@@ -64,7 +64,7 @@ Prueba hecha el 14/11/2026 por alguien del equipo usando las herramientas por pr
 1. Elegir un sitio de la lista y la fecha original: se ve el horizonte, el Sol y la Tierra, y los números. Mientras no esté el relieve (capa 5), decir que el horizonte es ideal y que la montaña es el siguiente paso; no afirmar que la herramienta muestra montañas tapando el Sol (ADR-011).
 2. Avanzar el reproductor de tiempo: el Sol se acerca al horizonte (a una montaña cuando esté el relieve). Aparece la cuenta regresiva: "el Sol se oculta en N horas".
 3. Cambiar la fecha (retraso): mirar la línea de tiempo de luz y de contacto con la Tierra.
-4. Comparar los dos escenarios lado a lado y concluir cuál conviene (capa 4).
+4. Comparar los dos escenarios lado a lado (capa 4): mostrar cuál tiene más horas de Sol y cuál más horas de Tierra. La herramienta no elige un "mejor": decir que depende de lo que necesite la misión (más energía o más comunicación) y que lo decide quien la usa (ADR-017).
 5. Mostrar el panel de validación contra Horizons (C3-06): para casos conocidos, nuestros números al lado de los de Horizons, con la diferencia.
 
 Elegir un sitio y fechas donde la diferencia sea visible y dramática; probarlas el sábado.

@@ -180,7 +180,7 @@
   border-radius: calc(var(--radius) / 1.5);
 }
 
-/* Resumen "cuál conviene" (C4-01d, #94). */
+/* Resumen de la comparación (C4-01d, #94, ADR-017): una línea por métrica, sin elegir un ganador. */
 .compare-summary {
   margin-bottom: var(--space-3);
   padding: var(--space-3) var(--space-4);
@@ -190,11 +190,16 @@
   border-radius: calc(var(--radius) / 1.5);
 }
 
-.compare-summary--tie,
 .compare-summary--same,
 .compare-summary--only,
 .compare-summary--none {
   border-left-color: var(--color-muted);
+}
+
+.compare-summary__lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .compare-summary__title {
@@ -212,21 +217,4 @@
   margin: var(--space-2) 0 0;
   font-size: var(--fs-xs);
   color: var(--color-muted);
-}
-
-/* Tarjeta ganadora: borde del color del Sol y etiqueta (no depende solo del color). */
-.compare-card--best {
-  --card-color: var(--color-sun);
-  border-color: var(--color-sun);
-}
-
-.compare-card__badge {
-  align-self: flex-start;
-  margin: 0 0 var(--space-1);
-  padding: 0.15rem 0.6rem;
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  color: var(--color-bg);
-  background: var(--color-sun);
-  border-radius: var(--radius-pill);
 }

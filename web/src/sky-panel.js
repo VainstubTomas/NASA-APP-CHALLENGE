@@ -6,6 +6,7 @@
 // Qué pasos se ejecutan lo decide applyPlan (sky-core.js, con tests).
 import { applyPlan } from './sky-core.js';
 import { validateCoords } from './live-core.js';
+import { pixelToLatLon, latLonToPixel, roundCoord, POLES } from './map-core.js';
 import { t } from './i18n.js';
 
 /**
@@ -23,15 +24,65 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   const modes = [...panel.querySelectorAll('[data-mode]')];
   const panes = [...panel.querySelectorAll('[data-pane]')];
   const apply = panel.querySelector('[data-sky-apply]');
-  const noApi = panel.querySelector('[data-no-api]');
+  const noApis = [...panel.querySelectorAll('[data-no-api]')];
   let mode = null;
   let applying = false;
 
   // Mapa lunar: polo sur (el del proyecto) y, con "Rotar", polo norte.
   const map = panel.querySelector('[data-pane="map"]');
   const poleLabel = map?.querySelector('[data-pole-label]');
+  const stage = map?.querySelector('[data-map-stage]');
+  const marker = map?.querySelector('[data-map-marker]');
+  const coordsText = map?.querySelector('[data-map-coords]');
+  let picked = null; // { pole, lat, lon }: el lugar elegido con un clic
+
+  const fmtCoords = (key, ll) => t(key, { lat: ll.lat.toFixed(2), lon: ll.lon.toFixed(2) });
+  function showPicked() {
+    if (coordsText) coordsText.textContent = picked ? fmtCoords('sky.panel.mapPicked', picked) : t('sky.panel.mapHint');
+  }
+  function placeMarker() {
+    if (!marker) return;
+    const px = picked ? latLonToPixel(picked.pole, picked.lat, picked.lon) : null;
+    marker.hidden = !px;
+    if (!px) return;
+    const p = POLES[picked.pole];
+    marker.style.left = `${(px.x / p.width) * 100}%`;
+    marker.style.top = `${(px.y / p.height) * 100}%`;
+  }
+  // Del evento del mouse o del toque a latitud y longitud: píxel en pantalla → píxel del PNG original
+  // → proyección inversa (map-core.js). Fuera del disco del mapa devuelve null.
+  function eventToLatLon(event) {
+    const img = map.querySelector('[data-pole-image]:not([hidden])');
+    const rect = img.getBoundingClientRect();
+    if (!rect.width || !rect.height) return null;
+    const p = POLES[map.dataset.pole];
+    const x = ((event.clientX - rect.left) / rect.width) * p.width;
+    const y = ((event.clientY - rect.top) / rect.height) * p.height;
+    const ll = pixelToLatLon(map.dataset.pole, x, y);
+    return ll && { lat: roundCoord(ll.lat), lon: roundCoord(ll.lon) };
+  }
+  stage?.addEventListener('pointermove', (event) => {
+    const ll = eventToLatLon(event);
+    if (ll) coordsText.textContent = fmtCoords('sky.panel.mapCoords', ll);
+    else showPicked();
+  });
+  stage?.addEventListener('pointerleave', showPicked);
+  stage?.addEventListener('click', (event) => {
+    const ll = eventToLatLon(event);
+    if (!ll) return;
+    picked = { pole: map.dataset.pole, ...ll };
+    console.log('[mapa] lugar elegido', picked);
+    placeMarker();
+    showPicked();
+    updateApply();
+  });
+
   function setPole(pole) {
     if (!map) return;
+    picked = null; // el lugar elegido pertenece a un polo: al rotar se descarta
+    placeMarker();
+    showPicked();
+    updateApply();
     map.dataset.pole = pole;
     for (const img of map.querySelectorAll('[data-pole-image]')) img.hidden = img.dataset.poleImage !== pole;
     poleLabel.textContent = t(pole === 'south' ? 'sky.panel.poleSouth' : 'sky.panel.poleNorth');
@@ -52,12 +103,12 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     for (const b of modes) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
     for (const p of panes) {
       const name = p.dataset.pane;
-      // La fecha acompaña a histórico y a ubicación específica; el mapa todavía no aplica nada.
-      p.hidden = !mode || (name === 'date' ? mode === 'map' : name !== mode);
+      // La fecha acompaña a los tres modos.
+      p.hidden = !mode || (name !== 'date' && name !== mode);
     }
-    if (noApi) noApi.hidden = liveEnabled;
-    // "Aplicar" está en los tres modos. El mapa todavía no permite elegir un lugar y la
-    // ubicación específica necesita la API en vivo: en esos casos queda deshabilitado.
+    for (const n of noApis) n.hidden = liveEnabled;
+    // "Aplicar" está en los tres modos. Ubicación específica y mapa necesitan la API en vivo (y el mapa,
+    // además, un lugar elegido): si falta algo queda deshabilitado.
     apply.hidden = !mode;
     updateApply();
   }
@@ -68,10 +119,11 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     return inputs?.length >= 2 && validateCoords(inputs[0].value, inputs[1].value).ok;
   }
 
-  // "Aplicar": histórico siempre; ubicación específica cuando hay API y las coordenadas son válidas;
+  // "Aplicar": histórico siempre; el mapa cuando hay API y un lugar elegido; ubicación específica cuando hay API (si las coordenadas no son válidas,
+  // runApply muestra el error de cada campo en vez de dejar el botón apagado sin explicación);
   // el mapa todavía no permite elegir un lugar.
   function updateApply() {
-    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled && coordsValid());
+    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled) || (mode === 'map' && liveEnabled && Boolean(picked));
     apply.disabled = !canApply;
   }
 
@@ -102,9 +154,24 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     control.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
+  // Pasa el lugar elegido en el mapa a los campos de latitud y longitud del formulario en vivo.
+  function fillLiveFromMap() {
+    const inputs = liveForm()?.querySelectorAll('input');
+    if (!picked || !inputs || inputs.length < 2) return false;
+    inputs[0].value = String(picked.lat);
+    inputs[1].value = String(picked.lon);
+    for (const input of inputs) input.dispatchEvent(new Event('input', { bubbles: true }));
+    return true;
+  }
+
   function runApply() {
     const form = liveForm();
-    if (mode === 'location' && !coordsValid()) {
+    let effectiveMode = mode;
+    if (mode === 'map') {
+      if (!liveEnabled || !fillLiveFromMap()) return;
+      effectiveMode = 'location';
+    }
+    if (effectiveMode === 'location' && !coordsValid()) {
       // Coordenadas inválidas (por ejemplo, Enter con un campo vacío): el formulario muestra
       // los errores de cada campo y el panel no se cierra. live.js no consulta si no son válidas.
       applying = true;
@@ -114,7 +181,7 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     }
     if (apply.disabled || apply.hidden) return;
     const steps = applyPlan({
-      mode,
+      mode: effectiveMode,
       current: { site: realSite.value, time: realTime.value },
       chosen: { site: site.value, time: time.value },
     });
