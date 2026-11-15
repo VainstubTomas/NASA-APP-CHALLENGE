@@ -85,17 +85,22 @@ const FRAGMENT = /* glsl */ `
     vec3 V = normalize(vView);
     float dist = length(vView);
     // Detalle fino del regolito (dos escalas), se apaga con la distancia
-    vec2 d1 = texture2D(detail, vPos.xz / 2.7).rg * 2.0 - 1.0;
-    vec2 d2 = texture2D(detail, vPos.xz / 23.0 + 0.37).rg * 2.0 - 1.0;
     float fade = clamp(1.0 - dist / 260.0, 0.0, 1.0);
-    vec3 n = normalize(vNormal + vec3(d1.x, 0.0, d1.y) * 0.55 * fade + vec3(d2.x, 0.0, d2.y) * 0.25);
+    vec2 d2 = texture2D(detail, vPos.xz / 23.0 + 0.37).rg * 2.0 - 1.0;
+    vec3 n = normalize(vNormal + vec3(d2.x, 0.0, d2.y) * 0.25);
+    if (fade > 0.0) {
+      vec2 d1 = texture2D(detail, vPos.xz / 2.7).rg * 2.0 - 1.0;
+      n = normalize(vNormal + vec3(d1.x, 0.0, d1.y) * 0.55 * fade + vec3(d2.x, 0.0, d2.y) * 0.25);
+    }
 
     vec3 color = vAlbedo * 0.012; // luz rebotada del terreno vecino (casi nada: sombras negras)
-    if (sunI > 0.0) {
+    // La sombra solo se recorre si la superficie mira a la luz: si no, lommel() ya da 0 y el
+    // resultado es el mismo, pero se ahorra la marcha de 48 pasos en todo lo que está a oscuras.
+    if (sunI > 0.0 && dot(n, sunDir) > 0.0) {
       float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), sunDir, sunSoft);
       color += vAlbedo * vec3(1.0, 0.98, 0.94) * sunI * 2.0 * lommel(n, sunDir, V) * sh;
     }
-    if (earthI > 0.0) {
+    if (earthI > 0.0 && dot(n, earthDir) > 0.0) {
       float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), earthDir, earthSoft);
       color += vAlbedo * vec3(0.62, 0.74, 1.0) * earthI * 2.0 * lommel(n, earthDir, V) * sh;
     }
