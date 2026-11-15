@@ -43,9 +43,12 @@ data/public/sites/<site_id>/metrics.json        (layer 3)
   ]
 }
 ```
-Optional fields: `mission`, `country`, `notes`. Every real site carries a verified `source` and `source_url`. `synthetic: true` marks test data and **must be removed before delivery**.
+Optional fields: `mission`, `country`, `notes`, `landing_utc` (landing, UTC), `landing_source` and `landing_source_url` (ADR-019). Every real site carries a verified `source` and `source_url`. `synthetic: true` marks test data and **must be removed before delivery**.
 
 > Note: the example's `id`, `name` and `source` values are kept as they appear in the schema example (Spanish text), since they are sample data.
+
+### `mission.json` (ADR-019)
+For each site with `landing_utc`, `data/public/sites/<id>/mission.json` has **exactly the format of `ephemeris.json`** (same schema): one sample per hour from 3 days before to 3 days after the landing time (hour rounded down, 145 samples). The web uses it when the date falls inside that window. It is generated with `python -m precompute.ephemeris.build_mission`.
 
 ## `horizon.json`
 ```json

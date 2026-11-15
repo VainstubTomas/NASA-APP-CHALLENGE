@@ -1,6 +1,6 @@
 // Selector de sitio y de fecha/hora UTC. Escribe el estado en la URL.
 import {
-  getRange, clampTime, toInputValue, fromInputValue, resolveState, formatT, mergeSearch,
+  getRange, rangeFor, clampTime, toInputValue, fromInputValue, resolveState, formatT, mergeSearch,
 } from './state.js';
 import { t, siteName } from './i18n.js';
 import { LANGS } from './i18n-core.js';
@@ -13,24 +13,27 @@ async function getJson(path) {
   return res.json(); // si el servidor devuelve HTML (archivo inexistente) esto lanza
 }
 
-// true si el sitio ya tiene efemerides generadas (C1-01). Se pregunta una sola vez por sitio:
-// con el reproductor (C3-02) el instante cambia cada segundo y no hay que volver a descargar.
+// true si el sitio ya tiene efemerides generadas (C1-01), o su ventana de misión (ADR-019) en modo misión.
+// Se pregunta una sola vez por sitio y archivo: con el reproductor (C3-02) el instante cambia cada
+// segundo y no hay que volver a descargar.
 const dataBySite = new Map();
-function hasData(siteId) {
-  if (!dataBySite.has(siteId)) {
-    dataBySite.set(
-      siteId,
-      getJson(`sites/${siteId}/ephemeris.json`).then(() => true, () => false),
-    );
+function hasData(siteId, mission = false) {
+  const file = mission ? 'mission.json' : 'ephemeris.json';
+  const key = `${siteId}/${file}`;
+  if (!dataBySite.has(key)) {
+    dataBySite.set(key, getJson(`sites/${siteId}/${file}`).then(() => true, () => false));
   }
-  return dataBySite.get(siteId);
+  return dataBySite.get(key);
 }
 
 /**
- * Devuelve { range, getState, setTime }: el reproductor (C3-02) mueve el instante con setTime.
+ * Devuelve { range, getRange, getState, setTime }: el reproductor (C3-02) mueve el instante con setTime.
+ * `range` es el rango normal (de hoy al fin de los datos); `getRange()` el que rige ahora, que en modo
+ * misión (ADR-019) es la ventana de la misión del sitio.
  * onUserInput se llama cuando la persona cambia sitio o fecha a mano (el reproductor se pausa).
+ * onRange({ minMs, maxMs, mission }) se llama cuando cambia el rango que rige.
  */
-export async function initSelector({ onChange, onUserInput } = {}) {
+export async function initSelector({ onChange, onUserInput, onRange } = {}) {
   const siteSelect = document.getElementById('site');
   const timeInput = document.getElementById('time');
   const notice = document.getElementById('notice');
@@ -40,6 +43,7 @@ export async function initSelector({ onChange, onUserInput } = {}) {
     const opt = document.createElement('option');
     opt.value = site.id;
     opt.textContent = site.synthetic ? `${siteName(site)} ${t('selector.syntheticTag')}` : siteName(site);
+    if (site.landing_utc) opt.dataset.landing = site.landing_utc; // el panel ofrece "Ir al día de la misión"
     siteSelect.appendChild(opt);
   }
 
@@ -49,9 +53,20 @@ export async function initSelector({ onChange, onUserInput } = {}) {
   timeInput.max = toInputValue(maxMs);
   timeInput.step = 3600; // una muestra por hora
 
+  const siteById = (id) => sites.find((s) => s.id === id);
   let state = resolveState(window.location.search, sites, nowMs);
+  let active = { minMs, maxMs, mission: false }; // rango que rige ahora (se calcula en render)
 
+  // Cada render tiene número: si llega otro (arrastrar el deslizador) antes de que termine el de sitio sin datos, se descarta.
+  let renderSeq = 0;
   async function render() {
+    const id = ++renderSeq;
+    const next = rangeFor(siteById(state.site), state.t, nowMs);
+    const changed = next.minMs !== active.minMs || next.maxMs !== active.maxMs || next.mission !== active.mission;
+    active = next;
+    // Los límites del campo son siempre los del rango normal: en modo misión no hay que bloquear las
+    // fechas actuales (el panel copia estos límites). La ventana de la misión la fija el deslizador.
+    if (changed) onRange?.(active);
     siteSelect.value = state.site;
     timeInput.value = toInputValue(state.t);
     // Conserva los demás parámetros de la URL (c, escenarios, etc.)
@@ -69,23 +84,28 @@ export async function initSelector({ onChange, onUserInput } = {}) {
     }
 
     history.replaceState(null, '', `?${search}`);
-    const ok = await hasData(state.site);
+    const ok = await hasData(state.site, active.mission);
+    if (id !== renderSeq) return;
     notice.hidden = ok;
     notice.textContent = ok ? '' : t('selector.noData');
-    onChange?.({ ...state, hasData: ok });
+    onChange?.({ ...state, hasData: ok, mission: active.mission });
   }
 
   siteSelect.addEventListener('change', () => {
     onUserInput?.();
-    state = { ...state, site: siteSelect.value };
+    // Al cambiar de sitio se sale de la misión del anterior: la fecha se ajusta al rango del sitio nuevo.
+    const r = rangeFor(siteById(siteSelect.value), state.t, nowMs);
+    state = { site: siteSelect.value, t: clampTime(state.t, r.minMs, r.maxMs) };
     render();
   });
 
   timeInput.addEventListener('change', () => {
     onUserInput?.();
     const ms = fromInputValue(timeInput.value);
-    // Vacio o invalido: se vuelve al valor anterior.
-    state = { ...state, t: ms === null ? state.t : clampTime(ms, minMs, maxMs) };
+    // Vacio o invalido: se vuelve al valor anterior. Una fecha dentro de la ventana de misión del sitio
+    // activa el modo misión; fuera de ella rige el rango normal.
+    const r = rangeFor(siteById(state.site), ms ?? state.t, nowMs);
+    state = { ...state, t: ms === null ? state.t : clampTime(ms, r.minMs, r.maxMs) };
     render();
   });
 
@@ -93,9 +113,11 @@ export async function initSelector({ onChange, onUserInput } = {}) {
 
   return {
     range: { minMs, maxMs },
+    getRange: () => active,
     getState: () => state,
     setTime(ms) {
-      state = { ...state, t: clampTime(ms, minMs, maxMs) };
+      const r = rangeFor(siteById(state.site), ms, nowMs);
+      state = { ...state, t: clampTime(ms, r.minMs, r.maxMs) };
       return render();
     },
   };

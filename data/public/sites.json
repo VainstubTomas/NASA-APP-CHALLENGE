@@ -19,7 +19,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 11",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1969-07-20T20:17:39Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "apollo-12",
@@ -30,7 +33,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 12",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1969-11-19T06:54:36Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "apollo-14",
@@ -41,7 +47,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 14",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1971-02-05T09:18:13Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "apollo-15",
@@ -52,7 +61,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 15",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1971-07-30T22:16:29Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "apollo-16",
@@ -63,7 +75,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 16",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1972-04-21T02:23:35Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "apollo-17",
@@ -74,7 +89,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_sites.html",
       "mission": "Apollo 17",
       "country": "EE. UU.",
-      "notes": "Módulo lunar. Fuera del mapa del polo sur."
+      "notes": "Módulo lunar. Fuera del mapa del polo sur.",
+      "landing_utc": "1972-12-11T19:54:58Z",
+      "landing_source": "Hora de alunizaje (UTC) de Orloff, 'Apollo by the Numbers', según la tabla de Scotti del Apollo Lunar Surface Journal (NASA)",
+      "landing_source_url": "https://www.nasa.gov/wp-content/uploads/static/history/alsj/Scotti_AltAz.txt"
     },
     {
       "id": "change-3",
@@ -85,7 +103,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "Chang'e 3",
       "country": "China",
-      "notes": "Fuera del mapa del polo sur."
+      "notes": "Fuera del mapa del polo sur.",
+      "landing_utc": "2013-12-14T13:11:00Z",
+      "landing_source": "Precisión de minuto. Universe Today (13:11 GMT); otras fuentes dan 13:12",
+      "landing_source_url": "https://www.universetoday.com/articles/stunning-change-3-lunar-landing-video-gives-astronauts-eye-view-of-descent-touchdown"
     },
     {
       "id": "change-4",
@@ -96,7 +117,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "Chang'e 4",
       "country": "China",
-      "notes": "Cara oculta: la Tierra nunca es visible en línea directa. Fuera del mapa del polo sur."
+      "notes": "Cara oculta: la Tierra nunca es visible en línea directa. Fuera del mapa del polo sur.",
+      "landing_utc": "2019-01-03T02:26:00Z",
+      "landing_source": "Precisión de minuto. The Planetary Society (02:26 UTC, 10:26 hora de Beijing)",
+      "landing_source_url": "https://www.planetary.org/articles/change4-success"
     },
     {
       "id": "change-6",
@@ -107,7 +131,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "Chang'e 6",
       "country": "China",
-      "notes": "Cara oculta. Fuera del mapa del polo sur."
+      "notes": "Cara oculta. Fuera del mapa del polo sur.",
+      "landing_utc": "2024-06-01T22:23:00Z",
+      "landing_source": "Precisión de minuto. SpaceNews (22:23 UTC; 06:23 hora de Beijing del 2 de junio)",
+      "landing_source_url": "https://spacenews.com/change-6-lands-on-far-side-of-the-moon-to-collect-unique-lunar-samples"
     },
     {
       "id": "chandrayaan-3",
@@ -118,7 +145,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "Chandrayaan-3",
       "country": "India",
-      "notes": "Latitud alta, pero fuera del mapa del polo sur (lat > -80)."
+      "notes": "Latitud alta, pero fuera del mapa del polo sur (lat > -80).",
+      "landing_utc": "2023-08-23T12:33:00Z",
+      "landing_source": "Precisión de minuto. Wikipedia y reportes de prensa del 23/08/2023: alunizaje ~12:33 UTC (~18:03-18:04 IST); el minuto exacto varía entre fuentes, la ventana no cambia",
+      "landing_source_url": "https://en.wikipedia.org/wiki/Chandrayaan-3"
     },
     {
       "id": "slim",
@@ -129,7 +159,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "SLIM",
       "country": "Japón",
-      "notes": "Fuera del mapa del polo sur."
+      "notes": "Fuera del mapa del polo sur.",
+      "landing_utc": "2024-01-19T15:20:00Z",
+      "landing_source": "Precisión de minuto. JAXA: 0:20 JST del 20 de enero de 2024 = 15:20 UTC del 19",
+      "landing_source_url": "https://global.jaxa.jp/press/2024/01/20240120-1_e.html"
     },
     {
       "id": "blue-ghost-1",
@@ -140,7 +173,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "Blue Ghost 1 (CLPS)",
       "country": "EE. UU.",
-      "notes": "Fuera del mapa del polo sur."
+      "notes": "Fuera del mapa del polo sur.",
+      "landing_utc": "2025-03-02T08:34:00Z",
+      "landing_source": "Precisión de minuto. DLR (08:34 UTC)",
+      "landing_source_url": "https://www.dlr.de/en/latest/news/2025/perfect-moon-landing-in-mare-crisium"
     },
     {
       "id": "odysseus-im-1",
@@ -151,7 +187,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "IM-1 (CLPS)",
       "country": "EE. UU.",
-      "notes": "Dentro del mapa del polo sur (lat <= -80), en el borde."
+      "notes": "Dentro del mapa del polo sur (lat <= -80), en el borde.",
+      "landing_utc": "2024-02-22T23:23:00Z",
+      "landing_source": "Precisión de minuto. SpacePolicyOnline (6:23 pm ET = 23:23 UTC)",
+      "landing_source_url": "https://spacepolicyonline.com/news/im-and-nasa-declare-success-odysseus-lander-on-the-moon/"
     },
     {
       "id": "intuitive-machines-2",
@@ -162,7 +201,10 @@
       "source_url": "https://nssdc.gsfc.nasa.gov/planetary/lunar/lunar_artifact_impacts.html",
       "mission": "IM-2 (CLPS)",
       "country": "EE. UU.",
-      "notes": "Dentro del mapa del polo sur (lat <= -80)."
+      "notes": "Dentro del mapa del polo sur (lat <= -80).",
+      "landing_utc": "2025-03-06T17:28:50Z",
+      "landing_source": "Wikipedia (IM-2): toque 17:28:50 UTC. Sin verificar contra Intuitive Machines/NASA. La ventana no cambia (se redondea a la hora)",
+      "landing_source_url": "https://www.wikiwand.com/en/articles/IM-2"
     }
   ]
 }

@@ -45,6 +45,19 @@
   background-position-y: 25%;
   background-color: #6f7176;
 }
+/* Fallback sin WebGL: la foto plana se ilumina según la elevación del Sol (--ground-light, que
+   pone sky.js) y gana profundidad con un degradado: más oscura pegada al horizonte, donde la
+   vista es rasante, y en el borde de abajo, donde se ve más cerca. */
+.sky:not(.has-ground-3d) .sky-ground {
+  filter: brightness(var(--ground-light, 1)) contrast(1.08);
+}
+.sky:not(.has-ground-3d) .sky-ground::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.12) 22%, transparent 45%, transparent 72%, rgba(0, 0, 0, 0.4) 100%);
+}
 .sky.is-ground-hidden .sky-ground { display: none; }
 /* Suelo 3D (sky-ground.js): reemplaza a la textura plana cuando carga */
 .sky.has-ground-3d .sky-ground { background-image: none !important; background-color: #000; }
@@ -101,6 +114,28 @@
   font-size: 0.45em;
   opacity: 0.85;
   font-variant-numeric: tabular-nums;
+}
+
+/* Indicador de bloqueo (cielo): bajo el centro, cuando la vista sigue a un cuerpo. Clic = soltar */
+.sky-lock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, 64px);
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sky-lock[hidden] {
+  display: none;
 }
 
 /* Aviso obligatorio: Luna lisa (ADR-011) */
@@ -289,7 +324,7 @@
   width: min(352px, calc(100vw - 40px));
 }
 .sky-brand { gap: 10px; }
-.sky-brand { display: flex; align-items: center; gap: 16px; }
+.sky-brand { display: flex; align-items: center; gap: 10px; }
 .sky-logo {
   display: grid;
   place-items: center;
@@ -338,6 +373,75 @@
 .sky-full[hidden] { display: none; }
 .sky-full:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25); }
 .sky-full:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+/* Idioma: botón cuadrado con bandera, mismo tamaño y estilo que pantalla completa */
+.sky-brand { position: relative; }
+.sky-langbtn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--sky-white);
+  cursor: pointer;
+  overflow: hidden;
+}
+.sky-langbtn svg,
+.sky-langmenu__flag svg { display: block; width: 26px; height: 18px; border-radius: 2px; }
+.sky-langbtn:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25); }
+.sky-langbtn:focus-visible,
+.sky-langmenu__item:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+/* Menú de idiomas: se abre debajo del botón, alineado a su derecha */
+.sky-langmenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  display: grid;
+  gap: 4px;
+  min-width: 180px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--sky-white);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.sky-langmenu[hidden] { display: none; }
+.sky-langmenu__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #000;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.sky-langmenu__item:hover { background: rgba(0, 0, 0, 0.08); }
+.sky-langmenu__item[aria-current="true"] { font-weight: 600; }
+/* Aviso visible sobre el cielo (lo oculta el atributo hidden) */
+.sky-notice {
+  position: absolute;
+  top: 6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  width: max-content;
+  max-width: min(90vw, 36rem);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius) / 1.5);
+  color: var(--color-notice);
+  background: var(--color-notice-bg);
+}
 .sky-search:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
 /* Deslizador de fecha: recuadro con borde blanco difuminado */
@@ -394,6 +498,29 @@
 .sky-time__slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.28); }
 .sky-time__slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--sky-white); }
 .sky-time__when { margin: 0; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+/* Modo misión (ADR-019): aviso bajo la fecha, con el botón para volver a las fechas actuales */
+.sky-time__mission {
+  display: grid;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sky-edge);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.sky-time__mission[hidden] { display: none; }
+.sky-time__mission-text { color: var(--sky-text-dim); }
+.sky-time__mission-exit {
+  justify-self: start;
+  padding: 3px 8px;
+  border: 1px solid var(--sky-edge);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.sky-time__mission-exit:hover { background: rgba(255, 255, 255, 0.12); }
+.sky-time__mission-exit:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
 /* Arriba a la derecha, pegado al borde: cuenta regresiva (sutil) */
 .sky-topright {
@@ -414,9 +541,49 @@
   font-size: 13px;
   color: var(--sky-text-dim);
 }
-.sky-cd { margin: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; }
-.sky-cd__dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; opacity: 0.45; }
+/* Cada fila es un botón: clic salta a la salida o a la puesta del cuerpo (o gira la vista si no hay cruce) */
+.sky-cd {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.sky-cd:hover { background: rgba(255, 255, 255, 0.08); }
+.sky-cd:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.sky-cd::after {
+  content: '›';
+  margin-left: 2px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sky-cd:hover::after,
+.sky-cd:focus-visible::after { opacity: 0.7; transform: none; }
+.sky-cd__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  align-self: center;
+  opacity: 0.45;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
 .sky-cd.is-visible .sky-cd__dot { opacity: 1; }
+.sky-cd:hover .sky-cd__dot { transform: scale(1.4); opacity: 1; }
+.sky-cd--sun:hover .sky-cd__dot { box-shadow: 0 0 8px var(--color-sun); }
+.sky-cd--earth:hover .sky-cd__dot { box-shadow: 0 0 8px var(--sky-earth); }
+@media (prefers-reduced-motion: reduce) {
+  .sky-cd, .sky-cd::after, .sky-cd__dot { transition: none; }
+}
 .sky-cd--sun .sky-cd__dot { background: var(--color-sun); }
 .sky-cd--earth .sky-cd__dot { background: var(--sky-earth); }
 /* Filas sin cuenta (siempre visible / no sale): sin hueco vacío a la derecha, el texto queda en el margen */
@@ -443,7 +610,8 @@
   border-radius: 5px;
   background: var(--sky-card);
 }
-.sky-chart svg { display: block; height: 100%; width: auto; max-width: 100%; }
+.sky-chart svg { display: block; height: 100%; width: auto; max-width: 100%; cursor: grab; touch-action: none; user-select: none; }
+.sky-chart.is-dragging svg { cursor: grabbing; }
 .sky-chart text { font-family: var(--font-mono); font-size: 13px; fill: var(--sky-text-dim); }
 .sky-chart__grid { stroke: var(--sky-grid); stroke-width: 1; }
 .sky-chart__ground { fill: var(--sky-chart-ground); }
@@ -555,6 +723,17 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 }
 /* El puntero se ubica en % del tamaño de la imagen: sigue al mapa si se redimensiona */
 .sky-map__stage { position: relative; cursor: crosshair; touch-action: manipulation; }
+/* Overlay de debug (?debug): FPS y estadísticas del render 3D */
+.sky-debug {
+  position: absolute; top: 8px; left: 8px; z-index: 30; min-width: 220px;
+  padding: 6px 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.72); color: #cfe;
+  font: 11px/1.5 ui-monospace, Consolas, monospace; pointer-events: auto;
+}
+.sky-debug[hidden] { display: none; }
+.sky-debug__title { color: #8ab; margin-bottom: 2px; }
+.sky-debug__row { display: flex; justify-content: space-between; gap: 12px; }
+.sky-debug__row b { font-weight: 600; color: #fff; }
+.sky-debug__check input { margin: 0; }
 .sky-map__marker {
   position: absolute;
   width: 16px;
@@ -632,6 +811,22 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
   font-size: 15px;
   cursor: pointer;
 }
+/* Ir al día de la misión (ADR-019) */
+.sky-mission { display: grid; gap: 4px; margin-top: 8px; }
+.sky-mission[hidden] { display: none; }
+.sky-mission__go {
+  justify-self: start;
+  padding: 6px 12px;
+  border: 1px solid var(--sky-primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sky-primary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sky-mission__go:hover { background: rgba(0, 0, 0, 0.06); }
+.sky-mission__go:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .sky-panel__apply:disabled { opacity: 0.4; cursor: default; }
 .sky-panel__apply[hidden] { display: none; }
 .sky-panel__apply:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }

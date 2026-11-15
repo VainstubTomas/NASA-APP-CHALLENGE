@@ -23,6 +23,11 @@
         <div class="sky-pane field" data-pane="historical" hidden>
           <label for="sky-site" data-i18n="sky.panel.historical"></label>
           <select id="sky-site"></select>
+          <!-- ADR-019: las misiones con fecha de alunizaje ofrecen ir a ese día (ventana de ±3 días). -->
+          <div class="sky-mission" data-mission hidden>
+            <button type="button" class="sky-mission__go" data-mission-go data-i18n="sky.panel.missionGo"></button>
+            <p class="field-hint" data-mission-hint></p>
+          </div>
         </div>
         <div class="sky-pane" data-pane="location" hidden>
           <section id="live" class="live" hidden></section>
@@ -51,6 +56,8 @@
         </div>
         <button type="button" class="sky-panel__apply" data-sky-apply data-i18n="sky.panel.apply" hidden></button>
       </div>
+      <!-- Avisos (sin datos, errores de carga): visibles en la vista del cielo, no solo dentro del cajón. -->
+      <p id="notice" class="sky-notice" role="alert" hidden></p>
       <!-- Controles reales del selector (src/selector.js); el panel los cambia al aplicar. -->
       <div hidden>
         <select id="site" tabindex="-1" aria-hidden="true"></select>
@@ -61,19 +68,14 @@
     <!-- Más información (Figma frame 2): cajón lateral con el detalle. -->
     <div class="page sky-drawer" id="details" aria-hidden="true" inert>
       <header>
-        <div class="topbar">
-          <label for="lang" data-i18n="lang.label">Idioma</label>
-          <select id="lang"></select>
-        </div>
         <h1 class="app-title">Lunar Landing Site Navigator</h1>
         <p class="app-question" data-i18n="app.question"></p>
         <p class="app-intro" data-i18n="app.intro"></p>
       </header>
 
       <main>
-        <p id="notice" hidden></p>
-        <section id="panel" aria-live="polite"></section>
         <section id="timeline"></section>
+        <section id="panel" aria-live="polite"></section>
         <section id="compare" class="compare" aria-live="polite"></section>
 
         <details class="validation">
@@ -101,6 +103,7 @@
       <footer class="footer">
         <p data-i18n="footer.data"></p>
         <p data-i18n="footer.ai"></p>
+        <p data-i18n="footer.logo"></p>
       </footer>
     </div>
     <script type="module" src="/src/main.js"></script>

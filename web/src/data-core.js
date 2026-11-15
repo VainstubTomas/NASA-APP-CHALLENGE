@@ -33,19 +33,22 @@ function memo(cache, key, load) {
 /**
  * Cargador de datos con caché: { loadSites, loadSite }.
  * - loadSites(): la lista de sitios de sites.json.
- * - loadSite(siteId): { ephemeris, horizon } del sitio, revisados contra lo que espera la web
+ * - loadSite(siteId, { mission }): { ephemeris, horizon } del sitio, revisados contra lo que espera la web
  *   (contract.js); si un archivo no cumple, rechaza con un error que lista los problemas.
+ *   Con { mission: true } las efemérides salen de mission.json (ventana alrededor del alunizaje,
+ *   ADR-019, mismo formato que ephemeris.json); el horizonte es el mismo.
  */
 export function createSiteLoader(fetchJson) {
   const cache = new Map();
 
-  async function fetchSite(siteId) {
+  async function fetchSite(siteId, mission) {
+    const file = mission ? 'mission.json' : 'ephemeris.json';
     const [ephemeris, horizon] = await Promise.all([
-      fetchJson(`sites/${siteId}/ephemeris.json`),
+      fetchJson(`sites/${siteId}/${file}`),
       fetchJson(`sites/${siteId}/horizon.json`),
     ]);
     const problems = [
-      ...checkEphemeris(ephemeris, siteId).map((p) => `ephemeris.json: ${p}`),
+      ...checkEphemeris(ephemeris, siteId).map((p) => `${file}: ${p}`),
       ...checkHorizon(horizon, siteId).map((p) => `horizon.json: ${p}`),
     ];
     if (problems.length) {
@@ -56,6 +59,10 @@ export function createSiteLoader(fetchJson) {
 
   return {
     loadSites: () => memo(cache, 'sites.json', async () => (await fetchJson('sites.json')).sites),
-    loadSite: (siteId) => memo(cache, `site:${siteId}`, () => fetchSite(siteId)),
+    loadSite: (siteId, { mission = false } = {}) => memo(
+      cache,
+      `${mission ? 'mission' : 'site'}:${siteId}`,
+      () => fetchSite(siteId, mission),
+    ),
   };
 }

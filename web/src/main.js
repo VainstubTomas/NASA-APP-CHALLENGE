@@ -1,7 +1,7 @@
 import './theme.css';
 import { initSelector } from './selector.js';
 import { renderPanel, clearPanel } from './panel.js';
-import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
+import { t as i18nT, siteName, applyStaticTexts, initLangMenu } from './i18n.js';
 import { loadSite, loadSites, loadValidation, loadMetrics } from './data.js';
 import { renderTimeline } from './timeline.js';
 import { renderValidation } from './validation-panel.js';
@@ -15,7 +15,6 @@ import { initWelcome } from './welcome.js';
 
 applyStaticTexts();
 initWelcome(); // modal de bienvenida (una vez por sesión)
-initLangSelect(document.getElementById('lang'));
 
 const panel = document.getElementById('panel');
 const timeline = document.getElementById('timeline');
@@ -46,17 +45,22 @@ const liveLoader = apiBase ? createLiveLoader({ apiBase, fetchImpl: (url) => fet
 let live = null; // formulario de latitud y longitud
 let liveSite = null; // { lat, lon } mientras se muestra una posición libre
 let liveSeq = 0; // descarta respuestas viejas si el usuario cambia algo mientras se consulta
+let changeSeq = 0; // sitio o fecha: descarta el resultado si llegó otro cambio mientras se cargaba
 
 // Vista del cielo (rediseño #99): pantalla principal. Se crea antes del selector porque el
 // primer render del selector ya le manda datos.
 const sky = initSky(document.getElementById('sky'), {
   range: getRange(Date.now()),
   onTime: (ms) => selectorApi?.setTime(ms),
+  // Modo misión (ADR-019): "Volver a las fechas actuales" lleva al inicio del rango normal (hoy).
+  onMissionExit: () => selectorApi?.setTime(selectorApi.range.minMs),
   onUserInput: () => player?.pause(),
   drawer: document.getElementById('details'),
   liveEnabled: Boolean(liveLoader),
   isLive: () => Boolean(liveSite),
 });
+// El selector de idioma vive en la vista del cielo (lo crea initSky), así que se llena después.
+initLangMenu(document.getElementById('lang-btn'), document.getElementById('lang-menu'));
 
 async function showLive(utcMs) {
   const { lat, lon } = liveSite;
@@ -89,7 +93,7 @@ async function showLive(utcMs) {
       { lat, lon, dem: horizon.dem?.name ?? 'sin mapa (Luna lisa)', error: reliefError?.message });
     const liveName = i18nT('live.siteName', { lat, lon });
     renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
-    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
+    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}`, lat });
     renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
     validationBody.replaceChildren(); // no hay valores de referencia de Horizons para un punto libre
     if (reliefError) live.setStatus(i18nT('live.reliefError', { error: reliefError.message }), true);
@@ -120,14 +124,18 @@ document.getElementById('site').addEventListener('change', () => {
 
 initSelector({
   onUserInput: () => player?.pause(),
-  onChange: async ({ site, t, hasData }) => {
+  onRange: (range) => sky.setRange(range), // modo misión: el deslizador recorre la ventana (ADR-019)
+  onChange: async ({ site, t, hasData, mission }) => {
+    const seq = ++changeSeq;
     player?.sync(t);
     if (liveSite) {
       await showLive(t);
       return;
     }
     if (!hasData) {
-      sky.clear({ siteName: await getSiteName(site), utcMs: t });
+      const name = await getSiteName(site);
+      if (seq !== changeSeq) return;
+      sky.clear({ siteName: name, utcMs: t });
       clearPanel(panel);
       timeline.replaceChildren();
       validationBody.replaceChildren();
@@ -136,14 +144,19 @@ initSelector({
     try {
       // Primera unión (#32): ephemeris.json y horizon.json reales, revisados contra el contrato.
       // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
-      const { ephemeris, horizon } = await loadSite(site);
+      // En modo misión las efemérides salen de mission.json (ventana alrededor del alunizaje, ADR-019).
+      const { ephemeris, horizon } = await loadSite(site, { mission });
       const name = await getSiteName(site);
-      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site });
-      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords: await getSiteCoords(site) });
+      const coords = await getSiteCoords(site);
+      // Si hubo otro cambio mientras esperábamos, este resultado ya no corresponde a la pantalla.
+      if (seq !== changeSeq) return;
+      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site, lat: coords?.lat });
+      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords });
       // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
       renderTimeline(timeline, ephemeris, horizon, t, 7);
     } catch (err) {
       console.error(err);
+      if (seq !== changeSeq) return;
       sky.clear({ utcMs: t });
       clearPanel(panel);
       timeline.replaceChildren();
@@ -152,14 +165,21 @@ initSelector({
       return;
     }
     // Panel de validación (#39): separado del panel principal, un fallo no lo tumba.
+    // Sus valores de referencia de Horizons son de las fechas actuales: en modo misión no aplican.
+    if (mission) {
+      validationBody.replaceChildren();
+      return;
+    }
     try {
       const [validation, metrics, { ephemeris, horizon }] = await Promise.all([
         loadValidation(),
         loadMetrics(site),
         loadSite(site),
       ]);
+      if (seq !== changeSeq) return;
       renderValidation(validationBody, { validation, siteId: site, ephemeris, horizon, metrics });
     } catch (err) {
+      if (seq !== changeSeq) return;
       validationBody.textContent = i18nT('validation.loadError', { error: err.message });
     }
   },
