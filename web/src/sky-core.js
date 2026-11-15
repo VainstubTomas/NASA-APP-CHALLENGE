@@ -191,3 +191,12 @@ export function pointerAngle(x0, y0, x1, y1) {
 export function nearCenter(x, y, width, height, fraction = 0.5) {
   return Math.abs(x - width / 2) <= (width * fraction) / 2 && Math.abs(y - height / 2) <= (height * fraction) / 2;
 }
+
+/**
+ * Azimut (0° a 360°) que corresponde a una posición horizontal del gráfico de 360°.
+ * x0 y x1 son los bordes del gráfico en las mismas unidades que x; fuera de ellos se recorta al borde.
+ */
+export function chartXToAz(x, x0, x1) {
+  const f = Math.max(0, Math.min(1, (x - x0) / (x1 - x0)));
+  return normAz(f * 360);
+}

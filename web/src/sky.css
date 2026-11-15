@@ -443,7 +443,8 @@
   border-radius: 5px;
   background: var(--sky-card);
 }
-.sky-chart svg { display: block; height: 100%; width: auto; max-width: 100%; }
+.sky-chart svg { display: block; height: 100%; width: auto; max-width: 100%; cursor: grab; touch-action: none; user-select: none; }
+.sky-chart.is-dragging svg { cursor: grabbing; }
 .sky-chart text { font-family: var(--font-mono); font-size: 13px; fill: var(--sky-text-dim); }
 .sky-chart__grid { stroke: var(--sky-grid); stroke-width: 1; }
 .sky-chart__ground { fill: var(--sky-chart-ground); }

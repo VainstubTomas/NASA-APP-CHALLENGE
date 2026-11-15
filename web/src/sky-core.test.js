@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, chartXToAz, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -205,4 +205,12 @@ test('tiltToCenter deja el cuerpo a media pantalla, también con el zoom máximo
     const p = project({ azimuth_deg: 90, elevation_deg: elevation }, { heading: 90, tilt, width, horizonY, fov: FOV_MIN_DEG });
     assert.ok(Math.abs(p.y - height / 2) < 1e-9, `elevación ${elevation}°: y=${p.y}`);
   }
+});
+
+test('chartXToAz traduce la posición en el gráfico a azimut y recorta en los bordes', () => {
+  assert.equal(chartXToAz(44, 44, 704), 0);
+  assert.equal(chartXToAz(374, 44, 704), 180);
+  assert.equal(chartXToAz(539, 44, 704), 270);
+  assert.equal(chartXToAz(0, 44, 704), 0); // a la izquierda del gráfico
+  assert.equal(chartXToAz(900, 44, 704), 0); // 360° es el mismo norte: normAz lo deja en 0
 });
