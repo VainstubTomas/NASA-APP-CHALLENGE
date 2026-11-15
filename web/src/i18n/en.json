@@ -130,5 +130,12 @@
   "countdown.sets": "Set",
   "countdown.rises": "Rise",
   "countdown.estimated": "{event} estimated: {time}",
-  "countdown.note": "Countdowns run in real time from the chosen date. The data is hourly: the exact moment is an estimate (±a few minutes)."
+  "countdown.note": "Countdowns run in real time from the chosen date. The data is hourly: the exact moment is an estimate (±a few minutes).",
+  "compare.title": "Compare scenarios",
+  "compare.intro": "Pick 2 or 3 combinations of site and date to see which one is better: the same site on another date, or another site.",
+  "compare.scenario": "Scenario {n}",
+  "compare.add": "Add scenario",
+  "compare.remove": "Remove",
+  "compare.removeAria": "Remove scenario {n}",
+  "compare.limits": "You can compare at least 2 and at most 3 scenarios."
 }

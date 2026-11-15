@@ -6,6 +6,7 @@ import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.j
 import { loadSite, loadSites, loadValidation, loadMetrics } from './data.js';
 import { renderTimeline } from './timeline.js';
 import { renderValidation } from './validation-panel.js';
+import { initCompare } from './compare.js';
 
 applyStaticTexts();
 initLangSelect(document.getElementById('lang'));
@@ -60,8 +61,14 @@ initSelector({
       validationBody.textContent = i18nT('validation.loadError', { error: err.message });
     }
   },
-}).then((selector) => {
+}).then(async (selector) => {
   player = initPlayer(document.getElementById('player'), selector);
+  // Capa 4 (#92): comparación de escenarios. Arranca con la selección actual como primer escenario.
+  initCompare(document.getElementById('compare'), {
+    sites: await loadSites(),
+    range: selector.range,
+    current: selector.getState(),
+  });
 }).catch((err) => {
   notice.hidden = false;
   notice.textContent = i18nT('app.loadError', { error: err.message });

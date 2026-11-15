@@ -1,0 +1,90 @@
+/* Comparación de escenarios (capa 4, #92). Colores y medidas de theme.css (#38). */
+.compare {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+}
+
+.compare__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.compare__intro,
+.compare__limits {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--color-muted);
+  font-size: var(--fs-sm);
+}
+
+.compare__limits {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-xs);
+}
+
+.compare-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.compare-scenario {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-3);
+  align-items: end;
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 1.5);
+}
+
+.compare-scenario__name {
+  padding: 0 var(--space-1);
+  font-weight: 700;
+}
+
+.compare-scenario select,
+.compare-scenario input {
+  background: var(--color-bg);
+}
+
+@media (max-width: 36rem) {
+  .compare-scenario {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-btn {
+  min-height: 44px; /* tamaño cómodo para el dedo en el celular */
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 1.5);
+  cursor: pointer;
+}
+
+.compare-btn:hover:not(:disabled) {
+  border-color: var(--color-focus);
+}
+
+.compare-btn:disabled {
+  color: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.compare-btn--add {
+  margin-top: var(--space-3);
+  font-weight: 700;
+  border-color: var(--color-sun);
+}
+
+.compare-btn--remove {
+  background: var(--color-bg);
+}
