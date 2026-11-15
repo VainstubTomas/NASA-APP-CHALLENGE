@@ -189,7 +189,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
   );
 
   const note = el('p', 'info-note', t(hasRelief(horizon) ? 'info.noteRelief' : 'info.note'));
-  container.append(header, position, windowsTable, periodSource, summary, note);
+  container.append(header, position, windowsTable, summary, periodSource, note);
 
   // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza
   // con el reloj real.
