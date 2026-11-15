@@ -52,6 +52,8 @@ let liveSeq = 0; // descarta respuestas viejas si el usuario cambia algo mientra
 const sky = initSky(document.getElementById('sky'), {
   range: getRange(Date.now()),
   onTime: (ms) => selectorApi?.setTime(ms),
+  // Modo misión (ADR-019): "Volver a las fechas actuales" lleva al inicio del rango normal (hoy).
+  onMissionExit: () => selectorApi?.setTime(selectorApi.range.minMs),
   onUserInput: () => player?.pause(),
   drawer: document.getElementById('details'),
   liveEnabled: Boolean(liveLoader),
@@ -120,7 +122,8 @@ document.getElementById('site').addEventListener('change', () => {
 
 initSelector({
   onUserInput: () => player?.pause(),
-  onChange: async ({ site, t, hasData }) => {
+  onRange: (range) => sky.setRange(range), // modo misión: el deslizador recorre la ventana (ADR-019)
+  onChange: async ({ site, t, hasData, mission }) => {
     player?.sync(t);
     if (liveSite) {
       await showLive(t);
@@ -136,7 +139,8 @@ initSelector({
     try {
       // Primera unión (#32): ephemeris.json y horizon.json reales, revisados contra el contrato.
       // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
-      const { ephemeris, horizon } = await loadSite(site);
+      // En modo misión las efemérides salen de mission.json (ventana alrededor del alunizaje, ADR-019).
+      const { ephemeris, horizon } = await loadSite(site, { mission });
       const name = await getSiteName(site);
       sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site });
       renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords: await getSiteCoords(site) });
@@ -152,6 +156,11 @@ initSelector({
       return;
     }
     // Panel de validación (#39): separado del panel principal, un fallo no lo tumba.
+    // Sus valores de referencia de Horizons son de las fechas actuales: en modo misión no aplican.
+    if (mission) {
+      validationBody.replaceChildren();
+      return;
+    }
     try {
       const [validation, metrics, { ephemeris, horizon }] = await Promise.all([
         loadValidation(),

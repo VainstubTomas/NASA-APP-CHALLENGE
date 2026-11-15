@@ -394,6 +394,29 @@
 .sky-time__slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.28); }
 .sky-time__slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--sky-white); }
 .sky-time__when { margin: 0; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+/* Modo misión (ADR-019): aviso bajo la fecha, con el botón para volver a las fechas actuales */
+.sky-time__mission {
+  display: grid;
+  gap: 4px;
+  padding-top: 6px;
+  border-top: 1px solid var(--sky-edge);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.sky-time__mission[hidden] { display: none; }
+.sky-time__mission-text { color: var(--sky-text-dim); }
+.sky-time__mission-exit {
+  justify-self: start;
+  padding: 3px 8px;
+  border: 1px solid var(--sky-edge);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.sky-time__mission-exit:hover { background: rgba(255, 255, 255, 0.12); }
+.sky-time__mission-exit:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
 /* Arriba a la derecha, pegado al borde: cuenta regresiva (sutil) */
 .sky-topright {
@@ -632,6 +655,22 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
   font-size: 15px;
   cursor: pointer;
 }
+/* Ir al día de la misión (ADR-019) */
+.sky-mission { display: grid; gap: 4px; margin-top: 8px; }
+.sky-mission[hidden] { display: none; }
+.sky-mission__go {
+  justify-self: start;
+  padding: 6px 12px;
+  border: 1px solid var(--sky-primary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sky-primary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.sky-mission__go:hover { background: rgba(0, 0, 0, 0.06); }
+.sky-mission__go:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .sky-panel__apply:disabled { opacity: 0.4; cursor: default; }
 .sky-panel__apply[hidden] { display: none; }
 .sky-panel__apply:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }

@@ -82,12 +82,13 @@ function createBody(key) {
  * @param {object} opts
  * @param {{minMs:number, maxMs:number}} opts.range rango de fechas del selector
  * @param {(ms:number) => void} opts.onTime el deslizador pide un instante nuevo
+ * @param {() => void} [opts.onMissionExit] la persona pide salir del modo misión (ADR-019)
  * @param {() => boolean} [opts.isLive] hay una posición libre (API): el deslizador pide recién al soltarse
  * @param {() => void} [opts.onUserInput] la persona tocó la fecha (pausar el reproductor)
  * @param {HTMLElement} [opts.drawer] cajón "Más información" (Figma frame 2)
  * @param {boolean} [opts.liveEnabled] hay API en vivo (ubicación específica)
  */
-export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
+export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
   const panelEl = root.querySelector('#sky-panel');
 
   // --- Escenario: cielo, suelo, horizonte ---
@@ -172,7 +173,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   slider.max = String(timeToSlider(range.maxMs, range.minMs));
   slider.step = '1';
   const when = el('p', 'sky-time__when');
-  time.append(timeLabel, slider, when);
+  // Modo misión (ADR-019): aviso con la hora del alunizaje y botón para volver a las fechas actuales.
+  const missionBar = el('div', 'sky-time__mission');
+  const missionText = el('span', 'sky-time__mission-text');
+  const missionExit = el('button', 'sky-time__mission-exit');
+  missionExit.type = 'button';
+  missionBar.append(missionText, missionExit);
+  missionBar.hidden = true;
+  time.append(timeLabel, slider, when, missionBar);
   topLeft.append(brandRow, time);
 
   // --- Arriba a la derecha: cuenta regresiva ---
@@ -549,6 +557,17 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (rows.length) cdTimer = setInterval(tick, 1000);
   }
 
+  function drawMission(landingMs) {
+    missionBar.hidden = landingMs == null;
+    if (landingMs == null) return;
+    missionText.textContent = t('sky.mission.badge', { landing: fmtUtc(landingMs) });
+    missionExit.textContent = t('sky.mission.back');
+  }
+  missionExit.addEventListener('click', () => {
+    onUserInput?.();
+    onMissionExit?.();
+  });
+
   function drawTime() {
     timeLabel.textContent = t('sky.slider', { site: data?.siteName ?? '' });
     if (data?.utcMs != null) {
@@ -793,6 +812,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       drawTime();
       drawCountdown();
       draw();
+    },
+    /**
+     * Cambia el rango del deslizador (ADR-019): en modo misión es la ventana alrededor del alunizaje
+     * (`landingMs`); fuera de él, el rango normal. El instante se redibuja con el próximo `update`.
+     */
+    setRange({ minMs, maxMs, mission = false, landingMs = null }) {
+      range = { minMs, maxMs };
+      slider.max = String(timeToSlider(maxMs, minMs));
+      drawMission(mission ? landingMs : null);
     },
     /** Loader central mientras se consulta la API: bloquea la vista y el deslizador. */
     setLoading(on) {

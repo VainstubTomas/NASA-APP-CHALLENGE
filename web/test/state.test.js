@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   HOUR_MS, DATA_END_MS, startOfUtcDay, getRange, clampTime, formatT, parseT,
   toInputValue, fromInputValue, defaultSite, resolveState, buildSearch, mergeSearch,
+  MISSION_DAYS, missionWindow, missionStartMs, rangeFor,
 } from '../src/state.js';
 import { scenariosToParam, parseScenarios } from '../src/scenarios-core.js';
 
@@ -125,4 +126,56 @@ test('mergeSearch: cambia lo pedido y conserva el resto de los parámetros', () 
   assert.equal(out.get('t'), '2026-11-15T00:00Z');
   assert.equal(out.get('c'), 'y');
   assert.equal(new URLSearchParams(mergeSearch('?c=x', { c: null })).has('c'), false);
+});
+
+// --- Modo misión (ADR-019): ventana de 3 días antes y después del alunizaje ---
+const APOLLO_11 = { id: 'apollo-11', landing_utc: '1969-07-20T20:17:39Z' };
+const MISSION_SITES = [{ id: 'demo-sintetico', synthetic: true }, APOLLO_11, { id: 'slim' }];
+const HOUR = 3600 * 1000;
+
+test('missionWindow: 3 días antes y después de la hora del alunizaje (igual que mission_window de Python)', () => {
+  const w = missionWindow(APOLLO_11);
+  assert.equal(MISSION_DAYS, 3);
+  assert.equal(formatT(w.minMs), '1969-07-17T20:00Z'); // mismo inicio que build_mission.py
+  assert.equal(formatT(w.maxMs), '1969-07-23T20:00Z');
+  assert.equal(w.landingMs, Date.UTC(1969, 6, 20, 20, 17, 39));
+  assert.equal((w.maxMs - w.minMs) / HOUR + 1, 145); // las 145 muestras de mission.json
+  assert.equal(formatT(missionStartMs(APOLLO_11)), '1969-07-20T20:00Z');
+});
+
+test('missionWindow: un sitio sin landing_utc no tiene misión', () => {
+  assert.equal(missionWindow({ id: 'slim' }), null);
+  assert.equal(missionWindow(undefined), null);
+  assert.equal(missionWindow({ landing_utc: 'no es una fecha' }), null);
+  assert.equal(missionStartMs({ id: 'slim' }), null);
+});
+
+test('rangeFor: dentro de la ventana rige la misión; fuera, el rango normal', () => {
+  const w = missionWindow(APOLLO_11);
+  const inside = rangeFor(APOLLO_11, w.landingMs, NOW);
+  assert.deepEqual(inside, { minMs: w.minMs, maxMs: w.maxMs, mission: true, landingMs: w.landingMs });
+  for (const ms of [w.minMs - HOUR, w.maxMs + HOUR, Date.UTC(2026, 11, 1)]) {
+    assert.deepEqual(rangeFor(APOLLO_11, ms, NOW), { ...getRange(NOW), mission: false }, formatT(ms));
+  }
+  assert.deepEqual(rangeFor({ id: 'slim' }, w.landingMs, NOW), { ...getRange(NOW), mission: false });
+});
+
+test('resolveState: una URL con la fecha de la misión se respeta; en otro sitio cae al día actual', () => {
+  assert.deepEqual(
+    resolveState('?site=apollo-11&t=1969-07-20T20:00Z', MISSION_SITES, NOW),
+    { site: 'apollo-11', t: Date.UTC(1969, 6, 20, 20) },
+  );
+  assert.equal(resolveState('?site=slim&t=1969-07-20T20:00Z', MISSION_SITES, NOW).t, startOfUtcDay(NOW));
+  // Fuera de la ventana (4 días después) vuelve al rango normal, sin pasado.
+  assert.equal(resolveState('?site=apollo-11&t=1969-07-24T20:00Z', MISSION_SITES, NOW).t, startOfUtcDay(NOW));
+});
+
+test('resolveState: dentro de la ventana, la hora se redondea y se limita a la ventana', () => {
+  const t = resolveState('?site=apollo-11&t=1969-07-20T20:40Z', MISSION_SITES, NOW).t;
+  assert.equal(formatT(t), '1969-07-20T21:00Z');
+});
+
+test('buildSearch y resolveState hacen ida y vuelta también en modo misión', () => {
+  const state = { site: 'apollo-11', t: Date.UTC(1969, 6, 22, 3) };
+  assert.deepEqual(resolveState(buildSearch(state), MISSION_SITES, NOW), state);
 });
