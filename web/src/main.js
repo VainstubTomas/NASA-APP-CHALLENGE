@@ -199,4 +199,7 @@ initSelector({
 }).catch((err) => {
   notice.hidden = false;
   notice.textContent = i18nT('app.loadError', { error: err.message });
+}).finally(() => {
+  // Recién ahora (sin error o con error ya mostrado) se pinta la UI, con estilos aplicados.
+  document.documentElement.classList.remove('is-booting');
 });
