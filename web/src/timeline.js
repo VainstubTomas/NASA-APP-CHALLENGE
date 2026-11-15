@@ -55,7 +55,7 @@ export function renderTimeline(container, eph, horizon, chosenMs, days = 7) {
 
   for (const body of ['sun', 'earth']) {
     const row = el('div', 'timeline__row');
-    row.append(el('span', 'timeline__label', t(`panel.${body}`)), track(body, series[body].visible.slice(first, last), n, nowFraction));
+    row.append(el('span', `timeline__label timeline__label--${body}`, t(`panel.${body}`)), track(body, series[body].visible.slice(first, last), n, nowFraction));
     chart.append(row);
   }
 

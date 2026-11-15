@@ -4,6 +4,8 @@
 .timeline { display: grid; gap: var(--space-2); }
 .timeline__row { display: grid; grid-template-columns: 4.5rem 1fr; align-items: center; gap: var(--space-3); }
 .timeline__label { font-size: var(--fs-sm); color: var(--color-muted); }
+.timeline__label--sun { color: var(--color-sun); }
+.timeline__label--earth { color: var(--color-earth); }
 .timeline__track {
   position: relative;
   height: 1.75rem;
