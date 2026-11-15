@@ -1,6 +1,6 @@
 > 🇬🇧 [Read in English](../en/adr/ADR-018-live-relief.md)
 
-# ADR-018: Relieve real para una posición libre: `GET /horizon` en la API y carga en dos etapas en la web
+# ADR-018: Relieve real para una posición libre: `GET /horizon` en la API y el loader espera el relieve
 
 - **Estado**: Propuesto
 - **Fecha**: 2026-11-15
@@ -22,10 +22,10 @@ Se midió el costo el 2026-11-15, con la API real de NASA Moon Trek:
 2. **Mismo cálculo que los sitios guardados**: `service.build_live_horizon` llama a `lola_horizon.site_horizon` (mapa polar de 30 m al sur de -75,7°; global de 128 ppd en el resto; 20 km de rayo). No hay un segundo algoritmo.
 3. **Cobertura**: al norte de 85° el recorte del mapa global se vuelve demasiado ancho; ahí responde la Luna lisa **sin `dem`** (la web ya muestra "horizonte ideal, sin relieve").
 4. **Caché**: el recorte queda en `data/raw/` (`dem_<site_id>.tif` o `dem30_<site_id>.tif`, no versionado). Un recorte ilegible se borra para que el próximo pedido reintente. Un candado por punto evita bajar el mismo recorte dos veces a la vez.
-5. **Web en dos etapas**: el relieve se pide en paralelo con las efemérides y **no bloquea el loader**. El cielo aparece con el horizonte liso, como antes; cuando llega el relieve, se vuelven a dibujar el cielo, el panel y la línea de tiempo sin mover la vista. El relieve se guarda por punto (no depende de la fecha). Si falla, queda el horizonte liso y se informa en el estado de la consulta.
+5. **La web espera el relieve con el loader del centro**: el relieve se pide en paralelo con las efemérides y el loader que ya se usa para la API sigue visible hasta que llegan los dos. El cielo se dibuja una sola vez, ya con el relieve (no aparece primero liso y después con montañas). El relieve se guarda por punto (no depende de la fecha), así que cambiar la fecha no lo vuelve a pedir. Si falla, el cielo se muestra con el horizonte liso y se informa en el estado de la consulta.
 
 ## Alternativas descartadas
-- **Esperar el relieve antes de mostrar el cielo**: en el polo sur sumaría ~30 s al loader.
+- **Mostrar primero el cielo liso y dibujar el relieve encima cuando llega** (carga en dos etapas): el loader dura menos, pero el horizonte cambia delante de la persona y durante unos segundos las horas de Sol y de Tierra no son las reales. El equipo prefirió mantener el loader hasta tener el dato completo.
 - **Calcular el relieve en el navegador**: habría que bajar el mapa desde la web (Moon Trek y CORS) y portar el cálculo a JavaScript, duplicando lo ya validado en Python.
 - **Mapa global para todo el planeta**: el archivo pesa 2,2 GB; se sigue pidiendo solo el recorte de cada punto.
 
@@ -33,4 +33,4 @@ Se midió el costo el 2026-11-15, con la API real de NASA Moon Trek:
 - Las horas de Sol y de Tierra de una posición libre pasan a tener en cuenta el relieve, como los sitios guardados.
 - La API necesita `rasterio` y `pyproj` (agregados a `data/api/requirements.txt`) y depende también de Moon Trek.
 - En Render gratis el disco no es persistente: la caché de recortes se pierde cuando el servicio se duerme, y el cálculo puede ser más lento por la CPU limitada.
-- Costo: la primera consulta de un punto del polo sur tarda ~30 s en mostrar el relieve (el cielo se ve antes).
+- Costo: la primera consulta de un punto del polo sur mantiene el loader ~30 s (fuera del polo, ~2–3 s más que antes). Las siguientes consultas del mismo punto no suman espera.

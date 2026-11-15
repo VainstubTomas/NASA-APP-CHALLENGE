@@ -106,26 +106,20 @@ export function createLiveLoader({ apiBase, fetchImpl }) {
 
   // Relieve por punto (no depende de la fecha): se pide una vez y queda guardado.
   const horizons = new Map();
-  const readyHorizons = new Map();
 
   return {
     /**
      * Relieve del punto (horizon.json con `dem`, o la Luna lisa si no hay mapa para esa latitud).
-     * La primera vez puede tardar: el cielo se muestra antes con el horizonte liso de load().
-     * Si falla, rechaza y el próximo pedido reintenta.
+     * La primera vez puede tardar (~30 s en el polo sur). Si falla, rechaza y el próximo pedido reintenta.
      */
     loadHorizon(lat, lon) {
       const key = `${lat}|${lon}`;
       if (!horizons.has(key)) {
         const promise = fetchHorizon(lat, lon);
-        promise.then((h) => readyHorizons.set(key, h), () => horizons.delete(key));
+        promise.catch(() => horizons.delete(key));
         horizons.set(key, promise);
       }
       return horizons.get(key);
-    },
-    /** El relieve del punto si ya llegó; si no, null (sin esperar). */
-    readyHorizon(lat, lon) {
-      return readyHorizons.get(`${lat}|${lon}`) ?? null;
     },
     load(lat, lon, utcMs) {
       const startMs = dayStartMs(utcMs);

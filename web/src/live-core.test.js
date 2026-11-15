@@ -109,16 +109,15 @@ test('buildHorizonUrl: arma /horizon con lat y lon', () => {
   assert.equal(buildHorizonUrl('http://localhost:8000/', -89.5, 0), 'http://localhost:8000/horizon?lat=-89.5&lon=0');
 });
 
-test('loader: el relieve se pide una vez por punto (no depende de la fecha) y queda listo sin esperar', async () => {
+test('loader: el relieve se pide una vez por punto (no depende de la fecha)', async () => {
   const calls = [];
   const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl: okFetch(relief(), calls) });
-  assert.equal(loader.readyHorizon(0, 30), null);
   const h = await loader.loadHorizon(0, 30);
   assert.equal(h.dem.pixel_m, 237);
   await loader.loadHorizon(0, 30);
   assert.equal(calls.length, 1);
-  assert.deepEqual(loader.readyHorizon(0, 30), h);
-  assert.equal(loader.readyHorizon(0, 31), null);
+  await loader.loadHorizon(0, 31);
+  assert.equal(calls.length, 2);
 });
 
 test('loader: la Luna lisa de la API (sin mapa para esa latitud) también es un relieve válido', async () => {
@@ -127,7 +126,7 @@ test('loader: la Luna lisa de la API (sin mapa para esa latitud) también es un 
   assert.equal(h.dem, undefined);
 });
 
-test('loader: si el relieve falla rechaza con el mensaje de la API, no queda listo y el próximo pedido reintenta', async () => {
+test('loader: si el relieve falla rechaza con el mensaje de la API y el próximo pedido reintenta', async () => {
   const calls = [];
   const fetchImpl = async (url) => {
     calls.push(url);
@@ -135,7 +134,6 @@ test('loader: si el relieve falla rechaza con el mensaje de la API, no queda lis
   };
   const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl });
   await assert.rejects(loader.loadHorizon(0, 30), /Moon Trek/);
-  assert.equal(loader.readyHorizon(0, 30), null);
   await assert.rejects(loader.loadHorizon(0, 30), /Moon Trek/);
   assert.equal(calls.length, 2);
 });

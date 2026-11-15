@@ -80,7 +80,7 @@ El recorte queda en `data/raw/` (no versionado): repetir el mismo punto tarda ~0
 ## Cómo la usa la web
 - Si hay una URL de API configurada (`VITE_API_URL`), la web muestra la sección "Posición libre en la Luna": dos inputs (latitud y longitud) que usan la fecha del selector.
 - La web valida los rangos antes de llamar a la API y muestra el error si falla. Cada consulta pide los 7 días desde el inicio del día UTC elegido y se guarda mientras se siga en ese día.
-- **Carga en dos etapas** (ADR-018): la web pide el relieve (`/horizon`) en paralelo con las efemérides. El cielo aparece apenas llegan las efemérides, con el horizonte ideal (Luna lisa); cuando llega el relieve se vuelve a dibujar sin mover la vista. El relieve se guarda por punto. Si falla, queda el horizonte ideal y el estado de la consulta lo avisa.
+- **Relieve** (ADR-018): la web pide el relieve (`/horizon`) en paralelo con las efemérides y el loader del centro sigue hasta que llegan los dos, así el cielo se dibuja una sola vez y ya con el relieve. El relieve se guarda por punto. Si falla, el cielo se muestra con el horizonte ideal y el estado de la consulta lo avisa.
 - Sin `VITE_API_URL` la sección no aparece y la web funciona solo con los sitios precalculados.
 - Código: `web/src/live-core.js` (lógica, probada con `npm test`) y `web/src/live.js` (formulario).
 

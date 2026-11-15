@@ -81,7 +81,7 @@ The crop stays in `data/raw/` (not versioned): repeating the same point takes ~0
 ## How the web app uses it
 - If an API URL is configured (`VITE_API_URL`), the web app shows the "Free position on the Moon" section: two inputs (latitude and longitude) that use the date from the selector.
 - The web app validates the ranges before calling the API and shows the error if it fails. Each query asks for the 7 days from the start of the chosen UTC day and is kept while the person stays on that day.
-- **Two-stage loading** (ADR-018): the web app requests the relief (`/horizon`) in parallel with the ephemerides. The sky appears as soon as the ephemerides arrive, with the ideal horizon (flat Moon); when the relief arrives it is redrawn without moving the view. The relief is cached per point. If it fails, the ideal horizon stays and the query status says so.
+- **Relief** (ADR-018): the web app requests the relief (`/horizon`) in parallel with the ephemerides and the central loader stays until both arrive, so the sky is drawn once and already with the relief. The relief is cached per point. If it fails, the sky shows the ideal horizon and the query status says so.
 - Without `VITE_API_URL` the section does not appear and the web app works only with the precomputed sites.
 - Code: `web/src/live-core.js` (logic, tested with `npm test`) and `web/src/live.js` (form).
 
