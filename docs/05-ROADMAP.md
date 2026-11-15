@@ -2,7 +2,7 @@
 
 # 05. Roadmap e issues iniciales
 
-Última actualización: 2026-11-14 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.md#mapa-del-proyecto).
+Última actualización: 2026-11-14 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.es.md#mapa-del-proyecto).
 
 Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada capa es una **épica** (`[EPICA] ...`, issue padre) y sus issues cuelgan de ella como sub-issues (ver "Épicas" en `docs/04-GIT-WORKFLOW.md` y ADR-008). Cada issue es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Es un equipo multirubro: no hay roles fijos y cualquiera toma issues de cualquier área.
 

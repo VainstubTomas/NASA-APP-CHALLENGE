@@ -2,7 +2,7 @@
 
 # 05. Roadmap and initial issues
 
-Last update: 2026-11-14 · Source of truth for issues: `scripts/issues.json`. This document is maintained by hand: if `issues.json` changes, it is updated here in the same PR. The general map of the phases is in the [README](../../README.en.md#project-map).
+Last update: 2026-11-14 · Source of truth for issues: `scripts/issues.json`. This document is maintained by hand: if `issues.json` changes, it is updated here in the same PR. The general map of the phases is in the [README](../../README.md#project-map).
 
 Issues are loaded into GitHub with `python scripts/create_issues.py` (see `04-GIT-WORKFLOW.md`). Each layer is an **epic** (`[EPICA] ...`, parent issue) and its issues hang from it as sub-issues (see "Epics" in `04-GIT-WORKFLOW.md` and ADR-008). Each issue is a task of up to ~4 hours, with a single assigned owner, and layer, area and size labels. It is a multidisciplinary team: there are no fixed roles, and anyone takes issues from any area.
 

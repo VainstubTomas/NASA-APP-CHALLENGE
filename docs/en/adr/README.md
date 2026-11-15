@@ -20,6 +20,8 @@ Template: copy `ADR-000-template.md`, number the next one (`ADR-011-...`) and fi
 | [010](ADR-010-issue-closing-automation.md) | Post-merge Action that closes issues and tracks across the "Hackaton" and "Main migrate" projects | Proposed |
 | [011](ADR-011-flat-moon-date-and-relief-last.md) | Flat Moon first, date from the start and relief at the end (layer 5) | Proposed |
 | [012](ADR-012-target-award.md) | Target award: Best Use of Data and, as a second choice, Best Use of Science | Proposed |
+| [014](ADR-014-scenario-comparison-criterion.md) | "Which one is better" rule in the scenario comparison (Sun, then Earth) | Proposed |
 | [015](ADR-015-live-horizons-api.md) | Own API in `data/api/` to query Horizons live for a user-chosen site | Proposed |
+| [016](ADR-016-3d-sky-view.md) | 3D sky view with the flat horizon (terrain rendering stays out of scope) | Proposed |
 
 Statuses: Proposed, Accepted, Replaced.
