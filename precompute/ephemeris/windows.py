@@ -1,7 +1,8 @@
 """Mejores ventanas de aterrizaje por sitio (issue C5-03, #45).
 
 Una ventana es un rango de días UTC consecutivos. Se ordena por horas de Sol y, en empate, por horas
-de Tierra visible (mismo criterio que ADR-014 en la web). Las horas salen de metrics.json (C3-01), así
+de Tierra visible (el orden del ADR-014). La web ya no lo usa para elegir un escenario (ADR-017): acá solo
+ordena ventanas, no da un veredicto. Las horas salen de metrics.json (C3-01), así
 que la suma de la ventana coincide con las métricas diarias por construcción.
 
 Solo se listan ventanas que empiezan desde `--desde` (por defecto, el inicio de hoy en UTC): no sirve
