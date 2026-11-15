@@ -134,6 +134,7 @@
   "compare.title": "Compare scenarios",
   "compare.intro": "Pick 2 or 3 combinations of site and date to see which one is better: the same site on another date, or another site.",
   "compare.scenario": "Scenario {n}",
+  "compare.group.header": "Scenarios {list}: same site and date",
   "compare.add": "Add scenario",
   "compare.remove": "Remove",
   "compare.removeAria": "Remove scenario {n}",
@@ -164,10 +165,12 @@
   "compare.best.title": "Which one is better?",
   "compare.best.badge": "Better",
   "compare.best.label": "scenario {n} ({site})",
+  "compare.best.labelGroup": "the group of scenarios {list} ({site})",
   "compare.best.sun": "The better choice is {scenario}: it has more hours of Sun ({hours} h against {other} h for the next one).",
   "compare.best.earth": "The better choice is {scenario}: Sun hours are tied ({sun} h), but it has more hours with Earth in view ({hours} h against {other} h).",
   "compare.best.tie": "Tie: scenarios {list} have the same hours of Sun ({sun} h) and of Earth in view ({earth} h). There is no difference between them.",
   "compare.best.only": "Only {scenario} has data: there is nothing to compare it with.",
+  "compare.best.same": "Same date and place: scenarios {list} are the same case, so there is no winner. Change the site or the date of one of them to compare.",
   "compare.best.none": "No scenario has data to compare.",
   "compare.best.rule": "Rule: the one with more hours of Sun (power) wins; if tied, the one with more hours with Earth in view (communication)."
 }
