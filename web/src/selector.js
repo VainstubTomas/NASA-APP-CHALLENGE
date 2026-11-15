@@ -3,6 +3,7 @@ import {
   getRange, clampTime, toInputValue, fromInputValue, resolveState, buildSearch,
 } from './state.js';
 import { t, siteName } from './i18n.js';
+import { LANGS } from './i18n-core.js';
 
 const base = import.meta.env.BASE_URL;
 
@@ -56,7 +57,7 @@ export async function initSelector({ onChange, onUserInput } = {}) {
     // Conserva `?lang=` (link de la entrega, #110): buildSearch solo escribe site y t.
     const search = new URLSearchParams(buildSearch(state));
     const lang = new URLSearchParams(window.location.search).get('lang');
-    if (lang) search.set('lang', lang);
+    if (LANGS.includes(lang)) search.set('lang', lang); // solo valores soportados, nunca texto libre de la URL
     history.replaceState(null, '', `?${search}`);
     const ok = await hasData(state.site);
     notice.hidden = ok;
