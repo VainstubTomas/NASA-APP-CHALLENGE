@@ -130,5 +130,12 @@
   "countdown.sets": "落下",
   "countdown.rises": "升起",
   "countdown.estimated": "{event}预计时间：{time}",
-  "countdown.note": "倒计时从所选日期开始实时运行。数据按小时提供，确切时刻为估算（约±几分钟）。"
+  "countdown.note": "倒计时从所选日期开始实时运行。数据按小时提供，确切时刻为估算（约±几分钟）。",
+  "compare.title": "比较方案",
+  "compare.intro": "选择 2 或 3 个地点与日期的组合，看看哪个更合适：同一地点的另一个日期，或另一个地点。",
+  "compare.scenario": "方案 {n}",
+  "compare.add": "添加方案",
+  "compare.remove": "移除",
+  "compare.removeAria": "移除方案 {n}",
+  "compare.limits": "最少比较 2 个、最多比较 3 个方案。"
 }

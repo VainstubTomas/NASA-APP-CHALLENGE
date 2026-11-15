@@ -130,5 +130,12 @@
   "countdown.sets": "Puesta",
   "countdown.rises": "Salida",
   "countdown.estimated": "{event} estimada: {time}",
-  "countdown.note": "Los contadores avanzan en tiempo real desde la fecha elegida. Los datos son horarios: el momento exacto es una estimación (±unos minutos)."
+  "countdown.note": "Los contadores avanzan en tiempo real desde la fecha elegida. Los datos son horarios: el momento exacto es una estimación (±unos minutos).",
+  "compare.title": "Comparar escenarios",
+  "compare.intro": "Elegí 2 o 3 combinaciones de sitio y fecha para ver cuál conviene: el mismo sitio en otra fecha, u otro sitio.",
+  "compare.scenario": "Escenario {n}",
+  "compare.add": "Agregar escenario",
+  "compare.remove": "Quitar",
+  "compare.removeAria": "Quitar el escenario {n}",
+  "compare.limits": "Se comparan como mínimo 2 y como máximo 3 escenarios."
 }
