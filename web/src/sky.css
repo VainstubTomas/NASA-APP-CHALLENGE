@@ -117,25 +117,26 @@
 }
 
 /* Aviso obligatorio: Luna lisa (ADR-011) */
-/* Botón Seguir (cielo): apagado / Sol / Tierra */
-.sky-follow {
+/* Indicador de bloqueo (cielo): bajo el centro, cuando la vista sigue a un cuerpo. Clic = soltar */
+.sky-lock {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  left: 50%;
+  top: 50%;
   z-index: 3;
-  padding: 6px 10px;
+  transform: translate(-50%, 64px);
+  padding: 4px 10px;
   border: 1px solid currentColor;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.45);
   color: #fff;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
+  white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
 }
-.sky-follow[aria-pressed='true'] {
-  background: #fff;
-  color: #000;
+.sky-lock[hidden] {
+  display: none;
 }
 
 .sky-smooth {

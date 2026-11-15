@@ -154,13 +154,12 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   loading.append(loadingBox);
   root.append(loading);
 
-  // Botón Seguir: cicla apagado → Sol → Tierra → apagado (ver setFollow).
-  const followBtn = el('button', 'sky-follow');
-  followBtn.type = 'button';
-  followBtn.textContent = t('sky.follow.off');
-  followBtn.setAttribute('aria-pressed', 'false');
-  followBtn.addEventListener('click', () => setFollow(nextFollow(follow)));
-  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers, followBtn);
+  // Indicador de bloqueo: aparece bajo las flechas mientras la vista sigue a un cuerpo. Clic = soltar.
+  const lockBtn = el('button', 'sky-lock');
+  lockBtn.type = 'button';
+  lockBtn.hidden = true;
+  lockBtn.addEventListener('click', () => stopFollow());
+  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers, lockBtn);
 
   // --- Arriba a la izquierda: logo, búsqueda y fecha ---
   const topLeft = el('div', 'sky-topleft');
@@ -747,12 +746,11 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   // --- Interacción ---
   // Seguir: la vista acompaña al Sol o a la Tierra al cambiar fecha, sitio o misión. Girar, arrastrar o
   // mirar otro cuerpo lo corta. Solo rota (heading): la altura de la mirada no cambia.
-  const nextFollow = (f) => (f === null ? 'sun' : f === 'sun' ? 'earth' : null);
+  // Solo cambia el estado y el indicador: el giro hacia el cuerpo lo hace lookAt (flecha) antes.
   function setFollow(next) {
     follow = next;
-    followBtn.textContent = t('sky.follow.' + (next ?? 'off'));
-    followBtn.setAttribute('aria-pressed', String(next !== null));
-    if (next && data?.sample) animateTo(normAz(data.sample[next].azimuth_deg));
+    if (next) lockBtn.textContent = t('sky.lock.' + next);
+    lockBtn.hidden = next === null;
   }
   function stopFollow() {
     if (follow) setFollow(null);
@@ -832,6 +830,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     b.addEventListener('click', () => {
       root.classList.remove(`is-pointing-${key}`);
       lookAt(key, true);
+      setFollow(key); // clic en la flecha: mira al cuerpo y queda bloqueado
     });
     // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
     b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
