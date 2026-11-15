@@ -5,7 +5,7 @@ toma la altura del relieve y devuelve el ángulo máximo sobre el plano tangente
 por curvatura d²/(2R) incluida. Sin refracción. Lo que no entra en el recorte se ignora.
 
 Uso (por sitio, descarga el recorte y escribe horizon.json):
-    python -m precompute.terrain.lola_horizon --sites-only apollo-11
+    python -m precompute.terrain.lola_horizon --only apollo-11
 """
 from __future__ import annotations
 

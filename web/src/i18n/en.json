@@ -234,6 +234,7 @@
   "info.dh": "{d} d {h} h",
   "info.h": "{h} h",
   "info.note": "Ideal horizon, no terrain (ADR-011). Visible: the upper edge of the disc is above the horizon. Hourly data from JPL Horizons; crossings are interpolated (± a few minutes).",
+  "info.noteRelief": "Real LOLA terrain. Visible: the upper edge of the disc is above the horizon. Hourly data from JPL Horizons; crossings are interpolated (± a few minutes).",
   "live.latPlaceholder": "From −90 to 90 (south negative)",
   "live.lonPlaceholder": "From −180 to 180 (east positive)",
   "compare.row.site": "Site",

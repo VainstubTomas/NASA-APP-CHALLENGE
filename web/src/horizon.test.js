@@ -44,11 +44,14 @@ test('respeta azimuth_start_deg y azimuth_step_deg distintos de 0 y 1', () => {
   assert.equal(horizonAt(shifted, 0), 2.5); // entre 315° (4) y 45° (1)
 });
 
-test('con el horizon.json real (Luna lisa) es 0° en cualquier dirección', () => {
+test('con el horizon.json real de Apollo 11 (LOLA) hay 360 valores con relieve y el DEM declarado', () => {
   const real = JSON.parse(
     readFileSync(new URL('../../data/public/sites/apollo-11/horizon.json', import.meta.url), 'utf8'),
   );
-  for (const az of [0, 47.3, 180, 359.9]) assert.equal(horizonAt(real, az), 0);
+  assert.equal(real.elevation_deg.length, 360);
+  assert.ok(real.dem?.name);
+  assert.ok(real.elevation_deg.some((v) => v !== 0));
+  for (const az of [0, 47.3, 180, 359.9]) assert.ok(Math.abs(horizonAt(real, az)) < 10);
 });
 
 test('un azimut que no es un número da un error claro (no NaN silencioso)', () => {

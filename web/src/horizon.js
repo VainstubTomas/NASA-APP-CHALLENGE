@@ -35,3 +35,8 @@ export function statusAgainstHorizon(position, angularRadiusDeg, horizon) {
   const horizonDeg = horizon ? horizonAt(horizon, position.azimuth_deg) : 0;
   return horizonStatus(position.elevation_deg, angularRadiusDeg, horizonDeg);
 }
+
+/** True si el horizon.json trae relieve real (campo `dem`); si no, es la Luna lisa (ADR-011). */
+export function hasRelief(horizon) {
+  return Boolean(horizon && horizon.dem);
+}

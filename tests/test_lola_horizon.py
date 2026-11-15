@@ -57,9 +57,26 @@ def test_samples_outside_crop_are_ignored():
 
 
 def test_real_crop_horizon_in_range():
-    path = lh.RAW_DIR / "lola_apollo11_apollo14.tif"
+    path = lh.RAW_DIR / "dem_apollo-11.tif"
     if not path.exists():
         pytest.skip("TIFF no descargado (data/raw/, no versionado)")
     elev = lh.horizon_from_tif(path, 23.4730, 0.6741, max_m=lh.DEFAULT_MAX_M)
     assert len(elev) == 360
     assert all(-10 < v < 30 for v in elev)
+
+
+def test_published_horizon_matches_dem_recomputation():
+    """El horizon.json publicado de Apollo 11 coincide con el horizonte recalculado del DEM real."""
+    import json
+
+    path = lh.RAW_DIR / "dem_apollo-11.tif"
+    if not path.exists():
+        pytest.skip("TIFF no descargado (data/raw/, no versionado)")
+    sites = json.loads((lh.ROOT / "data" / "public" / "sites.json").read_text(encoding="utf-8"))["sites"]
+    site = next(s for s in sites if s["id"] == "apollo-11")
+    published = json.loads(
+        (lh.ROOT / "data" / "public" / "sites" / "apollo-11" / "horizon.json").read_text(encoding="utf-8")
+    )
+    expected = lh.horizon_from_tif(path, site["lon_deg"], site["lat_deg"])
+    assert len(published["elevation_deg"]) == 360
+    assert published["elevation_deg"] == pytest.approx(expected, abs=0.01)

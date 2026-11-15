@@ -31,7 +31,7 @@ def test_bbox_invalido_falla(bbox):
 
 
 def test_tiff_descargado_es_float32_en_metros():
-    path = ld.RAW_DIR / "lola_apollo11_apollo14.tif"
+    path = ld.RAW_DIR / "dem_apollo-11.tif"
     if not path.exists():
         pytest.skip("TIFF no descargado todavía (data/raw/, no versionado)")
     info = ld.check_tiff(path)
