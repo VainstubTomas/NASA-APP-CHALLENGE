@@ -34,7 +34,7 @@ Goal: layers 1 to 4 (layer 4 was raised in priority by ADR-009 because it is the
 **Flat Moon first (ADR-011).** Layers 1 to 4 assume a sphere Moon with no relief: the horizon is 0° in every direction. Real relief arrives at the end and only changes the data in `horizon.json`, not the web. Meanwhile the web shows "ideal horizon, no relief": the result is optimistic, because a hill of a couple of degrees can hide the Sun or the Earth.
 
 ## Out of scope
-- 3D visualization of the terrain or realistic rendering of the surface.
+- Realistic rendering of the terrain (relief, textures). The 3D sky view with the flat horizon did go in (ADR-016).
 - Real relief before layers 1 to 4 are closed (ADR-011).
 - Calculating illumination for the whole pole (only the listed sites and, at most, a grid).
 - Production backend, user accounts, database.

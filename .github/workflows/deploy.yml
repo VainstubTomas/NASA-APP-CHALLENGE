@@ -27,6 +27,7 @@ jobs:
         working-directory: web
         env:
           VITE_BASE: /NASA-APP-CHALLENGE/
+          VITE_API_URL: ${{ vars.VITE_API_URL }}  # API de efemérides en vivo (ADR-015); vacía = sin consulta en vivo
         run: |
           npm ci
           npm run build

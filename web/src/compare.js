@@ -1,12 +1,13 @@
 // Comparación de escenarios (capa 4). C4-01b (#92): selector de 2 o 3 escenarios (sitio + fecha UTC).
 // C4-01c (#93): debajo del selector, una tarjeta por escenario (compare-cards.js).
 // La lógica de límites está en scenarios-core.js (probada con `npm test`); acá solo se dibuja.
-// Sin estado en la URL (eso es C4-04): la lista vive mientras la página está abierta.
+// C4-04 (#97): la lista vive también en la URL (parámetro `c`), así se comparte y sobrevive a recargar.
 import './compare.css';
 import {
   initialScenarios, canAdd, canRemove, addScenario, removeScenario, updateScenario,
+  scenariosToParam, SCENARIOS_PARAM,
 } from './scenarios-core.js';
-import { toInputValue, fromInputValue } from './state.js';
+import { toInputValue, fromInputValue, mergeSearch } from './state.js';
 import { t, siteName } from './i18n.js';
 import { summarizeAll, renderCompareCards } from './compare-cards.js';
 
@@ -44,10 +45,10 @@ function field(labelKey, control) {
  * @param {HTMLElement} container
  * @param {{sites: object[], range: {minMs: number, maxMs: number}, current: {site: string, t: number},
  *          onChange?: (scenarios: {id: string, site: string, t: number}[]) => void}} options
- *   `current` es la selección principal (primer escenario). `onChange` recibe la lista cada vez que cambia.
+ *   `current` es la selección principal (primer escenario). `initial` (opcional) es la lista leída de la URL. `onChange` recibe la lista cada vez que cambia.
  */
-export function initCompare(container, { sites, range, current, onChange }) {
-  let scenarios = initialScenarios(current, range);
+export function initCompare(container, { sites, range, current, initial, onChange }) {
+  let scenarios = initial ?? initialScenarios(current, range);
 
   const list = el('div', 'compare-list');
   const addBtn = el('button', 'compare-btn compare-btn--add', `+ ${t('compare.add')}`);
@@ -121,6 +122,7 @@ export function initCompare(container, { sites, range, current, onChange }) {
   function render() {
     list.replaceChildren(...scenarios.map((s, i) => row(s, i + 1)));
     addBtn.disabled = !canAdd(scenarios);
+    history.replaceState(null, '', mergeSearch(window.location.search, { [SCENARIOS_PARAM]: scenariosToParam(scenarios) }));
     showResults();
     onChange?.(scenarios);
   }

@@ -77,6 +77,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 ```
 - Cada arreglo tiene exactamente `count` valores.
 - `angular_radius_deg` son valores nominales de v1 (Sol ~0,5° de diámetro, Tierra ~2°). Una v1.1 puede reemplazarlos por un radio variable por muestra.
+- **Consulta en vivo (ADR-015)**: la API de `data/api/` (`GET /ephemeris?lat&lon&start&days`) responde con este mismo formato para un punto libre, con `site_id` `live-<lat>-<lon>` (p. ej. `live-n0p0-e30p0`). El contrato y su esquema no cambian.
 
 ## `metrics.json` (capa 3)
 ```json

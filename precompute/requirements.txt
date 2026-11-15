@@ -5,3 +5,7 @@ pyproj
 matplotlib
 pytest
 jsonschema
+
+# API de efemérides en vivo (issue #104, ADR-015); httpx lo usa el TestClient en los tests
+-r ../data/api/requirements.txt
+httpx

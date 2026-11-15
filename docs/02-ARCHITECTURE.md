@@ -54,7 +54,8 @@ La web sirve `data/public/` como carpeta estática (Vite `publicDir`), así que 
 ## Web
 - Vite + JavaScript, sin framework pesado. Dibujo del horizonte en SVG o canvas (ver ADR-004).
 - Estado en la URL (`?site=...&t=...`) para poder compartir.
-- Funciona sin conexión durante la demo (todo estático).
+- Funciona sin conexión durante la demo (todo estático) para los sitios precalculados.
+- **Consulta en vivo (ADR-015, #104)**: si hay `VITE_API_URL`, la web suma un input de latitud y longitud que pide las efemérides a la API de `data/api/` (FastAPI, ver su README), que consulta Horizons y responde en el formato de `ephemeris.json`. Es la única excepción a "Python y la web solo se hablan por JSON de `data/public/`"; necesita red y la API levantada.
 - Despliegue: GitHub Pages o Vercel desde `main`.
 
 ## Validación

@@ -11,6 +11,8 @@ We aim for **Best Use of Data** ("the project that best makes space data accessi
 > NASA's data to know whether a lunar site has Sun and line of sight with the Earth already exists, but it is in complex tools. We made it accessible: one screen, one question, and numbers verified against JPL Horizons.
 
 ## Presentation structure (3 to 5 minutes, adjust to the time given)
+> This is the **in-person defense** before the local jury. The demo uploaded to Space Apps is a different thing with strict limits: up to 7 slides or a 30 s video, in English (see "Official submission and rubric" in `00-CONTEXT.md`).
+
 In brackets, the award each block speaks to.
 1. **The problem** (30 s) [Mission Concept]: lunar south pole, Sun and Earth stuck to the horizon, any mountain hides them; Artemis requires illumination and direct communication. Campsite analogy: sun for the solar panel and signal for the phone.
 2. **Why it is hard today** (30 s) [Data]: the data exists in Quickmap, Moon Trek and Horizons, but it is powerful and confusing. Show 2 or 3 screenshots and what is confusing (full list below, in "Why it is hard today: what we found").
@@ -75,12 +77,24 @@ Choose a site and dates where the difference is visible and dramatic; test them 
 - Run the full demo at least twice before the defense (Sun 15, between 14:30 and 16:30).
 - Test with someone from outside (a mentor or a teammate from another team) and note where they get confused.
 
-## Delivery checklist (confirm what the organization requires)
-- [ ] Public GitHub repo, up to date, with a clear README
-- [ ] `main` contains the final version and starts by following the README
-- [ ] Synthetic development data removed (`synthetic: true` out of `sites.json`)
-- [ ] Web deployed with a link in the README
-- [ ] Credits and data sources cited (JPL Horizons, ASU's Quickmap, NASA Moon Trek, LRO/LOLA data; CSA if used)
-- [ ] Presentation ready
-- [ ] Uploaded with a margin before 14:30 on Sunday 15
-- [ ] Short backup video (if requested or for safety)
+## Submission checklist (official guides: see "Official submission and rubric" in `00-CONTEXT.md`)
+**Repo and web app**
+- [x] English README as the front page, with use of AI, credits and license (#110)
+- [x] The web app opens in English with `?lang=en` and uses English when the browser language is not supported (#110)
+- [ ] `main` contains the final version and runs by following the README
+- [ ] Synthetic development data removed (`synthetic: true` out of `sites.json`, E-01 #48)
+- [ ] Web app deployed from the final version, with a link in the README
+
+**Demo** (E-03, #50)
+- [ ] Up to 7 slides counting title and intro, in English, with team name, members and challenge; or a video of up to 30 s (with English subtitles if another language is spoken)
+- [ ] Public link with no login, tested in a private window
+
+**Form on spaceappschallenge.org** (draft in `../08-SUBMISSION.md`)
+- [ ] Every field filled in, in English
+- [ ] Final project link: the web app with `?lang=en` and the repo
+- [ ] All members appear in the Members tab
+- [ ] Both checkboxes ticked and "Submit for Judging" before Sunday 15 at 23:59 (we aim for 14:30)
+
+**In-person defense**
+- [ ] Presentation ready and rehearsed
+- [ ] Short backup video in case the internet or the projector fails

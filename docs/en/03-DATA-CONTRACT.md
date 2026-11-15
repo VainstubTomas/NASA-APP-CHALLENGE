@@ -79,6 +79,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 ```
 - Each array has exactly `count` values.
 - `angular_radius_deg` are nominal values for v1 (Sun ~0.5° diameter, Earth ~2°). A v1.1 may replace them with a variable radius per sample.
+- **Live query (ADR-015)**: the API in `data/api/` (`GET /ephemeris?lat&lon&start&days`) answers with this same format for a free point, with `site_id` `live-<lat>-<lon>` (e.g. `live-n0p0-e30p0`). The contract and its schema do not change.
 
 ## `metrics.json` (layer 3)
 ```json
