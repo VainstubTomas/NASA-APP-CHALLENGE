@@ -93,7 +93,7 @@ async function showLive(utcMs) {
       { lat, lon, dem: horizon.dem?.name ?? 'sin mapa (Luna lisa)', error: reliefError?.message });
     const liveName = i18nT('live.siteName', { lat, lon });
     renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
-    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
+    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}`, lat });
     renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
     validationBody.replaceChildren(); // no hay valores de referencia de Horizons para un punto libre
     if (reliefError) live.setStatus(i18nT('live.reliefError', { error: reliefError.message }), true);
@@ -150,7 +150,7 @@ initSelector({
       const coords = await getSiteCoords(site);
       // Si hubo otro cambio mientras esperábamos, este resultado ya no corresponde a la pantalla.
       if (seq !== changeSeq) return;
-      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site });
+      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site, lat: coords?.lat });
       renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords });
       // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
       renderTimeline(timeline, ephemeris, horizon, t, 7);

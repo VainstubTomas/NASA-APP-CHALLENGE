@@ -8,16 +8,65 @@
 // comunes fallan con el Sol a 1-2° de altura). El regolito refleja según Lommel-Seeliger.
 import * as THREE from 'three';
 import { directionFromAzEl } from './dials-core.js';
-import { EYE_M, createTerrain, curvatureDrop, groundCamera } from './sky-terrain-core.js';
+import { EYE_M, MAX_HEIGHT_M, createTerrain, curvatureDrop, groundCamera } from './sky-terrain-core.js';
+import { needsMaskBake } from './sky-core.js';
 
 const RINGS = 220; // anillos de la malla, más densos cerca del observador
-const SEGMENTS = 540; // divisiones alrededor
+const SEGMENTS = 540; // divisiones alrededor de cada anillo
 const R_MIN = 0.6;
 const R_MAX = 4200; // más allá del horizonte geométrico (~2,4 km)
 const NEAR_SIZE = 512; // m: mapa de alturas fino (1 m por texel) para las sombras cercanas
 const NEAR_RES = 512;
 const FAR_SIZE = 8192; // m: mapa de alturas grueso para las sombras lejanas
 const FAR_RES = 256;
+const BAKE_RES = 1024; // mapa de sombras horneado: se recalcula solo cuando cambia la dirección del Sol o la Tierra
+const BAKE_EXT = 2048; // m que cubre el mapa (2 m por texel), centrado en el observador. Fuera, se marcha en vivo.
+
+// Alturas y sombra por marcha de rayos: se usa en el render y en el horneado del mapa de sombras.
+const SHADOW_GLSL = /* glsl */ `
+  uniform sampler2D hNear;
+  uniform sampler2D hFar;
+
+  float H(vec2 p) {
+    vec2 uv = p / ${NEAR_SIZE.toFixed(1)} + 0.5;
+    if (uv.x > 0.002 && uv.x < 0.998 && uv.y > 0.002 && uv.y < 0.998) return texture2D(hNear, uv).r;
+    return texture2D(hFar, p / ${FAR_SIZE.toFixed(1)} + 0.5).r;
+  }
+
+  // Sombra con penumbra física: avanza hacia la luz y mide cuánto del disco tapa el terreno.
+  // soft = 1 / tan(radio angular): el Sol (0,27°) da sombras nítidas; la Tierra (1°), más suaves.
+  float shadow(vec3 p, vec3 L, float soft) {
+    float s = 1.0;
+    float t = 0.35;
+    for (int i = 0; i < 48; i++) {
+      vec3 q = p + L * t;
+      float d = q.y - H(q.xz);
+      if (d < -0.5 * t / soft) return 0.0;
+      s = min(s, 0.5 + 0.5 * soft * d / t);
+      // Ningún terreno está más arriba que MAX_H: si el rayo ya pasó y sube, no hay más oclusión.
+      if (L.y > 0.0 && q.y > ${(MAX_HEIGHT_M - EYE_M).toFixed(3)}) break;
+      t *= 1.16;
+      if (t > 2500.0) break;
+    }
+    return clamp(s, 0.0, 1.0);
+  }
+`;
+
+// Horneado: una pasada por texel del mapa (sol en r, tierra en g). Corre al cambiar la dirección de la luz.
+const BAKE_FRAGMENT = /* glsl */ `
+  precision highp float;
+  uniform vec3 sunDir;
+  uniform float sunSoft;
+  uniform vec3 earthDir;
+  uniform float earthSoft;
+  varying vec2 vUv;
+  ${SHADOW_GLSL}
+  void main() {
+    vec2 p = (vUv - 0.5) * ${BAKE_EXT.toFixed(1)};
+    vec3 o = vec3(p.x, H(p) + 0.04, p.y);
+    gl_FragColor = vec4(shadow(o, sunDir, sunSoft), shadow(o, earthDir, earthSoft), 0.0, 1.0);
+  }
+`;
 
 const VERTEX = /* glsl */ `
   attribute float hRaw;
@@ -38,9 +87,8 @@ const VERTEX = /* glsl */ `
 
 const FRAGMENT = /* glsl */ `
   precision highp float;
-  uniform sampler2D hNear;
-  uniform sampler2D hFar;
   uniform sampler2D detail;
+  uniform sampler2D shadowMap; // sombras horneadas (r: Sol, g: Tierra) dentro de BAKE_EXT
   uniform vec3 sunDir;
   uniform float sunI;
   uniform float sunSoft;
@@ -52,52 +100,53 @@ const FRAGMENT = /* glsl */ `
   varying vec3 vAlbedo;
   varying vec3 vView;
 
-  float H(vec2 p) {
-    vec2 uv = p / ${NEAR_SIZE.toFixed(1)} + 0.5;
-    if (uv.x > 0.002 && uv.x < 0.998 && uv.y > 0.002 && uv.y < 0.998) return texture2D(hNear, uv).r;
-    return texture2D(hFar, p / ${FAR_SIZE.toFixed(1)} + 0.5).r;
-  }
-
-  // Sombra con penumbra física: avanza hacia la luz y mide cuánto del disco tapa el terreno.
-  // soft = 1 / tan(radio angular): el Sol (0,27°) da sombras nítidas; la Tierra (1°), más suaves.
-  float shadow(vec3 p, vec3 L, float soft) {
-    float s = 1.0;
-    float t = 0.35;
-    for (int i = 0; i < 48; i++) {
-      vec3 q = p + L * t;
-      float d = q.y - H(q.xz);
-      if (d < -0.5 * t / soft) return 0.0;
-      s = min(s, 0.5 + 0.5 * soft * d / t);
-      t *= 1.16;
-      if (t > 2500.0) break;
-    }
-    return clamp(s, 0.0, 1.0);
-  }
+  ${SHADOW_GLSL}
 
   // Reflectancia del regolito (Lommel-Seeliger): sin oscurecimiento hacia el borde, como la Luna.
   float lommel(vec3 n, vec3 L, vec3 V) {
     float mu0 = max(dot(n, L), 0.0);
     float mu = max(dot(n, V), 0.02);
-    return mu0 / (mu0 + mu);
+    // Efecto de oposición: el regolito brilla más cuando se lo mira con el Sol a la espalda
+    // (ángulo de fase chico), porque cada grano tapa la sombra de los vecinos.
+    float phase = acos(clamp(dot(V, L), -1.0, 1.0));
+    float surge = 1.0 + 0.55 / (1.0 + phase * phase / 0.012);
+    return surge * mu0 / (mu0 + mu);
+  }
+
+  // Cavidades: una hondonada recibe menos luz de rebote y tiene micro-sombras que la grilla no
+  // resuelve. Se estima con la altura del punto contra el promedio de 4 vecinos a ~2 m.
+  float cavity(vec2 p) {
+    float hc = H(p);
+    float avg = 0.25 * (H(p + vec2(2.0, 0.0)) + H(p - vec2(2.0, 0.0)) + H(p + vec2(0.0, 2.0)) + H(p - vec2(0.0, 2.0)));
+    return clamp(1.0 + 2.5 * (hc - avg), 0.55, 1.0);
   }
 
   void main() {
     vec3 V = normalize(vView);
     float dist = length(vView);
     // Detalle fino del regolito (dos escalas), se apaga con la distancia
-    vec2 d1 = texture2D(detail, vPos.xz / 2.7).rg * 2.0 - 1.0;
-    vec2 d2 = texture2D(detail, vPos.xz / 23.0 + 0.37).rg * 2.0 - 1.0;
     float fade = clamp(1.0 - dist / 260.0, 0.0, 1.0);
-    vec3 n = normalize(vNormal + vec3(d1.x, 0.0, d1.y) * 0.55 * fade + vec3(d2.x, 0.0, d2.y) * 0.25);
-
-    vec3 color = vAlbedo * 0.012; // luz rebotada del terreno vecino (casi nada: sombras negras)
-    if (sunI > 0.0) {
-      float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), sunDir, sunSoft);
-      color += vAlbedo * vec3(1.0, 0.98, 0.94) * sunI * 2.0 * lommel(n, sunDir, V) * sh;
+    vec2 d2 = texture2D(detail, vPos.xz / 23.0 + 0.37).rg * 2.0 - 1.0;
+    vec3 n = normalize(vNormal + vec3(d2.x, 0.0, d2.y) * 0.25);
+    if (fade > 0.0) {
+      vec2 d1 = texture2D(detail, vPos.xz / 2.7).rg * 2.0 - 1.0;
+      n = normalize(vNormal + vec3(d1.x, 0.0, d1.y) * 0.55 * fade + vec3(d2.x, 0.0, d2.y) * 0.25);
     }
-    if (earthI > 0.0) {
-      float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), earthDir, earthSoft);
-      color += vAlbedo * vec3(0.62, 0.74, 1.0) * earthI * 2.0 * lommel(n, earthDir, V) * sh;
+
+    float cav = fade > 0.0 ? mix(1.0, cavity(vPos.xz), fade) : 1.0;
+    vec3 color = vAlbedo * 0.012; // luz rebotada del terreno vecino (casi nada: sombras negras)
+    // Dentro del mapa horneado la sombra es una lectura de textura; fuera, se marcha el rayo.
+    vec2 mk = vPos.xz / ${BAKE_EXT.toFixed(1)} + 0.5;
+    bool inMask = all(greaterThan(mk, vec2(0.0))) && all(lessThan(mk, vec2(1.0)));
+    // La sombra solo se recorre si la superficie mira a la luz: si no, lommel() ya da 0 y el
+    // resultado es el mismo, pero se ahorra todo lo que está a oscuras.
+    if (sunI > 0.0 && dot(n, sunDir) > 0.0) {
+      float sh = inMask ? texture2D(shadowMap, mk).r : shadow(vPos + vec3(0.0, 0.04, 0.0), sunDir, sunSoft);
+      color += vAlbedo * vec3(1.0, 0.98, 0.94) * sunI * 2.0 * lommel(n, sunDir, V) * sh * cav;
+    }
+    if (earthI > 0.0 && dot(n, earthDir) > 0.0) {
+      float sh = inMask ? texture2D(shadowMap, mk).g : shadow(vPos + vec3(0.0, 0.04, 0.0), earthDir, earthSoft);
+      color += vAlbedo * vec3(0.62, 0.74, 1.0) * earthI * 2.0 * lommel(n, earthDir, V) * sh * cav;
     }
     color = color / (1.0 + color * 0.35); // compresión suave de los brillos
     gl_FragColor = vec4(pow(clamp(color, 0.0, 1.0), vec3(1.0 / 2.2)), 1.0);
@@ -167,7 +216,9 @@ function detailTexture(size = 256) {
   return tex;
 }
 
-function heightTexture(terrain, sizeM, res) {
+// `linear`: interpola entre texels (sombras suaves). Los Float32 solo se pueden filtrar si el
+// navegador da OES_texture_float_linear; si no, se queda en el vecino más cercano (bloques).
+function heightTexture(terrain, sizeM, res, linear) {
   const data = new Float32Array(res * res);
   for (let j = 0; j < res; j += 1) {
     for (let i = 0; i < res; i += 1) {
@@ -177,12 +228,15 @@ function heightTexture(terrain, sizeM, res) {
     }
   }
   const tex = new THREE.DataTexture(data, res, res, THREE.RedFormat, THREE.FloatType);
-  tex.magFilter = THREE.NearestFilter;
-  tex.minFilter = THREE.NearestFilter;
+  tex.magFilter = linear ? THREE.LinearFilter : THREE.NearestFilter;
+  tex.minFilter = linear ? THREE.LinearFilter : THREE.NearestFilter;
   tex.needsUpdate = true;
   return tex;
 }
 
+/**
+ * Malla en anillos (más densos cerca) con SEGMENTS divisiones fijas por anillo.
+ */
 function terrainMesh(terrain, material) {
   const count = (RINGS + 1) * SEGMENTS;
   const pos = new Float32Array(count * 3);
@@ -247,11 +301,13 @@ export function createGround(container) {
   renderer.domElement.className = 'sky-ground__canvas';
   renderer.domElement.setAttribute('aria-hidden', 'true');
 
+  const linearHeights = renderer.extensions.has('OES_texture_float_linear');
+
   // Mismo cielo, mismo terreno en cada carga (las coordenadas del sitio no cambian el dibujo).
   const terrain = createTerrain(11);
   const uniforms = {
-    hNear: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, NEAR_SIZE, NEAR_RES) },
-    hFar: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, FAR_SIZE, FAR_RES) },
+    hNear: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, NEAR_SIZE, NEAR_RES, linearHeights) },
+    hFar: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, FAR_SIZE, FAR_RES, linearHeights) },
     detail: { value: detailTexture() },
     sunDir: { value: new THREE.Vector3(0, 1, 0) },
     sunI: { value: 0 },
@@ -259,25 +315,74 @@ export function createGround(container) {
     earthSoft: { value: 57 },
     earthDir: { value: new THREE.Vector3(0, 1, 0) },
     earthI: { value: 0 },
+    shadowMap: { value: null },
   };
+  // Mapa de sombras: se hornea en una textura de 1024² (2 m/texel) solo cuando cambia la dirección del
+  // Sol o de la Tierra. Así, al mover la cámara, la sombra cercana es una lectura de textura, no 48 pasos.
+  const bakeTarget = new THREE.WebGLRenderTarget(BAKE_RES, BAKE_RES, {
+    type: THREE.UnsignedByteType,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+    depthBuffer: false,
+  });
+  uniforms.shadowMap.value = bakeTarget.texture;
+  const bakeScene = new THREE.Scene();
+  bakeScene.add(new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.ShaderMaterial({
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+      fragmentShader: BAKE_FRAGMENT,
+      uniforms,
+    }),
+  ));
+  let lastBakeDirs = null;
+  let bakes = 0; // horneados del mapa de sombras (para el overlay de debug)
   const material = new THREE.ShaderMaterial({ vertexShader: VERTEX, fragmentShader: FRAGMENT, uniforms });
   const scene = new THREE.Scene();
-  scene.add(terrainMesh(terrain, material));
+  const mesh = terrainMesh(terrain, material);
+  scene.add(mesh);
+  let renders = 0; // cuadros 3D dibujados (para el overlay de debug)
   const camera = new THREE.PerspectiveCamera(15, 4, 0.2, 6000);
   camera.position.set(0, 0, 0);
   camera.rotation.order = 'YXZ';
   container.append(renderer.domElement);
 
   // Fracción visible del disco (0 = bajo el horizonte, 1 = entero arriba)
+  const size = { w: 0, h: 0, ratio: 0 }; // último tamaño aplicado al canvas
+
   const visibleFraction = (el, r) => Math.min(1, Math.max(0, (el + r) / (2 * r)));
 
-  return {
-    render({ width, groundHeight, pxPerDeg, heading, sun, earth, radii }) {
-      if (groundHeight < 1 || width < 1) return;
+  // Resolución adaptativa: mientras se arrastra (cuadros seguidos) se dibuja a ratio 1, que en una
+  // GPU integrada cuesta ~2,25 veces menos que 1,5; al soltar, un cuadro final a calidad completa.
+  const FULL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+  const BUSY_MS = 120; // dos render() separados por menos que esto cuentan como movimiento
+  const SETTLE_MS = 180;
+  let lastRenderAt = 0;
+  let lastArgs = null;
+  let settleTimer = 0;
+
+  function render(args, forceFull = false) {
+    const { width, groundHeight, pxPerDeg, heading, sun, earth, radii } = args;
+    if (groundHeight < 1 || width < 1) return;
+    const now = performance.now();
+    const busy = !forceFull && now - lastRenderAt < BUSY_MS;
+    lastRenderAt = now;
+    lastArgs = args;
+    clearTimeout(settleTimer);
+    if (busy && FULL_RATIO > 1) settleTimer = setTimeout(() => render(lastArgs, true), SETTLE_MS);
+    const ratio = busy ? 1 : FULL_RATIO;
+    {
       const cam = groundCamera({ width, groundHeight, pxPerDeg });
-      renderer.setSize(width, groundHeight, false);
-      renderer.domElement.style.width = `${width}px`;
-      renderer.domElement.style.height = `${groundHeight}px`;
+      // setSize reasigna canvas.width/height, lo que borra el buffer: solo si el tamaño cambió.
+      if (width !== size.w || groundHeight !== size.h || ratio !== size.ratio) {
+        size.w = width;
+        size.h = groundHeight;
+        size.ratio = ratio;
+        renderer.setPixelRatio(ratio);
+        renderer.setSize(width, groundHeight, false);
+        renderer.domElement.style.width = `${width}px`;
+        renderer.domElement.style.height = `${groundHeight}px`;
+      }
       camera.fov = cam.vFovDeg;
       camera.aspect = cam.aspect;
       camera.setViewOffset(width, cam.fullHeight, 0, cam.offsetY, width, groundHeight);
@@ -297,7 +402,37 @@ export function createGround(container) {
       // La luz de la Tierra es miles de veces más débil que la del Sol (y depende de su fase, que
       // no se modela); acá se realza a propósito para que la noche no quede totalmente negra.
       setLight(earth, uniforms.earthDir, uniforms.earthI, 0.06, radii?.earth ?? 1);
+      const dirs = [...uniforms.sunDir.value.toArray(), ...uniforms.earthDir.value.toArray()];
+      if (needsMaskBake(lastBakeDirs, dirs)) {
+        lastBakeDirs = dirs;
+        renderer.setRenderTarget(bakeTarget);
+        renderer.render(bakeScene, camera);
+        renderer.setRenderTarget(null);
+        bakes += 1;
+      }
       renderer.render(scene, camera);
+      renders += 1;
+    }
+  }
+
+  return {
+    render: (args) => render(args),
+    setWireframe(on) {
+      material.wireframe = on;
+    },
+    stats() {
+      const info = renderer.info;
+      return {
+        renders,
+        bakes,
+        triangles: info.render.triangles,
+        meshTriangles: mesh.geometry.index.count / 3,
+        calls: info.render.calls,
+        geometries: info.memory.geometries,
+        textures: info.memory.textures,
+        canvas: { w: size.w, h: size.h },
+        pixelRatio: size.ratio,
+      };
     },
   };
 }
