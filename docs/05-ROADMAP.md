@@ -97,7 +97,7 @@ Orden: primero los extras y **último de todo el relieve** (ADR-011). Corte fina
 | ID | Tarea | Área | Tamaño | Decisión |
 |---|---|---|---|---|
 | C5-01 | Botón se atrasó el lanzamiento (#43) | Web | M | Cerrada: la cubren el reproductor (C3-02) y la comparación (capa 4) |
-| C5-03 | Buscador de mejores ventanas de aterrizaje (#45) | Efemérides | L | **Extra principal.** Usa `metrics.json` y la regla del ADR-014; tiene que entrar antes de las 12:30 del domingo |
+| C5-03 | Buscador de mejores ventanas de aterrizaje (#45) | Efemérides | L | **Extra principal. Hecha como herramienta de línea de comandos** (`python -m precompute.ephemeris.windows`, PR #117): usa `metrics.json` y la regla del ADR-014, y solo lista ventanas desde hoy. Mostrarla en la web queda por decidir y tiene que entrar antes de las 12:30 del domingo |
 | C5-04 | Decidir coordenadas personalizadas: grilla precalculada o servidor (#46) | Terreno | M | Cerrada: ADR-015 (servidor) e implementación en #104 |
 | C5-05 | Conseguir el mapa de elevación del polo sur (#13). Antes C0-03 | Terreno | M | **Spike de 1 h**: si sale, sigue la cadena; si no, se cierran C5-05 a C5-08 |
 | C5-06 | Perfil de horizonte de un sitio y gráfico de la silueta (#16). Antes C0-06 | Terreno | L | Condicionada al spike; como mucho 1 o 2 sitios del polo sur |
@@ -106,7 +106,7 @@ Orden: primero los extras y **último de todo el relieve** (ADR-011). Corte fina
 | C5-02 | Pendiente del terreno por sitio (#44) | Terreno | M | Cerrada: depende del mapa; pasa a "próximos pasos" del pitch |
 | - | Rediseño con el diseño de Figma (#99) | Web | M | Tiene que entrar antes de las 12:30 del domingo |
 | - | Agrupar escenarios repetidos en la comparación (#107) | Web | S | Opcional, prioridad baja |
-| - | Cobertura de tests del núcleo web (#106) | Web | S | Prioridad baja; al ser tests, puede entrar después de las 12:30 |
+| - | Cobertura de tests del núcleo web (#106) | Web | S | Hecha (PR #115): las ramas del núcleo llegan a 99,33 %. Los módulos que dibujan quedan fuera de la medición, y su lógica está en los `*-core.js` probados |
 
 ### Entrega y demo
 
@@ -118,9 +118,9 @@ Orden: primero los extras y **último de todo el relieve** (ADR-011). Corte fina
 | E-04 | Diapositiva Luna frente a Tierra: horas de Sol en un sitio lunar y en una ciudad (#79) | Producto | S |
 | E-05 | Requisitos oficiales de entrega: inglés, uso de IA, créditos y licencia (#110) | Producto | M |
 | C4-03 | Escenario de comparación en el guion de la demo y la diapositiva (#113) | Producto | M |
-| - | Test de regresión: horas de Sol y Tierra de escenarios contra JPL Horizons (#105) | Efemérides | M |
+| - | Test de regresión: horas de Sol y Tierra de escenarios contra JPL Horizons (#105, hecho en el PR #115) | Efemérides | M |
 
-E-05 ya está hecha. El test de regresión no es un feature: puede entrar después de congelar features.
+E-05 y el test de regresión (#105) ya están hechos.
 
 ## Cómo se divide el trabajo
 

@@ -97,7 +97,7 @@ Order: first the extras and **last of all the relief** (ADR-011). Final cut on t
 | ID | Task | Area | Size | Decision |
 |---|---|---|---|---|
 | C5-01 | "Launch was delayed" button (#43) | Web | M | Closed: covered by the time player (C3-02) and the comparison (layer 4) |
-| C5-03 | Best landing windows finder (#45) | Ephemeris | L | **Main extra.** Uses `metrics.json` and the ADR-014 rule; must be in before Sunday 12:30 |
+| C5-03 | Best landing windows finder (#45) | Ephemeris | L | **Main extra. Done as a command-line tool** (`python -m precompute.ephemeris.windows`, PR #117): it uses `metrics.json` and the ADR-014 rule, and only lists windows from today on. Showing it in the web app is still to be decided and must be in before Sunday 12:30 |
 | C5-04 | Decide custom coordinates: precomputed grid or server (#46) | Terrain | M | Closed: ADR-015 (server) and implementation in #104 |
 | C5-05 | Get the south pole elevation map (#13). Formerly C0-03 | Terrain | M | **1-hour spike**: if it works, the chain goes on; if not, C5-05 to C5-08 are closed |
 | C5-06 | Horizon profile of a site and silhouette chart (#16). Formerly C0-06 | Terrain | L | Depends on the spike; at most 1 or 2 south pole sites |
@@ -106,7 +106,7 @@ Order: first the extras and **last of all the relief** (ADR-011). Final cut on t
 | C5-02 | Terrain slope per site (#44) | Terrain | M | Closed: depends on the map; moves to "next steps" in the pitch |
 | - | Redesign from the Figma design (#99) | Web | M | Must be in before Sunday 12:30 |
 | - | Group repeated scenarios in the comparison (#107) | Web | S | Optional, low priority |
-| - | Test coverage of the web core (#106) | Web | S | Low priority; being tests, it can go in after 12:30 |
+| - | Test coverage of the web core (#106) | Web | S | Done (PR #115): core branches reach 99.33%. The modules that draw are left out of the measurement, and their logic lives in the tested `*-core.js` files |
 
 ### Delivery and demo
 
@@ -118,9 +118,9 @@ Order: first the extras and **last of all the relief** (ADR-011). Final cut on t
 | E-04 | Moon versus Earth slide: hours of Sun at a lunar site and in a city (#79) | Product | S |
 | E-05 | Official submission requirements: English, use of AI, credits and license (#110) | Product | M |
 | C4-03 | Comparison scenario in the demo script and the slide (#113) | Product | M |
-| - | Regression test: Sun and Earth hours of scenarios against JPL Horizons (#105) | Ephemeris | M |
+| - | Regression test: Sun and Earth hours of scenarios against JPL Horizons (#105, done in PR #115) | Ephemeris | M |
 
-E-05 is done. The regression test is not a feature: it can go in after the feature freeze.
+E-05 and the regression test (#105) are done.
 
 ## How the work is split
 
