@@ -137,5 +137,16 @@
   "compare.add": "Agregar escenario",
   "compare.remove": "Quitar",
   "compare.removeAria": "Quitar el escenario {n}",
-  "compare.limits": "Se comparan como mínimo 2 y como máximo 3 escenarios."
+  "compare.limits": "Se comparan como mínimo 2 y como máximo 3 escenarios.",
+  "compare.loading": "Calculando la comparación…",
+  "compare.hours": "{hours} h",
+  "compare.sunHours": "con Sol sobre el horizonte",
+  "compare.earthHours": "con la Tierra visible (se puede comunicar)",
+  "compare.next.sets": "Se oculta: {time}",
+  "compare.next.rises": "Sale: {time}",
+  "compare.next.none": "No cambia hasta el final de los datos",
+  "compare.noData": "No hay datos de este sitio para esa fecha.",
+  "compare.partial": "Solo hay datos para {days} días: la comparación no es pareja.",
+  "compare.window": "Horas contadas en los {days} días desde el día elegido en cada escenario (UTC).",
+  "compare.flatNote": "Horizonte ideal, sin relieve: por ahora la Luna se dibuja lisa, sin montañas que tapen el Sol o la Tierra."
 }

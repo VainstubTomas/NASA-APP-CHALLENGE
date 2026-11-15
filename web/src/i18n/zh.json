@@ -137,5 +137,16 @@
   "compare.add": "添加方案",
   "compare.remove": "移除",
   "compare.removeAria": "移除方案 {n}",
-  "compare.limits": "最少比较 2 个、最多比较 3 个方案。"
+  "compare.limits": "最少比较 2 个、最多比较 3 个方案。",
+  "compare.loading": "正在计算比较结果…",
+  "compare.hours": "{hours} 小时",
+  "compare.sunHours": "太阳在地平线以上",
+  "compare.earthHours": "地球可见（可以通信）",
+  "compare.next.sets": "落下：{time}",
+  "compare.next.rises": "升起：{time}",
+  "compare.next.none": "直到数据结束都没有变化",
+  "compare.noData": "该地点在这个日期没有数据。",
+  "compare.partial": "只有 {days} 天的数据：比较并不对等。",
+  "compare.window": "按每个方案所选日期起的 {days} 天统计小时数（UTC）。",
+  "compare.flatNote": "理想地平线，无地形：目前月球被画成光滑的，没有遮挡太阳或地球的山。"
 }

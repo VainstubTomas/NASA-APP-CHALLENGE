@@ -88,3 +88,94 @@
 .compare-btn--remove {
   background: var(--color-bg);
 }
+
+/* Tarjetas de escenarios (C4-01c, #93): reusan .panel-card (panel.css), una columna por escenario. */
+.compare-results {
+  margin-top: var(--space-4);
+}
+
+.compare-cards {
+  display: grid;
+  grid-template-columns: repeat(var(--compare-cols, 2), minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 36rem) {
+  .compare-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  --card-color: var(--color-border);
+}
+
+.compare-card__name {
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.compare-card__body {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.compare-card__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+}
+
+.compare-card__hours {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.compare-card__body--sun .compare-card__hours {
+  color: var(--color-sun);
+}
+
+.compare-card__body--earth .compare-card__hours {
+  color: var(--color-earth);
+}
+
+.compare-card__next,
+.compare-card__empty,
+.compare-card__partial {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+.compare-card__partial {
+  color: var(--color-notice);
+}
+
+.compare__window,
+.compare__flat,
+.compare__loading {
+  margin: var(--space-3) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+/* Aviso del horizonte ideal: visible, como el #notice principal. */
+.compare__flat {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-notice);
+  background: var(--color-notice-bg);
+  border-radius: calc(var(--radius) / 1.5);
+}

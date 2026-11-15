@@ -137,5 +137,16 @@
   "compare.add": "Add scenario",
   "compare.remove": "Remove",
   "compare.removeAria": "Remove scenario {n}",
-  "compare.limits": "You can compare at least 2 and at most 3 scenarios."
+  "compare.limits": "You can compare at least 2 and at most 3 scenarios.",
+  "compare.loading": "Working out the comparison…",
+  "compare.hours": "{hours} h",
+  "compare.sunHours": "with the Sun above the horizon",
+  "compare.earthHours": "with Earth in view (contact possible)",
+  "compare.next.sets": "Sets: {time}",
+  "compare.next.rises": "Rises: {time}",
+  "compare.next.none": "No change until the end of the data",
+  "compare.noData": "There is no data for this site on that date.",
+  "compare.partial": "Data covers only {days} days: the comparison is not even.",
+  "compare.window": "Hours counted over the {days} days from the chosen day of each scenario (UTC).",
+  "compare.flatNote": "Ideal horizon, no terrain: for now the Moon is drawn smooth, with no mountains hiding the Sun or Earth."
 }
