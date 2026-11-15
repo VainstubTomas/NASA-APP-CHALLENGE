@@ -56,7 +56,9 @@
 .compare-table th:not(.info-table__key),
 .compare-table td { text-align: left; }
 .compare-table thead th { color: var(--color-text); }
-.compare-table .compare-table__more { font-weight: 700; color: var(--color-text); }
+.compare-table .compare-table__more { font-weight: 700; }
+.compare-table td.compare-table__sun { color: var(--color-sun); }
+.compare-table td.compare-table__earth { color: var(--color-earth); }
 .sky-drawer .compare-summary {
   border: 1px solid var(--color-border);
   border-left: 2px solid var(--color-text);

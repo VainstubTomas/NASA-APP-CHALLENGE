@@ -200,3 +200,15 @@ export function chartXToAz(x, x0, x1) {
   const f = Math.max(0, Math.min(1, (x - x0) / (x1 - x0)));
   return normAz(f * 360);
 }
+
+/**
+ * Qué hace el clic en un indicador de la cuenta regresiva (Sol o Tierra).
+ * Oculto y con salida en los datos: salta a la primera hora con el cuerpo visible (`atMs`).
+ * Visible, o sin cruce en los datos: solo gira la vista hacia el cuerpo.
+ * @param {{visible:boolean, event:string|null, atMs:number|null}|null} change resultado de nextVisibilityChange
+ * @returns {{type:'jump', ms:number} | {type:'look'}}
+ */
+export function countdownAction(change) {
+  if (change?.event && !change.visible && change.atMs != null) return { type: 'jump', ms: change.atMs };
+  return { type: 'look' };
+}

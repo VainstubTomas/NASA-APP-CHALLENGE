@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, chartXToAz, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, chartXToAz, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter, countdownAction,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -213,4 +213,19 @@ test('chartXToAz traduce la posición en el gráfico a azimut y recorta en los b
   assert.equal(chartXToAz(539, 44, 704), 270);
   assert.equal(chartXToAz(0, 44, 704), 0); // a la izquierda del gráfico
   assert.equal(chartXToAz(900, 44, 704), 0); // 360° es el mismo norte: normAz lo deja en 0
+});
+
+test('countdownAction: clic en un cuerpo oculto que sale salta a su salida', () => {
+  const change = { visible: false, event: 'rises', atMs: 1_700_000_000_000, crossMs: 1_699_999_000_000 };
+  assert.deepEqual(countdownAction(change), { type: 'jump', ms: 1_700_000_000_000 });
+});
+
+test('countdownAction: cuerpo visible solo gira la vista (no cambia la fecha)', () => {
+  const change = { visible: true, event: 'sets', atMs: 1_700_000_000_000, crossMs: 1_700_000_000_000 };
+  assert.deepEqual(countdownAction(change), { type: 'look' });
+});
+
+test('countdownAction: sin cruce en los datos solo gira la vista', () => {
+  assert.deepEqual(countdownAction({ visible: false, event: null, atMs: null, crossMs: null }), { type: 'look' });
+  assert.deepEqual(countdownAction(null), { type: 'look' });
 });

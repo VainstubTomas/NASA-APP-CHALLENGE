@@ -248,6 +248,7 @@
   "info.next30d": "Next 30 days",
   "info.next30dHelp": "Hours, out of the next 30 days, in which the body is above the horizon. “Both” counts hours with the Sun and Earth up at once.",
   "info.period": "Summary {from} to {to} ({hours} h)",
+  "info.periodSource": "Taken from all the hourly JPL Horizons data the app has for this site ({hours} hourly samples, {from} to {to}). It does not depend on the date you picked.",
   "info.value": "Value",
   "info.sunVisible": "Sun visible",
   "info.sunVisibleHelp": "Hours in the period when the Sun is above the horizon: there is light for solar panels. In parentheses, the share of the period.",
