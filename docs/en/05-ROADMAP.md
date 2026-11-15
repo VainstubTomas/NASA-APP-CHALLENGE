@@ -2,7 +2,7 @@
 
 # 05. Roadmap and initial issues
 
-Last update: 2026-11-14 · Source of truth for issues: `scripts/issues.json`. This document is maintained by hand: if `issues.json` changes, it is updated here in the same PR. The general map of the phases is in the [README](../../README.md#project-map).
+Last update: 2026-11-15 · Source of truth for issues: `scripts/issues.json`. This document is maintained by hand: if `issues.json` changes, it is updated here in the same PR. The general map of the phases is in the [README](../../README.md#project-map).
 
 Issues are loaded into GitHub with `python scripts/create_issues.py` (see `04-GIT-WORKFLOW.md`). Each layer is an **epic** (`[EPICA] ...`, parent issue) and its issues hang from it as sub-issues (see "Epics" in `04-GIT-WORKFLOW.md` and ADR-008). Each issue is a task of up to ~4 hours, with a single assigned owner, and layer, area and size labels. It is a multidisciplinary team: there are no fixed roles, and anyone takes issues from any area.
 
@@ -75,33 +75,52 @@ Smooth sphere Moon: the horizon is 0° in all directions (ADR-011).
 
 ### Layer 4: scenario comparison (mandatory since ADR-009)
 
-| ID | Task | Area | Size |
-|---|---|---|---|
-| C4-01 | Comparison of 2 or 3 scenarios side by side | Web | L |
+Status on the night of 11/14: **all sub-issues closed**. Epic #40 closes once the comparison is published from `main`.
+
+| ID | Task | Area | Size | Status |
+|---|---|---|---|---|
+| C4-01 | Comparison of 2 or 3 scenarios side by side (#41) | Web | L | Done, split into C4-01a to C4-01d |
+| C4-01a | Comparison core: Sun and Earth hours per scenario (#91) | Web | S | Done |
+| C4-01b | Selector for 2 or 3 scenarios (#92) | Web | S | Done |
+| C4-01c | Side-by-side scenario cards (#93) | Web | S | Done |
+| C4-01d | Summary of which scenario is better (#94) | Web | S | Done |
+| C4-02 | ADR-014: "which one is better" rule (#95) | Product | S | Done |
+| C4-04 | Scenarios saved in the URL (#97, optional) | Web | S | Done |
+| - | Own API to query Horizons live with user-chosen coordinates (#104, ADR-015) | Ephemeris | L | Done (solves C5-04) |
+
+C4-03 (comparison in the demo script and the slide) moved to delivery: #113.
 
 ### Layer 5: extras and, at the end, real relief (only if time allows)
 
-Order: first the extras and **last of all the relief** (ADR-011).
+Order: first the extras and **last of all the relief** (ADR-011). Final cut on the night of 11/14 (details in epic #42):
 
-| ID | Task | Area | Size |
-|---|---|---|---|
-| C5-01 | "The launch was delayed" button | Web | M |
-| C5-03 | Best landing window finder | Ephemerides | L |
-| C5-04 | Decide custom coordinates: precalculated grid or server | Terrain | M |
-| C5-05 | Get the south pole elevation map (Moon Trek, Quickmap or PDS). Formerly C0-03 | Terrain | M |
-| C5-06 | Horizon profile of a site (360 values) and silhouette chart. Formerly C0-06 | Terrain | L |
-| C5-07 | Generate horizon.json with relief for the south pole sites | Terrain | M |
-| C5-08 | Silhouette drawing with relief and visible or hidden by relief in the web | Web | M |
-| C5-02 | Terrain slope per site | Terrain | M |
+| ID | Task | Area | Size | Decision |
+|---|---|---|---|---|
+| C5-01 | "Launch was delayed" button (#43) | Web | M | Closed: covered by the time player (C3-02) and the comparison (layer 4) |
+| C5-03 | Best landing windows finder (#45) | Ephemeris | L | **Main extra. Done as a command-line tool** (`python -m precompute.ephemeris.windows`, PR #117): it uses `metrics.json` and the ADR-014 rule, and only lists windows from today on. Showing it in the web app is still to be decided and must be in before Sunday 12:30 |
+| C5-04 | Decide custom coordinates: precomputed grid or server (#46) | Terrain | M | Closed: ADR-015 (server) and implementation in #104 |
+| C5-05 | Get the south pole elevation map (#13). Formerly C0-03 | Terrain | M | **1-hour spike**: if it works, the chain goes on; if not, C5-05 to C5-08 are closed |
+| C5-06 | Horizon profile of a site and silhouette chart (#16). Formerly C0-06 | Terrain | L | Depends on the spike; at most 1 or 2 south pole sites |
+| C5-07 | Generate horizon.json with relief for the south pole sites (#51) | Terrain | M | Depends on the spike |
+| C5-08 | Draw the relief silhouette in the web app (#52) | Web | M | Depends on the spike |
+| C5-02 | Terrain slope per site (#44) | Terrain | M | Closed: depends on the map; moves to "next steps" in the pitch |
+| - | Redesign from the Figma design (#99) | Web | M | Must be in before Sunday 12:30 |
+| - | Group repeated scenarios in the comparison (#107) | Web | S | Optional, low priority |
+| - | Test coverage of the web core (#106) | Web | S | Done (PR #115): core branches reach 99.33%. The modules that draw are left out of the measurement, and their logic lives in the tested `*-core.js` files |
 
 ### Delivery and demo
 
 | ID | Task | Area | Size |
 |---|---|---|---|
-| E-01 | Repo ready for delivery: final README and cleanup of synthetic data | Product | S |
-| E-02 | Demo script and rehearsal | Product | M |
-| E-03 | Presentation and backup video | Product | M |
-| E-04 | Moon vs. Earth slide: sunlight hours at a lunar site and in a city on Earth | Product | S |
+| E-01 | Repo ready for delivery: final README and synthetic data cleanup (#48) | Product | S |
+| E-02 | Demo script and rehearsal (#49) | Product | M |
+| E-03 | Presentation and backup video (#50): official demo of up to 7 slides or 30 s, in English | Product | M |
+| E-04 | Moon versus Earth slide: hours of Sun at a lunar site and in a city (#79) | Product | S |
+| E-05 | Official submission requirements: English, use of AI, credits and license (#110) | Product | M |
+| C4-03 | Comparison scenario in the demo script and the slide (#113) | Product | M |
+| - | Regression test: Sun and Earth hours of scenarios against JPL Horizons (#105, done in PR #115) | Ephemeris | M |
+
+E-05 and the regression test (#105) are done.
 
 ## How the work is split
 
