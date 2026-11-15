@@ -16,12 +16,13 @@ from pydantic import BaseModel, Field
 from data.api import service
 from precompute.ephemeris import horizons_client as hc
 
-# Orígenes que pueden llamar a la API desde el navegador: desarrollo local y GitHub Pages.
+# Orígenes que pueden llamar a la API desde el navegador: desarrollo local, GitHub Pages y Vercel (producción).
 # Se pueden cambiar con la variable CORS_ORIGINS (separados por comas), p. ej. en Render.
 DEFAULT_ORIGINS = [
     "http://localhost:5173", "http://127.0.0.1:5173",
     "http://localhost:4173", "http://127.0.0.1:4173",
     "https://vainstubtomas.github.io",
+    "https://vizcachasfueradeorbita.vercel.app",
 ]
 
 DESCRIPTION = """

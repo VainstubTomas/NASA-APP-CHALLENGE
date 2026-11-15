@@ -228,6 +228,9 @@ def test_cors_allows_the_web_origin_and_not_others(client):
     ok = client.options("/ephemeris", headers={
         "Origin": "http://localhost:5173", "Access-Control-Request-Method": "GET"})
     assert ok.headers.get("access-control-allow-origin") == "http://localhost:5173"
+    vercel = client.options("/ephemeris", headers={
+        "Origin": "https://vizcachasfueradeorbita.vercel.app", "Access-Control-Request-Method": "GET"})
+    assert vercel.headers.get("access-control-allow-origin") == "https://vizcachasfueradeorbita.vercel.app"
     bad = client.options("/ephemeris", headers={
         "Origin": "https://sitio-ajeno.example", "Access-Control-Request-Method": "GET"})
     assert "access-control-allow-origin" not in bad.headers

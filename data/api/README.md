@@ -39,9 +39,9 @@ La caja de latitud y longitud de la web aparece **solo si hay una URL de API**. 
 ```
 VITE_API_URL=http://localhost:8000
 ```
-y correr `npm run dev` en `web/`. Sin esa variable la web funciona como siempre, con los sitios precalculados. En el deploy a GitHub Pages, la URL va en la variable de repositorio `VITE_API_URL` (Settings → Secrets and variables → Actions → Variables).
+y correr `npm run dev` en `web/`. Sin esa variable la web funciona como siempre, con los sitios precalculados. En el deploy a GitHub Pages, la URL va en la variable de repositorio `VITE_API_URL` (Settings → Secrets and variables → Actions → Variables). En **Vercel**, va en Settings → Environment Variables del proyecto (con el mismo nombre) y hay que volver a deployar.
 
-CORS permite `localhost:5173`, `localhost:4173` y `https://vainstubtomas.github.io`. Para otros orígenes: variable de entorno `CORS_ORIGINS` (separados por comas).
+CORS permite `localhost:5173`, `localhost:4173`, `https://vainstubtomas.github.io` y `https://vizcachasfueradeorbita.vercel.app` (Vercel, producción). Los previews de Vercel (`...-git-...vercel.app`) tienen otro dominio en cada rama y no están permitidos. Para otros orígenes: variable de entorno `CORS_ORIGINS` (separados por comas).
 
 ## Deploy en Render (ADR-015)
 1. New → **Web Service**, conectar el repo, rama `main`.
