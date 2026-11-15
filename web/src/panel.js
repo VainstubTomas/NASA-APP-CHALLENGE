@@ -140,7 +140,8 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
     row('info.elevation', (b) => signedDeg(sample[b].elevation_deg)),
     row('info.state', (b) => {
       const s = visibilityState(sample[b], radius[b], horizon);
-      return { text: t(`panel.status.${s}`), className: `info-state info-state--${s}` };
+      // Clase por cuerpo: "Arriba" toma el color de su cuerpo (ver panel.css).
+      return { text: t(`panel.status.${s}`), className: `info-state info-state--${s} info-state--${b}` };
     }),
     row('info.next', (b) => {
       const c = changes[b];
@@ -163,7 +164,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
     const cell = (n) => ({ text: `${n} h`, className: 'info-num' });
     return [label(key), cell(w.sun), cell(w.earth), cell(w.both)];
   });
-  const windowsTable = table(t('info.windows'), ['', t('panel.sun'), t('panel.earth'), t('info.both')], windows);
+  const windowsTable = table(t('info.windows'), ['', t('panel.sun'), t('panel.earth'), t('info.both')], windows, 'info-table--bodies');
 
   // 3) Resumen del período completo de datos
   const sum = periodSummary(vis);
