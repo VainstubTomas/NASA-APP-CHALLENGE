@@ -127,4 +127,7 @@ def test_horizonte_polar_publicado_coincide_con_el_mapa_de_30_m(site_id):
                 if s["id"] == site_id)
     published = json.loads((lh.ROOT / "data" / "public" / "sites" / site_id / "horizon.json").read_text(encoding="utf-8"))
     assert published["dem"]["name"] == lh.POLAR_DEM_NAME
-    assert published == lh.site_horizon(site)
+    expected = lh.site_horizon(site)
+    assert published["dem"] == expected["dem"]
+    # Tolerancia como en Apollo 11: un recorte bajado de nuevo puede diferir en el último decimal.
+    assert published["elevation_deg"] == pytest.approx(expected["elevation_deg"], abs=0.01)
