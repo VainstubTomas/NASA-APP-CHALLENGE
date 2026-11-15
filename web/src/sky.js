@@ -1014,10 +1014,11 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
       const sample = sampleAt(ephemeris, utcMs);
       // Misma sitio: los cuerpos se deslizan desde donde están hasta la nueva muestra. Sitio nuevo: salto.
       const sameSite = key === siteKey;
-      const prevMs = data?.utcMs ?? null;
+      // Al interrumpir una transición, el nuevo movimiento arranca desde la pose y los días que se ven ahora.
+      const fromDays = starDays();
       const from = sameSite && data?.sample && sample ? currentPose() : null;
       data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
-      move = from ? { from, to: sample, t0: performance.now(), days: [prevMs / DAY_MS, utcMs / DAY_MS] } : null;
+      move = from ? { from, to: sample, t0: performance.now(), days: [fromDays, utcMs / DAY_MS] } : null;
       // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
       smooth.style.display = hasRelief(hz) ? 'none' : '';
       const newSite = key !== siteKey;
