@@ -239,3 +239,24 @@ export function pointerAngle(x0, y0, x1, y1) {
 export function nearCenter(x, y, width, height, fraction = 0.5) {
   return Math.abs(x - width / 2) <= (width * fraction) / 2 && Math.abs(y - height / 2) <= (height * fraction) / 2;
 }
+
+/** Diferencia de azimut por el camino corto, en grados (-180, 180]. */
+export const azDelta = (from, to) => ((((to - from) % 360) + 540) % 360) - 180;
+
+/**
+ * Pose intermedia entre dos muestras de cuerpos ({ azimuth_deg, elevation_deg }), con t en [0, 1].
+ * El azimut va por el camino corto (no da la vuelta entera al cruzar el norte); ease-out cúbico.
+ */
+export function tweenPose(from, to, t) {
+  const e = 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
+  return {
+    azimuth_deg: normAz(from.azimuth_deg + azDelta(from.azimuth_deg, to.azimuth_deg) * e),
+    elevation_deg: from.elevation_deg + (to.elevation_deg - from.elevation_deg) * e,
+  };
+}
+
+/** ¿Hay que recalcular el mapa de sombras? Sí si alguna componente de la dirección cambió más de eps. */
+export function needsMaskBake(prev, next, eps = 1e-4) {
+  if (!prev) return true;
+  return next.some((v, i) => Math.abs(v - prev[i]) > eps);
+}

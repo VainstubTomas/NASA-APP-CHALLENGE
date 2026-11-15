@@ -12,6 +12,10 @@ import sunImg from './assets/sky/sun.png';
 import earthImg from './assets/sky/earth.png';
 import groundImg from './assets/sky/ground.png';
 import { makeGroundPanorama, PANO_DEP_MIN_DEG, PANO_DEP_MAX_DEG } from './ground-texture.js';
+import { createDebugOverlay } from './debug-overlay.js';
+
+// ?debug en la URL activa el overlay de FPS y estadísticas (F3 lo oculta)
+const DEBUG_OVERLAY = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
 import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
@@ -24,7 +28,11 @@ import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter, tiltToCenter,
+  tweenPose,
 } from './sky-core.js';
+
+/** Duración del movimiento de Sol, Tierra y suelo al cambiar la fecha o la hora. */
+const MOVE_MS = 600;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // Altura del horizonte en la pantalla (fracción del alto), como en el Figma: 1082 / 1346.
@@ -204,6 +212,9 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   let tilt = 0;
   let fov = FOV_DEG; // cambia con la rueda del mouse (zoom)
   let data = null; // { ephemeris, horizon, utcMs, siteName, sample }
+  let move = null; // { from, to, t0 }: transición en curso de la pose de Sol y Tierra
+  let pose = null; // pose mostrada este cuadro (interpolada durante la transición)
+  let moveQueued = false;
   let siteKey = null;
   let anim = null;
   let cdTimer = null;
@@ -253,7 +264,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       ground.style.backgroundSize = `${tileW}px auto`;
       ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
     }
-    ground.style.setProperty('--ground-light', groundLight(data?.sample?.sun?.elevation_deg).toFixed(3));
+    ground.style.setProperty('--ground-light', groundLight(pose?.sun?.elevation_deg).toFixed(3));
     drawGround(v, k, hy);
     root.classList.toggle('is-tilted', tilt !== 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
@@ -281,7 +292,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     }
     const radii = data.ephemeris.angular_radius_deg;
     discs = [];
-    for (const b of bodies) drawBody(b, data.sample[b.key], radii[b.key], v, k, hy);
+    for (const b of bodies) drawBody(b, pose[b.key], radii[b.key], v, k, hy);
     hidePointersOverDiscs(v);
   }
 
@@ -290,14 +301,13 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   let ground3d = null;
   function drawGround(v, k, hy) {
     if (!ground3d) return;
-    const sample = data?.sample;
     ground3d.render({
       width: Math.round(v.width),
       groundHeight: Math.max(0, Math.round(v.height - hy)),
       pxPerDeg: k,
       heading,
-      sun: sample?.sun ?? null,
-      earth: sample?.earth ?? null,
+      sun: pose?.sun ?? null,
+      earth: pose?.earth ?? null,
       radii: data?.ephemeris?.angular_radius_deg,
     });
   }
@@ -306,6 +316,12 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       .then(({ createGround }) => {
         ground3d = createGround(ground);
         root.classList.add('has-ground-3d');
+        if (DEBUG_OVERLAY) {
+          createDebugOverlay(root, {
+            getStats: () => ground3d?.stats() ?? null,
+            onWireframe: (on) => ground3d?.setWireframe(on),
+          });
+        }
         draw();
       })
       .catch((err) => {
@@ -396,8 +412,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     ctx.clearRect(0, 0, w, h);
     if (!hasRelief(data?.horizon) || h === 0) return;
     const pts = skylinePoints(data.horizon, { heading, width: v.width, k, hy });
-    const sample = data.sample;
-    const light = sample ? { sun: sample.sun, earth: sample.earth } : null;
+    const light = pose ? { sun: pose.sun, earth: pose.earth } : null;
     const radii = data.ephemeris.angular_radius_deg;
     const azAt = (x) => heading + (x - v.width / 2) / k;
     ctx.lineWidth = 1.5;
@@ -602,9 +617,31 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     }
   }
 
+  // Pose de Sol y Tierra de este cuadro: la muestra actual, o la interpolación si hay transición.
+  function currentPose(now = performance.now()) {
+    if (!move) return data?.sample ?? null;
+    const t = (now - move.t0) / MOVE_MS;
+    if (t >= 1) {
+      move = null;
+      return data?.sample ?? null;
+    }
+    return {
+      sun: tweenPose(move.from.sun, move.to.sun, t),
+      earth: tweenPose(move.from.earth, move.to.earth, t),
+    };
+  }
+
   function draw() {
+    pose = currentPose();
     drawStage();
     drawChart();
+    if (move && !moveQueued) {
+      moveQueued = true;
+      requestAnimationFrame(() => {
+        moveQueued = false;
+        draw();
+      });
+    }
   }
 
   // Al arrastrar llegan muchos pointermove por cuadro (un mouse de 1000 Hz manda ~16). Se junta todo en
@@ -843,7 +880,11 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
      */
     update({ ephemeris, horizon: hz, utcMs, siteName, key, lat }) {
       const sample = sampleAt(ephemeris, utcMs);
+      // Misma sitio: los cuerpos se deslizan desde donde están hasta la nueva muestra. Sitio nuevo: salto.
+      const sameSite = key === siteKey;
+      const from = sameSite && data?.sample && sample ? currentPose() : null;
       data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
+      move = from ? { from, to: sample, t0: performance.now() } : null;
       // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
       smooth.style.display = hasRelief(hz) ? 'none' : '';
       if (key !== siteKey && sample) {
@@ -866,6 +907,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     /** Sin datos para mostrar: el cielo queda vacío (se conserva el sitio y la fecha). */
     clear({ siteName = data?.siteName ?? '', utcMs = data?.utcMs ?? null } = {}) {
       data = { siteName, utcMs, sample: null };
+      move = null;
       drawTime();
       drawCountdown();
       draw();
