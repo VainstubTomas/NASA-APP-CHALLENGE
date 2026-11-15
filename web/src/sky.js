@@ -544,7 +544,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     anim = requestAnimationFrame(step);
   }
   const turn = (delta) => animateTo(rotate(heading, delta));
-  const setTilt = (value) => { tilt = clampTilt(value, maxTilt(), minTilt()); draw(); };
+  // Las flechas verticales animan igual que las laterales. Se encadenan desde el destino anterior,
+  // no desde la posición a mitad de camino, para que varias pulsaciones seguidas sumen sus pasos.
+  let tiltGoal = null;
+  const stepTilt = (stepFn, limit) => {
+    const from = anim && tiltGoal !== null ? tiltGoal : tilt;
+    tiltGoal = clampTilt(stepFn(from, limit), maxTilt(), minTilt());
+    animateTo(heading, { tiltTo: tiltGoal });
+  };
 
   // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
   // ecuador), también sube la mirada para que entre.
@@ -662,8 +669,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (e.target.closest('input, select, textarea, .sky-panel')) return;
     if (e.key === 'ArrowLeft') turn(-ROTATE_STEP_DEG);
     else if (e.key === 'ArrowRight') turn(ROTATE_STEP_DEG);
-    else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt, maxTilt()));
-    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt, minTilt()));
+    else if (e.key === 'ArrowUp') stepTilt(tiltUp, maxTilt());
+    else if (e.key === 'ArrowDown') stepTilt(tiltDown, minTilt());
     else if ((e.key === 'f' || e.key === 'F') && canFullscreen && !e.metaKey && !e.ctrlKey) toggleFullscreen();
     else return;
     e.preventDefault();
