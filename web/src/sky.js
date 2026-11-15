@@ -491,6 +491,18 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     drawChart();
   }
 
+  // Al arrastrar llegan muchos pointermove por cuadro (un mouse de 1000 Hz manda ~16). Se junta todo en
+  // un solo draw() por cuadro: el estado (heading, tilt) ya está actualizado cuando se dibuja.
+  let drawQueued = false;
+  function drawSoon() {
+    if (drawQueued) return;
+    drawQueued = true;
+    requestAnimationFrame(() => {
+      drawQueued = false;
+      draw();
+    });
+  }
+
   // --- Interacción ---
   // Gira hasta `target`; opcionalmente también acerca (fovTo) y mueve la mirada vertical (tiltTo).
   function animateTo(target, { fovTo = fov, tiltTo = tilt } = {}) {
@@ -587,7 +599,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const k = pxPerDeg(stage.clientWidth, fov);
     heading = normAz(drag.heading - dx / k);
     tilt = clampTilt(drag.tilt + dy / k, maxTilt(), minTilt());
-    draw();
+    drawSoon();
   });
   const endDrag = () => {
     if (drag && !drag.moved && drag.body) {

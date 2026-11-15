@@ -167,7 +167,9 @@ function detailTexture(size = 256) {
   return tex;
 }
 
-function heightTexture(terrain, sizeM, res) {
+// `linear`: interpola entre texels (sombras suaves). Los Float32 solo se pueden filtrar si el
+// navegador da OES_texture_float_linear; si no, se queda en el vecino más cercano (bloques).
+function heightTexture(terrain, sizeM, res, linear) {
   const data = new Float32Array(res * res);
   for (let j = 0; j < res; j += 1) {
     for (let i = 0; i < res; i += 1) {
@@ -177,8 +179,8 @@ function heightTexture(terrain, sizeM, res) {
     }
   }
   const tex = new THREE.DataTexture(data, res, res, THREE.RedFormat, THREE.FloatType);
-  tex.magFilter = THREE.NearestFilter;
-  tex.minFilter = THREE.NearestFilter;
+  tex.magFilter = linear ? THREE.LinearFilter : THREE.NearestFilter;
+  tex.minFilter = linear ? THREE.LinearFilter : THREE.NearestFilter;
   tex.needsUpdate = true;
   return tex;
 }
@@ -247,11 +249,13 @@ export function createGround(container) {
   renderer.domElement.className = 'sky-ground__canvas';
   renderer.domElement.setAttribute('aria-hidden', 'true');
 
+  const linearHeights = renderer.extensions.has('OES_texture_float_linear');
+
   // Mismo cielo, mismo terreno en cada carga (las coordenadas del sitio no cambian el dibujo).
   const terrain = createTerrain(11);
   const uniforms = {
-    hNear: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, NEAR_SIZE, NEAR_RES) },
-    hFar: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, FAR_SIZE, FAR_RES) },
+    hNear: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, NEAR_SIZE, NEAR_RES, linearHeights) },
+    hFar: { value: heightTexture({ height: (x, z) => terrain.height(x, z) - EYE_M }, FAR_SIZE, FAR_RES, linearHeights) },
     detail: { value: detailTexture() },
     sunDir: { value: new THREE.Vector3(0, 1, 0) },
     sunI: { value: 0 },
@@ -269,15 +273,22 @@ export function createGround(container) {
   container.append(renderer.domElement);
 
   // Fracción visible del disco (0 = bajo el horizonte, 1 = entero arriba)
+  const size = { w: 0, h: 0 }; // último tamaño aplicado al canvas
+
   const visibleFraction = (el, r) => Math.min(1, Math.max(0, (el + r) / (2 * r)));
 
   return {
     render({ width, groundHeight, pxPerDeg, heading, sun, earth, radii }) {
       if (groundHeight < 1 || width < 1) return;
       const cam = groundCamera({ width, groundHeight, pxPerDeg });
-      renderer.setSize(width, groundHeight, false);
-      renderer.domElement.style.width = `${width}px`;
-      renderer.domElement.style.height = `${groundHeight}px`;
+      // setSize reasigna canvas.width/height, lo que borra el buffer: solo si el tamaño cambió.
+      if (width !== size.w || groundHeight !== size.h) {
+        size.w = width;
+        size.h = groundHeight;
+        renderer.setSize(width, groundHeight, false);
+        renderer.domElement.style.width = `${width}px`;
+        renderer.domElement.style.height = `${groundHeight}px`;
+      }
       camera.fov = cam.vFovDeg;
       camera.aspect = cam.aspect;
       camera.setViewOffset(width, cam.fullHeight, 0, cam.offsetY, width, groundHeight);
