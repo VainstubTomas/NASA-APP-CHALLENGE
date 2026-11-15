@@ -7,6 +7,7 @@ import { loadSite, loadSites, loadValidation, loadMetrics } from './data.js';
 import { renderTimeline } from './timeline.js';
 import { renderValidation } from './validation-panel.js';
 import { initCompare } from './compare.js';
+import { parseScenarios, SCENARIOS_PARAM } from './scenarios-core.js';
 
 applyStaticTexts();
 initLangSelect(document.getElementById('lang'));
@@ -64,10 +65,13 @@ initSelector({
 }).then(async (selector) => {
   player = initPlayer(document.getElementById('player'), selector);
   // Capa 4 (#92): comparación de escenarios. Arranca con la selección actual como primer escenario.
+  const sites = await loadSites();
   initCompare(document.getElementById('compare'), {
-    sites: await loadSites(),
+    sites,
     range: selector.range,
     current: selector.getState(),
+    // C4-04 (#97): escenarios guardados en la URL (?c=...); si faltan o son inválidos, los de por defecto.
+    initial: parseScenarios(new URLSearchParams(window.location.search).get(SCENARIOS_PARAM), sites, selector.range),
   });
 }).catch((err) => {
   notice.hidden = false;
