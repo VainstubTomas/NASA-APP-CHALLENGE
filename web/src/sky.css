@@ -230,6 +230,7 @@
   pointer-events: none;
   text-shadow: 0 0 6px #000;
 }
+.sky-label.is-blocked { font-style: italic; }
 .sky-label--sun { color: var(--color-sun); }
 .sky-label--earth { color: var(--sky-earth); }
 
@@ -446,6 +447,12 @@
 .sky-chart__horizon { stroke: var(--sky-text); stroke-width: 1.5; }
 .sky-chart__tick { stroke: var(--sky-text-dim); }
 .sky-chart__view { fill: var(--sky-view-fill); stroke: var(--sky-edge); stroke-width: 1; }
+/* Silueta del relieve (C5-08): canvas encima de los discos, dentro de .sky-air */
+.sky-skyline { position: absolute; top: 0; left: 0; pointer-events: none; }
+.sky-chart__profile { fill: none; }
+.sky-chart__body.is-hidden { fill: none; stroke-width: 2; stroke-dasharray: 3 2; }
+.sky-chart__body--sun.is-hidden { stroke: var(--color-sun); }
+.sky-chart__body--earth.is-hidden { stroke: var(--sky-earth); }
 .sky-chart__body--sun { fill: var(--color-sun); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart__body--earth { fill: var(--sky-earth); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart text.sky-chart__name--sun { fill: var(--color-sun); }
