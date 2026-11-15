@@ -1,7 +1,7 @@
 // Lista de escenarios a comparar (C4-01b, #92), sin DOM. Un escenario es { id, site, t } (t en ms UTC).
 // Reglas: mínimo 2 y máximo 3 escenarios; el primero arranca con la selección actual.
 // Las funciones no modifican la lista: devuelven una nueva (o la misma si la acción no se puede hacer).
-import { HOUR_MS, clampTime } from './state.js';
+import { HOUR_MS, clampTime, formatT, parseT } from './state.js';
 
 export const MIN_SCENARIOS = 2;
 export const MAX_SCENARIOS = 3;
@@ -42,4 +42,33 @@ export function updateScenario(list, id, patch, range) {
     const next = { ...s, ...patch };
     return { ...next, t: clampTime(next.t, range.minMs, range.maxMs) };
   });
+}
+
+// ---- Estado en la URL (C4-04, #97) ----
+// Parámetro `c`: "<sitio>@<ISO UTC>,<sitio>@<ISO UTC>[,...]". Convive con ?site=&t= (escenario principal).
+export const SCENARIOS_PARAM = 'c';
+
+/** Lista de escenarios -> valor del parámetro `c` (sin los ids: se regeneran al leer). */
+export function scenariosToParam(list) {
+  return list.map((s) => `${s.site}@${formatT(s.t)}`).join(',');
+}
+
+/**
+ * Valor del parámetro `c` -> lista de escenarios, con tolerancia: descarta entradas inválidas (sitio que no
+ * existe, fecha mala), lleva la fecha al rango y la redondea a la hora, y recorta a MAX_SCENARIOS.
+ * Devuelve null si quedan menos de MIN_SCENARIOS válidos (el que llama usa los valores por defecto).
+ */
+export function parseScenarios(param, sites, range) {
+  if (typeof param !== 'string' || param === '') return null;
+  const valid = [];
+  for (const part of param.split(',')) {
+    const at = part.indexOf('@');
+    if (at < 1) continue;
+    const site = part.slice(0, at);
+    const t = parseT(part.slice(at + 1));
+    if (t === null || !sites.some((s) => s.id === site)) continue;
+    valid.push({ site, t: clampTime(t, range.minMs, range.maxMs) });
+  }
+  if (valid.length < MIN_SCENARIOS) return null;
+  return valid.slice(0, MAX_SCENARIOS).map((s, i) => ({ id: `s${i + 1}`, ...s }));
 }

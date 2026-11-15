@@ -1,6 +1,6 @@
 // Selector de sitio y de fecha/hora UTC. Escribe el estado en la URL.
 import {
-  getRange, clampTime, toInputValue, fromInputValue, resolveState, buildSearch,
+  getRange, clampTime, toInputValue, fromInputValue, resolveState, formatT, mergeSearch,
 } from './state.js';
 import { t, siteName } from './i18n.js';
 
@@ -53,7 +53,8 @@ export async function initSelector({ onChange, onUserInput } = {}) {
   async function render() {
     siteSelect.value = state.site;
     timeInput.value = toInputValue(state.t);
-    history.replaceState(null, '', buildSearch(state));
+    // Conserva los demás parámetros de la URL (por ejemplo `c`, los escenarios de la comparación, C4-04).
+    history.replaceState(null, '', mergeSearch(window.location.search, { site: state.site, t: formatT(state.t) }));
     const ok = await hasData(state.site);
     notice.hidden = ok;
     notice.textContent = ok ? '' : t('selector.noData');
