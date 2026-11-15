@@ -35,7 +35,7 @@ python -m uvicorn data.api.main:app --reload --port 8000
 Convenciones: azimut en grados con 0° = norte y sentido horario; elevación en grados sobre el horizonte; tiempo en UTC; marco topocéntrico (desde el punto elegido). Son las mismas del resto del proyecto.
 
 ### Ejemplo de respuesta
-Para `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (se muestran solo las primeras 3 de las 24 muestras; valores reales de Horizons):
+Para `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (se muestran solo las primeras 3 de las 24 muestras; valores de ejemplo con el formato real, no verificados contra Horizons):
 ```json
 {
   "schema_version": "1.0",
