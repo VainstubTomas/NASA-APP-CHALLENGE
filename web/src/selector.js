@@ -49,6 +49,8 @@ export async function initSelector({ onChange, onUserInput, onRange } = {}) {
 
   const nowMs = Date.now();
   const { minMs, maxMs } = getRange(nowMs);
+  timeInput.min = toInputValue(minMs);
+  timeInput.max = toInputValue(maxMs);
   timeInput.step = 3600; // una muestra por hora
 
   const siteById = (id) => sites.find((s) => s.id === id);
@@ -59,8 +61,8 @@ export async function initSelector({ onChange, onUserInput, onRange } = {}) {
     const next = rangeFor(siteById(state.site), state.t, nowMs);
     const changed = next.minMs !== active.minMs || next.maxMs !== active.maxMs || next.mission !== active.mission;
     active = next;
-    timeInput.min = toInputValue(active.minMs);
-    timeInput.max = toInputValue(active.maxMs);
+    // Los límites del campo son siempre los del rango normal: en modo misión no hay que bloquear las
+    // fechas actuales (el panel copia estos límites). La ventana de la misión la fija el deslizador.
     if (changed) onRange?.(active);
     siteSelect.value = state.site;
     timeInput.value = toInputValue(state.t);

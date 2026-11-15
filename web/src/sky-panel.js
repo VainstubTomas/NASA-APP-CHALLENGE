@@ -145,8 +145,6 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   missionGo?.addEventListener('click', () => {
     const w = selectedMission();
     if (!w) return;
-    time.min = toInputValue(w.minMs);
-    time.max = toInputValue(w.maxMs);
     time.value = toInputValue(missionStartMs({ landing_utc: site.selectedOptions[0].dataset.landing }));
     runApply();
   });
