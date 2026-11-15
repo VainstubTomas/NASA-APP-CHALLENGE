@@ -94,7 +94,7 @@ Usamos herramientas de IA, como permiten las reglas de Space Apps, y decimos dó
 - **Código, tests y documentación**: escritos con ayuda de Claude (Anthropic), usado como asistente de programación dentro de nuestro flujo de Git. Los commits en los que participó llevan la línea `Co-Authored-By: Claude`, y cada cambio pasó por un pull request revisado por alguien del equipo. La guía que le damos está en [`CLAUDE.md`](CLAUDE.md).
 - **Traducciones**: los textos de la web en inglés, hindi y chino simplificado se tradujeron con IA y no los revisaron hablantes nativos (ver [`web/src/i18n/README.md`](web/src/i18n/README.md)). La web también lo dice en el pie.
 - **Lo que no generó la IA**: los números. Las posiciones del Sol y la Tierra salen de JPL Horizons y se comparan contra respuestas guardadas de Horizons con tests automáticos (ADR-005, ADR-013).
-- **Imágenes**: el logo del equipo (`logo-vizcachas.svg` y el favicon) se generó con ChatGPT (OpenAI). Las demás imágenes de la web (superficie lunar, Sol, Tierra, mapas polares, íconos de la interfaz) no son de IA: salen de archivos y proyectos públicos de Figma (ver Créditos).
+- **Imágenes**: el logo del equipo (`logo-vizcachas.svg` y el favicon) se generó con ChatGPT (OpenAI). Las demás imágenes de la web no son de IA: salen de fuentes públicas que figuran en Créditos (USGS, Figma Community).
 - Ningún video ni audio del proyecto se generó con IA.
 
 ## Créditos y referencias
@@ -106,7 +106,7 @@ Usamos herramientas de IA, como permiten las reglas de Space Apps, y decimos dó
 **Recursos de agencias espaciales socias**
 - [Moon Exploration](https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/) (CSA, Agencia Espacial Canadiense): contexto para el pitch.
 
-**Imágenes**: las imágenes de superficie lunar, Sol, Tierra, mapas polares e íconos de la web (`web/src/assets/sky/`) se tomaron de archivos y proyectos públicos de Figma. El logo del equipo está generado con IA (ver Uso de IA).
+**Imágenes** (`web/src/assets/sky/`): las imágenes 2D de la Luna (mapas polares) salen del [Image mosaic and topographic map of the Moon](https://pubs.usgs.gov/sim/3316/downloads/sim3316_sheet1_lo_res.pdf) del USGS (Scientific Investigations Map 3316, 2015). Las imágenes del Sol y la Tierra salen del archivo de Figma Community [Space Elements](https://www.figma.com/design/cd2hSZ5cz9CFRURSDR5w1x/Space-Elements--Community---Community-?m=auto&t=QqI0kQe9hwV0xPfn-1). La textura del suelo y los íconos de la interfaz se tomaron de archivos y proyectos públicos de Figma. El logo del equipo está generado con IA (ver Uso de IA).
 
 **Coordenadas de los sitios**: cada sitio de [`data/public/sites.json`](data/public/sites.json) indica su fuente.
 
@@ -114,7 +114,7 @@ Usamos herramientas de IA, como permiten las reglas de Space Apps, y decimos dó
 - Web: [three.js](https://threejs.org/) (MIT) para la vista 3D, [Vite](https://vite.dev/) (MIT) para el build.
 - Python: [NumPy](https://numpy.org/) (BSD-3-Clause), [Requests](https://requests.readthedocs.io/) (Apache-2.0), [rasterio](https://rasterio.readthedocs.io/) (BSD-3-Clause), [pyproj](https://pyproj4.github.io/pyproj/) (MIT), [Matplotlib](https://matplotlib.org/) (licencia de Matplotlib), [pytest](https://pytest.org/) (MIT), [jsonschema](https://python-jsonschema.readthedocs.io/) (MIT); para la API en vivo (ADR-015): [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Uvicorn](https://www.uvicorn.org/) (BSD-3-Clause), [HTTPX](https://www.python-httpx.org/) (BSD-3-Clause).
 
-No se usan logos ni otros elementos de marca de NASA.
+La única marca de NASA en la app es el logo del NASA Space Apps Challenge, que se muestra en el diálogo de bienvenida para identificar el evento. No se usan otros logos ni elementos de marca de NASA.
 
 ## Licencia
 El código se publica con la [licencia MIT](LICENSE). Los datos vienen de las fuentes de arriba, con sus propias condiciones.
