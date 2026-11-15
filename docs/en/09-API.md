@@ -35,7 +35,7 @@ python -m uvicorn data.api.main:app --reload --port 8000
 Conventions: azimuth in degrees with 0° = north, clockwise; elevation in degrees above the horizon; time in UTC; topocentric frame (from the chosen point). They are the same as in the rest of the project.
 
 ### Example response
-For `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (only the first 3 of the 24 samples are shown; example values in the real format, not yet verified against Horizons):
+For `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (only the first 3 of the 24 samples are shown; the Sun values are verified against Horizons, the Earth values are not):
 ```json
 {
   "schema_version": "1.0",
