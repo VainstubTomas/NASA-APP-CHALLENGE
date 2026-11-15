@@ -78,7 +78,19 @@ const FRAGMENT = /* glsl */ `
   float lommel(vec3 n, vec3 L, vec3 V) {
     float mu0 = max(dot(n, L), 0.0);
     float mu = max(dot(n, V), 0.02);
-    return mu0 / (mu0 + mu);
+    // Efecto de oposición: el regolito brilla más cuando se lo mira con el Sol a la espalda
+    // (ángulo de fase chico), porque cada grano tapa la sombra de los vecinos.
+    float phase = acos(clamp(dot(V, L), -1.0, 1.0));
+    float surge = 1.0 + 0.55 / (1.0 + phase * phase / 0.012);
+    return surge * mu0 / (mu0 + mu);
+  }
+
+  // Cavidades: una hondonada recibe menos luz de rebote y tiene micro-sombras que la grilla no
+  // resuelve. Se estima con la altura del punto contra el promedio de 4 vecinos a ~2 m.
+  float cavity(vec2 p) {
+    float hc = H(p);
+    float avg = 0.25 * (H(p + vec2(2.0, 0.0)) + H(p - vec2(2.0, 0.0)) + H(p + vec2(0.0, 2.0)) + H(p - vec2(0.0, 2.0)));
+    return clamp(1.0 + 2.5 * (hc - avg), 0.55, 1.0);
   }
 
   void main() {
@@ -93,16 +105,17 @@ const FRAGMENT = /* glsl */ `
       n = normalize(vNormal + vec3(d1.x, 0.0, d1.y) * 0.55 * fade + vec3(d2.x, 0.0, d2.y) * 0.25);
     }
 
+    float cav = fade > 0.0 ? mix(1.0, cavity(vPos.xz), fade) : 1.0;
     vec3 color = vAlbedo * 0.012; // luz rebotada del terreno vecino (casi nada: sombras negras)
     // La sombra solo se recorre si la superficie mira a la luz: si no, lommel() ya da 0 y el
     // resultado es el mismo, pero se ahorra la marcha de 48 pasos en todo lo que está a oscuras.
     if (sunI > 0.0 && dot(n, sunDir) > 0.0) {
       float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), sunDir, sunSoft);
-      color += vAlbedo * vec3(1.0, 0.98, 0.94) * sunI * 2.0 * lommel(n, sunDir, V) * sh;
+      color += vAlbedo * vec3(1.0, 0.98, 0.94) * sunI * 2.0 * lommel(n, sunDir, V) * sh * cav;
     }
     if (earthI > 0.0 && dot(n, earthDir) > 0.0) {
       float sh = shadow(vPos + vec3(0.0, 0.04, 0.0), earthDir, earthSoft);
-      color += vAlbedo * vec3(0.62, 0.74, 1.0) * earthI * 2.0 * lommel(n, earthDir, V) * sh;
+      color += vAlbedo * vec3(0.62, 0.74, 1.0) * earthI * 2.0 * lommel(n, earthDir, V) * sh * cav;
     }
     color = color / (1.0 + color * 0.35); // compresión suave de los brillos
     gl_FragColor = vec4(pow(clamp(color, 0.0, 1.0), vec3(1.0 / 2.2)), 1.0);

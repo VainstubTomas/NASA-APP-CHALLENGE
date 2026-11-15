@@ -169,6 +169,44 @@ export function makeStars(count, seed = 1) {
   return stars;
 }
 
+/** Un giro completo de la Luna respecto de las estrellas (mes sidéreo), en días. */
+export const SIDEREAL_MONTH_DAYS = 27.321661;
+
+/**
+ * Campo de estrellas sobre la esfera celeste entera (ascensión recta `ra` y declinación `dec`, en
+ * grados), con el brillo y color de makeStars. Decorativo: no es un catálogo.
+ */
+export function makeCelestialStars(count, seed = 1) {
+  const rand = rng(seed ^ 0x9e3779b9);
+  return makeStars(count, seed).map((s) => ({
+    ra: rand() * 360,
+    dec: (Math.asin(2 * rand() - 1) * 180) / Math.PI, // uniforme sobre la esfera
+    alpha: s.alpha,
+    size: s.size,
+    color: s.color,
+  }));
+}
+
+/**
+ * Azimut y elevación (grados, azimut 0° = norte, horario) de una estrella de makeCelestialStars,
+ * vista desde la latitud `latDeg` cuando pasaron `days` días desde el origen del cielo. El cielo
+ * gira una vuelta por mes sidéreo, de este a oeste (la Luna gira hacia el este). El eje es el de
+ * la Luna, que casi no se inclina, así que el polo celeste queda a `latDeg` de elevación.
+ * El giro es una aproximación decorativa: no está calculado con Horizons ni con una efeméride.
+ */
+export function starAzEl(star, latDeg, days) {
+  const rad = Math.PI / 180;
+  const hour = (days / SIDEREAL_MONTH_DAYS) * 2 * Math.PI - star.ra * rad; // ángulo horario
+  const dec = star.dec * rad;
+  const lat = latDeg * rad;
+  const sinEl = Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hour);
+  const az = Math.atan2(
+    -Math.cos(dec) * Math.sin(hour),
+    Math.cos(lat) * Math.sin(dec) - Math.sin(lat) * Math.cos(dec) * Math.cos(hour),
+  );
+  return { az: normAz(az / rad), el: Math.asin(Math.max(-1, Math.min(1, sinEl))) / rad };
+}
+
 /**
  * Ángulo de la flecha que va del punto (x0, y0) al (x1, y1) en pantalla: 0° = arriba,
  * sentido horario, en [0, 360). Sirve también para cuerpos fuera de la vista (project los deja

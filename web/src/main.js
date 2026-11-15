@@ -71,7 +71,7 @@ async function showLive(utcMs) {
     console.log('[live] consulta OK', { lat, lon, utc: new Date(utcMs).toISOString(), site_id: ephemeris.site_id, muestras: ephemeris.time.count });
     const liveName = i18nT('live.siteName', { lat, lon });
     renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
-    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
+    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}`, lat });
     renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
     validationBody.replaceChildren(); // no hay valores de referencia de Horizons para un punto libre
     live.setStatus(i18nT('live.active'));
@@ -119,8 +119,9 @@ initSelector({
       // El panel compara contra el horizonte real en la dirección de cada cuerpo (hoy 0°: Luna lisa).
       const { ephemeris, horizon } = await loadSite(site);
       const name = await getSiteName(site);
-      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site });
-      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords: await getSiteCoords(site) });
+      const coords = await getSiteCoords(site);
+      sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site, lat: coords?.lat });
+      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords });
       // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
       renderTimeline(timeline, ephemeris, horizon, t, 7);
     } catch (err) {

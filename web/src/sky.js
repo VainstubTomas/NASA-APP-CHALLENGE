@@ -21,7 +21,7 @@ import { initSkyPanel } from './sky-panel.js';
 import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter,
+  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -35,7 +35,7 @@ const CLICK_SLOP_PX = 4;
 // Al hacer clic en un cuerpo se centra y la vista se acerca hasta este campo de visión (°).
 const ZOOM_ON_BODY_FOV = 45;
 // Estrellas decorativas (sky-core.js): fijas en el cielo del sitio, giran con la vista.
-const STARS = makeStars(1400, 2026);
+const STARS = makeCelestialStars(2800, 2026);
 // Flechas del centro: a qué distancia del centro se dibuja cada una. Radios distintos para que
 // no se pisen cuando el Sol y la Tierra quedan para el mismo lado.
 const POINTER_RADIUS_PX = { sun: 58, earth: 96 };
@@ -294,6 +294,19 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       .catch((err) => console.warn('[sky] suelo 3D no disponible, se usa la textura plana:', err.message));
   }, 0);
 
+  // Posición de cada estrella en el cielo del sitio. El cielo gira con la fecha (una vuelta por mes
+  // sidéreo), así que se recalcula solo cuando cambian la fecha o la latitud, no en cada cuadro.
+  let starCache = { key: '', pos: STARS.map(() => ({ az: 0, el: 0 })) };
+  function starPositions() {
+    const lat = data?.lat ?? 0;
+    const days = (data?.utcMs ?? 0) / 86400000;
+    const key = `${lat}|${days}`;
+    if (starCache.key !== key) {
+      starCache = { key, pos: STARS.map((st) => starAzEl(st, lat, days)) };
+    }
+    return starCache.pos;
+  }
+
   // Estrellas: un canvas del tamaño del cielo; solo se dibujan las que caen en la vista.
   function drawStars(v, k, hy) {
     const dpr = window.devicePixelRatio || 1;
@@ -312,11 +325,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const half = fov / 2 + 1;
     // Al acercar, las estrellas crecen un poco (como en una foto con más aumento).
     const grow = Math.min(1.6, Math.max(0.8, Math.sqrt(FOV_DEG / fov)));
-    for (const st of STARS) {
-      const rel = relAz(st.az, heading);
+    const sky = starPositions();
+    for (let i = 0; i < STARS.length; i += 1) {
+      const st = STARS[i];
+      const pos = sky[i];
+      if (pos.el < -1) continue; // bajo el horizonte
+      const rel = relAz(pos.az, heading);
       if (Math.abs(rel) > half) continue;
       const x = w / 2 + rel * k;
-      const y = hy - st.el * k;
+      const y = hy - pos.el * k;
       if (y < -2 || y > h) continue;
       ctx.globalAlpha = st.alpha;
       ctx.fillStyle = st.color;
@@ -715,9 +732,9 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
      * Muestra un sitio en un instante. `key` identifica el sitio (o la posición libre):
      * al cambiar, la vista vuelve a mirar hacia el Sol (o la Tierra).
      */
-    update({ ephemeris, horizon: hz, utcMs, siteName, key }) {
+    update({ ephemeris, horizon: hz, utcMs, siteName, key, lat }) {
       const sample = sampleAt(ephemeris, utcMs);
-      data = { ephemeris, horizon: hz, utcMs, siteName, sample };
+      data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
       smooth.style.display = hasRelief(hz) ? 'none' : '';
       if (key !== siteKey && sample) {
         siteKey = key;

@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, pointerAngle, nearCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -144,6 +144,36 @@ test('zoomFov: la rueda acerca (campo más chico) y aleja, entre 20° y 100°', 
   assert.equal(zoomFov(99, 100000), 100);
   // Ida y vuelta: el mismo giro de rueda en los dos sentidos vuelve al campo inicial.
   assert.ok(Math.abs(zoomFov(zoomFov(60, -120), 120) - 60) < 1e-9);
+});
+
+test('starAzEl: el polo celeste queda al norte a la altura de la latitud y el cielo vuelve en un mes sidéreo', () => {
+  const pole = { ra: 0, dec: 90 };
+  for (const days of [0, 3, 11.2]) {
+    const p = starAzEl(pole, 40, days);
+    assert.ok(Math.abs(p.el - 40) < 1e-9);
+    assert.ok(Math.min(p.az, 360 - p.az) < 1e-9); // norte
+  }
+  // En el polo sur de la Luna la estrella del polo celeste sur queda en el cenit y no se mueve
+  assert.ok(Math.abs(starAzEl({ ra: 10, dec: -90 }, -90, 5).el - 90) < 1e-9);
+  const s = { ra: 123, dec: 17 };
+  const a = starAzEl(s, -69.4, 2.5);
+  const b = starAzEl(s, -69.4, 2.5 + SIDEREAL_MONTH_DAYS);
+  assert.ok(Math.abs(a.el - b.el) < 1e-6 && Math.abs(relAz(a.az, b.az)) < 1e-6);
+});
+
+test('starAzEl: una estrella del ecuador sale por el este y se pone por el oeste', () => {
+  const s = { ra: 0, dec: 0 };
+  const rise = starAzEl(s, 0, -SIDEREAL_MONTH_DAYS / 4); // 6 h antes de cruzar el meridiano
+  const set = starAzEl(s, 0, SIDEREAL_MONTH_DAYS / 4);
+  assert.ok(Math.abs(rise.az - 90) < 1e-6 && Math.abs(rise.el) < 1e-6);
+  assert.ok(Math.abs(set.az - 270) < 1e-6 && Math.abs(set.el) < 1e-6);
+});
+
+test('makeCelestialStars: repartidas por toda la esfera y siempre las mismas', () => {
+  const a = makeCelestialStars(400, 5);
+  assert.deepEqual(makeCelestialStars(400, 5), a);
+  assert.ok(a.some((s) => s.dec < -30) && a.some((s) => s.dec > 30));
+  assert.ok(a.every((s) => s.ra >= 0 && s.ra < 360 && Math.abs(s.dec) <= 90));
 });
 
 test('makeStars: siempre las mismas para la misma semilla, sobre el horizonte y casi todas débiles', () => {
