@@ -792,7 +792,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     pose = currentPose();
     // Seguir: la mirada sigue al cuerpo en cada cuadro (incluidas las transiciones y la vista previa
     // del deslizador). Durante un giro animado (anim) manda la animación; al terminar, vuelve a seguir.
-    if (follow && pose && !anim) {
+    if (follow && pose && !anim && !timeAnim) {
       // Centra el cuerpo en horizontal y en vertical (misma regla que el clic en la flecha).
       const body = pose[follow];
       const v = view();
@@ -851,8 +851,8 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
       heading = normAz(start + delta * e);
       fov = fov0 + (fovTo - fov0) * e;
       tilt = clampTilt(tilt0 + (tiltTo - tilt0) * e, maxTilt(), minTilt());
-      draw();
       anim = f < 1 ? requestAnimationFrame(step) : null;
+      draw();
       if (f >= 1) refreshHover();
     };
     anim = requestAnimationFrame(step);
@@ -901,7 +901,8 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     } else if (zoom || pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
       // Sobre el horizonte: lo deja a media pantalla (sin redondear a pasos de TILT_STEP_DEG: con
       // zoom fuerte, redondear hacia arriba lo mandaba debajo del borde inferior y no se veía).
-      tiltTo = clampTilt(centered, maxT, 0);
+      // Con el bloqueo puesto en este cuerpo, el mismo límite que usa draw() al seguirlo (si no, al terminar se corrige de golpe).
+      tiltTo = clampTilt(centered, maxT, follow === key ? minT : 0);
     }
     animateTo(normAz(pos.azimuth_deg), { fovTo, tiltTo });
   }
