@@ -13,6 +13,8 @@ Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y 
 2. **Terreno** (Python): perfil de horizonte de 360 direcciones por sitio. Hoy es plano (0°); el mapa de elevación LOLA va al final (ADR-011).
 3. **Web**: lee esos datos precalculados y compara cada cuerpo contra el horizonte.
 
+Además, una **API en vivo** (FastAPI, [`data/api/`](data/api/)) permite elegir cualquier latitud y longitud de la Luna: consulta a Horizons y responde en el mismo formato. Es opcional; sin ella la web usa solo los sitios precalculados. Guía: [`docs/09-API.md`](docs/09-API.md).
+
 Las posiciones del Sol y la Tierra salen de [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); los sitios y el terreno se exploran con Quickmap y Moon Trek, los recursos oficiales del desafío.
 
 ## Mapa del proyecto
@@ -48,6 +50,7 @@ Obligatorias: capas 0 a 4. Opcional: capa 5. Los issues de cada capa, los horari
 | `precompute/` | Scripts Python que generan los datos (`ephemeris/`, `terrain/`) |
 | `web/` | Web (Vite) |
 | `data/public/` | JSON precalculados que consume la web |
+| `data/api/` | API en vivo (FastAPI): efemérides de una posición libre de la Luna (ADR-015) |
 | `data/schema/` | Esquemas JSON del contrato de datos |
 | `tests/` | Pruebas del contrato y validación contra Horizons |
 
@@ -67,6 +70,10 @@ python -m pytest tests/          # incluye tests/test_environment.py, que revisa
 
 # Web (Vite; sirve data/public/ como carpeta estática)
 cd web && npm ci && npm run dev   # http://localhost:5173 y /sites.json
+
+# API en vivo (opcional, desde la raíz del repo): Swagger en http://localhost:8000/docs
+python -m uvicorn data.api.main:app --reload --port 8000
+# Para que la web la use: crear web/.env.local con VITE_API_URL=http://localhost:8000
 ```
 
 Versión desplegada (Vercel): https://vizcachasfueradeorbita.vercel.app/
@@ -76,7 +83,7 @@ Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtoma
 Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
 
 ## Documentación
-Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md). El borrador del formulario de entrega de Space Apps está en [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md).
+Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md). El borrador del formulario de entrega de Space Apps está en [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md). La API en vivo se explica en [`docs/09-API.md`](docs/09-API.md).
 
 ## Uso de IA
 Usamos herramientas de IA, como permiten las reglas de Space Apps, y decimos dónde:

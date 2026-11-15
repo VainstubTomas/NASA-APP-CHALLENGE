@@ -1,6 +1,8 @@
+> 🇬🇧 [Read in English](README.en.md)
+
 # API de efemérides en vivo (issue #104, ADR-015)
 
-Servicio FastAPI que consulta **JPL Horizons** para una posición libre de la Luna (latitud, longitud) y devuelve el azimut y la elevación del Sol y la Tierra con **el mismo formato que `ephemeris.json`** (`docs/03-DATA-CONTRACT.md`). La web no llama a Horizons: Horizons no permite CORS, así que pasa por esta API. Los sitios de `sites.json` siguen usando los JSON precalculados.
+Servicio FastAPI que consulta **JPL Horizons** para una posición libre de la Luna (latitud, longitud) y devuelve el azimut y la elevación del Sol y la Tierra con **el mismo formato que `ephemeris.json`** (`docs/03-DATA-CONTRACT.md`). La web no llama a Horizons: Horizons no permite CORS, así que pasa por esta API. Los sitios de `sites.json` siguen usando los JSON precalculados. La guía de uso completa está en [`docs/09-API.md`](../../docs/09-API.md).
 
 - `main.py`: la app (endpoint, validación de parámetros, errores, CORS y documentación Swagger).
 - `service.py`: arma la respuesta reusando `precompute/ephemeris/horizons_client.py` (consulta validada en el ADR-006).
