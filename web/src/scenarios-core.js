@@ -72,14 +72,3 @@ export function parseScenarios(param, sites, range) {
   if (valid.length < MIN_SCENARIOS) return null;
   return valid.slice(0, MAX_SCENARIOS).map((s, i) => ({ id: `s${i + 1}`, ...s }));
 }
-
-/** Aplica `patch` (clave -> valor, null borra) sobre una query string sin tocar los demás parámetros. */
-export function mergeSearch(search, patch) {
-  const params = new URLSearchParams(search);
-  for (const [key, value] of Object.entries(patch)) {
-    if (value === null) params.delete(key);
-    else params.set(key, value);
-  }
-  const out = params.toString();
-  return out ? `?${out}` : '';
-}

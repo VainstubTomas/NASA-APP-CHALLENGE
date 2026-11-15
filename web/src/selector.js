@@ -1,9 +1,8 @@
 // Selector de sitio y de fecha/hora UTC. Escribe el estado en la URL.
 import {
-  getRange, clampTime, toInputValue, fromInputValue, resolveState, formatT,
+  getRange, clampTime, toInputValue, fromInputValue, resolveState, formatT, mergeSearch,
 } from './state.js';
 import { t, siteName } from './i18n.js';
-import { mergeSearch } from './scenarios-core.js';
 
 const base = import.meta.env.BASE_URL;
 

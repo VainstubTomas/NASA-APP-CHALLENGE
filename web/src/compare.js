@@ -5,9 +5,9 @@
 import './compare.css';
 import {
   initialScenarios, canAdd, canRemove, addScenario, removeScenario, updateScenario,
-  scenariosToParam, mergeSearch, SCENARIOS_PARAM,
+  scenariosToParam, SCENARIOS_PARAM,
 } from './scenarios-core.js';
-import { toInputValue, fromInputValue } from './state.js';
+import { toInputValue, fromInputValue, mergeSearch } from './state.js';
 import { t, siteName } from './i18n.js';
 import { summarizeAll, renderCompareCards } from './compare-cards.js';
 

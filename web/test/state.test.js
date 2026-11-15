@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   HOUR_MS, DATA_END_MS, startOfUtcDay, getRange, clampTime, formatT, parseT,
-  toInputValue, fromInputValue, defaultSite, resolveState, buildSearch,
+  toInputValue, fromInputValue, defaultSite, resolveState, buildSearch, mergeSearch,
 } from '../src/state.js';
+import { scenariosToParam, parseScenarios } from '../src/scenarios-core.js';
 
 const SITES = [
   { id: 'demo-sintetico', synthetic: true },
@@ -71,8 +72,6 @@ test('buildSearch y resolveState hacen ida y vuelta', () => {
   assert.equal(buildSearch(state), '?site=slim&t=2027-01-03T22%3A00Z');
   assert.deepEqual(resolveState(buildSearch(state), SITES, NOW), state);
 });
-
-import { scenariosToParam, parseScenarios, mergeSearch } from '../src/scenarios-core.js';
 
 const DAY_MS = 24 * HOUR_MS;
 const T0 = Date.parse('2026-11-15T00:00:00Z');

@@ -69,3 +69,14 @@ export function buildSearch({ site, t }) {
   params.set('t', formatT(t));
   return `?${params.toString()}`;
 }
+
+/** Aplica `patch` (clave -> valor, null borra) sobre una query string sin tocar los demás parámetros. */
+export function mergeSearch(search, patch) {
+  const params = new URLSearchParams(search);
+  for (const [key, value] of Object.entries(patch)) {
+    if (value === null) params.delete(key);
+    else params.set(key, value);
+  }
+  const out = params.toString();
+  return out ? `?${out}` : '';
+}
