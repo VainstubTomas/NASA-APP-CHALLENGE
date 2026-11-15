@@ -85,3 +85,27 @@ def test_apolo_coincide_con_la_tabla_del_alsj(site_id):
     assert _at(doc, "sun", "azimuth_deg", when) == pytest.approx(sun_az, abs=SUN_TOL_DEG)
     assert _at(doc, "earth", "elevation_deg", when) == pytest.approx(earth_el, abs=EARTH_TOL_DEG)
     assert _at(doc, "earth", "azimuth_deg", when) == pytest.approx(earth_az, abs=EARTH_TOL_DEG)
+
+
+# Horas de alunizaje de las misiones sin tabla independiente (Sol y Tierra no se validan acá).
+# Fuente: Wikipedia, que a su vez cita reportes de prensa del día del evento. Tolerancia: 1 minuto.
+# Chandrayaan-3: reportes del 23/08/2023 dan ~12:33 UTC (~18:03-18:04 IST).
+# IM-2: Wikipedia da 17:28:50 UTC el 06/03/2025.
+REFERENCIA_ALUNIZAJE = {
+    "chandrayaan-3": "2023-08-23T12:33:00Z",
+    "intuitive-machines-2": "2025-03-06T17:28:50Z",
+}
+TOLERANCIA_ALUNIZAJE = timedelta(minutes=1)
+
+
+@pytest.mark.parametrize("site_id", sorted(REFERENCIA_ALUNIZAJE))
+def test_alunizaje_coincide_con_la_referencia_publica(site_id):
+    site = next(s for s in SITES if s["id"] == site_id)
+    referencia = REFERENCIA_ALUNIZAJE[site_id]
+    assert abs(_utc(site["landing_utc"]) - _utc(referencia)) <= TOLERANCIA_ALUNIZAJE
+
+
+@pytest.mark.parametrize("site_id", sorted(REFERENCIA_ALUNIZAJE))
+def test_ventana_no_cambia_con_el_minuto_exacto(site_id):
+    site = next(s for s in SITES if s["id"] == site_id)
+    assert mission_window(site["landing_utc"]) == mission_window(REFERENCIA_ALUNIZAJE[site_id])

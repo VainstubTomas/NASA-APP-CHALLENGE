@@ -147,7 +147,7 @@
       "country": "India",
       "notes": "Latitud alta, pero fuera del mapa del polo sur (lat > -80).",
       "landing_utc": "2023-08-23T12:33:00Z",
-      "landing_source": "Precisión de minuto. Fuente secundaria (18:03 IST = 12:33 UTC); pendiente de confirmar con ISRO",
+      "landing_source": "Precisión de minuto. Wikipedia y reportes de prensa del 23/08/2023: alunizaje ~12:33 UTC (~18:03-18:04 IST); el minuto exacto varía entre fuentes, la ventana no cambia",
       "landing_source_url": "https://en.wikipedia.org/wiki/Chandrayaan-3"
     },
     {
@@ -202,8 +202,8 @@
       "mission": "IM-2 (CLPS)",
       "country": "EE. UU.",
       "notes": "Dentro del mapa del polo sur (lat <= -80).",
-      "landing_utc": "2025-03-06T17:28:00Z",
-      "landing_source": "Precisión de minuto. Fuente secundaria (17:28:50 UTC; otra dice 17:27); pendiente de confirmar con Intuitive Machines o NASA",
+      "landing_utc": "2025-03-06T17:28:50Z",
+      "landing_source": "Wikipedia (IM-2): toque 17:28:50 UTC. Sin verificar contra Intuitive Machines/NASA. La ventana no cambia (se redondea a la hora)",
       "landing_source_url": "https://www.wikiwand.com/en/articles/IM-2"
     }
   ]
