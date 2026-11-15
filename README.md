@@ -84,7 +84,7 @@ Deployed version (Vercel): https://vizcachasfueradeorbita.vercel.app/
 
 Test version deployed (GitHub Pages, from `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 
-The heavy data (elevation map and Horizons query cache) is not in the repo. See `docs/en/02-ARCHITECTURE.md` and ADR-006 to learn where it comes from.
+The heavy data (elevation map and Horizons query cache) is not in the repo. Download the team's data package as a `.zip` from [Google Drive](https://drive.google.com/file/d/1eHksUGXfSD7nCEHd5K7PTSbDYjdNmFKH/view?usp=sharing) and unzip it into `data/raw/`. See `docs/en/02-ARCHITECTURE.md` and ADR-006 to learn where the data comes from.
 
 ## Documentation
 Start with [`docs/en/00-CONTEXT.md`](docs/en/00-CONTEXT.md). Spanish originals are in [`docs/`](docs/) (start with [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md)). To work with Claude, see [`CLAUDE.md`](CLAUDE.md). The Space Apps submission form draft is in [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md). The live API is explained in [`docs/en/09-API.md`](docs/en/09-API.md).
