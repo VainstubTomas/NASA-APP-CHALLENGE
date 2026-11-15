@@ -1,7 +1,7 @@
 // Pruebas del núcleo de comparación (C4-01a, #91). Correr con: npm test (dentro de web/).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { summarizeScenario, pickBest, groupScenarios } from './compare-core.js';
+import { summarizeScenario, groupScenarios } from './compare-core.js';
 import { HOUR_MS } from './state.js';
 
 // Efeméride hecha a mano, 1 muestra por hora desde 2026-11-01T00:00Z (ver ephemeris.test.js).
@@ -27,30 +27,6 @@ test('resumen de escenario: caso conocido con horizonte plano', () => {
 
 test('resumen de escenario: fuera de los datos devuelve null', () => {
   assert.equal(summarizeScenario(mini, flat, T0 - 3600 * 1000, 7), null);
-});
-
-test('elegir: gana más horas de Sol', () => {
-  const a = { id: 'a', summary: { sunHours: 5, earthHours: 1 } };
-  const b = { id: 'b', summary: { sunHours: 7, earthHours: 0 } };
-  assert.deepEqual(pickBest([a, b]), { id: 'b', tie: false });
-});
-
-test('elegir: en empate de Sol gana más horas de Tierra visible', () => {
-  const a = { id: 'a', summary: { sunHours: 5, earthHours: 2 } };
-  const b = { id: 'b', summary: { sunHours: 5, earthHours: 4 } };
-  assert.deepEqual(pickBest([a, b]), { id: 'b', tie: false });
-});
-
-test('elegir: empate total se marca como tie', () => {
-  const a = { id: 'a', summary: { sunHours: 5, earthHours: 2 } };
-  const b = { id: 'b', summary: { sunHours: 5, earthHours: 2 } };
-  assert.equal(pickBest([a, b]).tie, true);
-});
-
-test('elegir: ignora escenarios sin datos y devuelve null si no queda ninguno', () => {
-  assert.equal(pickBest([{ id: 'a', summary: null }]), null);
-  const b = { id: 'b', summary: { sunHours: 1, earthHours: 0 } };
-  assert.deepEqual(pickBest([{ id: 'a', summary: null }, b]), { id: 'b', tie: false });
 });
 
 // ---- Agrupar escenarios duplicados (#107) ----

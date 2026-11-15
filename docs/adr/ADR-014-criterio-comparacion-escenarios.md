@@ -2,7 +2,7 @@
 
 # ADR-014: Criterio de "cuál conviene" en la comparación de escenarios
 
-- **Estado**: Propuesto
+- **Estado**: Reemplazado en la comparación de la web por el [ADR-017](ADR-017-comparacion-sin-veredicto.md). Sigue siendo el orden del buscador de ventanas (C5-03)
 - **Fecha**: 2026-11-14
 - **Decidieron**: pendiente de confirmar por el equipo (ver #95)
 
