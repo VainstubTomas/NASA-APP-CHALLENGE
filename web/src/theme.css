@@ -57,6 +57,31 @@
   --radius: 0.75rem;
   --radius-pill: 999px;
   --page-width: 46rem;
+
+  /* Vista del cielo (rediseño #99, colores del Figma) */
+  --sky-bg: #000000;
+  --sky-text: #ffffff;
+  --sky-text-dim: #b9bfcc;
+  --sky-white: #ffffff;
+  --sky-primary: #12131a;       /* Figma "Primary": botones oscuros */
+  --sky-horizon: #dd00e8;       /* horizonte y brújula */
+  --sky-horizon-glow: rgba(221, 0, 232, 0.55);
+  --sky-border: #dd00ff;        /* recuadros del Figma */
+  --sky-earth: #00ffe5;         /* etiqueta y aro de la Tierra */
+  --sky-earth-chart: #6cb2ff;
+  --sky-sun-glow: rgba(255, 214, 120, 0.55);
+  --sky-sun-hover: rgba(255, 214, 60, 0.85);   /* brillo al pasar el mouse: Sol amarillo */
+  --sky-earth-glow: rgba(0, 255, 229, 0.55);   /* Tierra celeste (Figma "Ellipse 2") */
+  --sky-card: #161b22;
+  --sky-tab: #1c1f25;
+  --sky-grid: #2a303b;
+  --sky-chart-ground: #232833;
+  --sky-view-fill: rgba(221, 0, 232, 0.12);
+  --sky-chip-bg: rgba(0, 0, 0, 0.62);
+  --sky-field: #d9d9d9;
+  --sky-shadow: 0 1.5px 3px rgba(18, 19, 26, 0.25); /* Figma "Shadow" */
+  --font-sky: 'Inter', var(--font-sans);
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 *,
