@@ -43,6 +43,7 @@ The problem is split into **three independent pieces**. The first two run in Pyt
 - `metrics.json` (Python) carries the same numbers precalculated in order to **cross-check results**: if the web and Python do not match, there is a bug.
 
 ## Data structure in the repo
+The heavy data in `data/raw/` is distributed as a `.zip` on Google Drive: https://drive.google.com/file/d/1eHksUGXfSD7nCEHd5K7PTSbDYjdNmFKH/view?usp=sharing. Unzip it into `data/raw/` before running `precompute/`.
 ```
 data/raw/                      elevation map and Horizons cache (NOT versioned; copy in the team's cloud)
 data/public/sites.json         list of sites

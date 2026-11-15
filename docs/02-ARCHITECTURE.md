@@ -43,6 +43,7 @@ El problema se divide en **tres piezas independientes**. Las dos primeras corren
 - `metrics.json` (Python) trae los mismos números precalculados para **cruzar resultados**: si la web y Python no coinciden, hay un bug.
 
 ## Estructura de datos en el repo
+Los datos pesados de `data/raw/` se distribuyen como `.zip` en Google Drive: https://drive.google.com/file/d/1eHksUGXfSD7nCEHd5K7PTSbDYjdNmFKH/view?usp=sharing. Hay que descomprimirlos en `data/raw/` antes de correr `precompute/`.
 ```
 data/raw/                      mapa de elevación y caché de Horizons (NO versionado; copia en la nube del equipo)
 data/public/sites.json         lista de sitios

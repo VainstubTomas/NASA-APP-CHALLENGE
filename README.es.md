@@ -84,7 +84,7 @@ Versión desplegada (Vercel): https://vizcachasfueradeorbita.vercel.app/
 
 Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 
-Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
+Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Descargá el paquete de datos del equipo en formato `.zip` desde [Google Drive](https://drive.google.com/file/d/1eHksUGXfSD7nCEHd5K7PTSbDYjdNmFKH/view?usp=sharing) y descomprimilo en `data/raw/`. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen los datos.
 
 ## Documentación
 Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md). El borrador del formulario de entrega de Space Apps está en [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md). La API en vivo se explica en [`docs/09-API.md`](docs/09-API.md).
