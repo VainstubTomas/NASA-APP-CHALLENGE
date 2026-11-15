@@ -148,5 +148,14 @@
   "compare.noData": "There is no data for this site on that date.",
   "compare.partial": "Data covers only {days} days: the comparison is not even.",
   "compare.window": "Hours counted over the {days} days from the chosen day of each scenario (UTC).",
-  "compare.flatNote": "Ideal horizon, no terrain: for now the Moon is drawn smooth, with no mountains hiding the Sun or Earth."
+  "compare.flatNote": "Ideal horizon, no terrain: for now the Moon is drawn smooth, with no mountains hiding the Sun or Earth.",
+  "compare.best.title": "Which one is better?",
+  "compare.best.badge": "Better",
+  "compare.best.label": "scenario {n} ({site})",
+  "compare.best.sun": "The better choice is {scenario}: it has more hours of Sun ({hours} h against {other} h for the next one).",
+  "compare.best.earth": "The better choice is {scenario}: Sun hours are tied ({sun} h), but it has more hours with Earth in view ({hours} h against {other} h).",
+  "compare.best.tie": "Tie: scenarios {list} have the same hours of Sun ({sun} h) and of Earth in view ({earth} h). There is no difference between them.",
+  "compare.best.only": "Only {scenario} has data: there is nothing to compare it with.",
+  "compare.best.none": "No scenario has data to compare.",
+  "compare.best.rule": "Rule: the one with more hours of Sun (power) wins; if tied, the one with more hours with Earth in view (communication)."
 }
