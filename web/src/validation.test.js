@@ -29,12 +29,25 @@ test('caso conocido: apollo-12 Sol 2026-11-14T00:00Z coincide con Horizons dentr
 
 test('fecha fuera del rango de la web: status outOfRange y no es error', () => {
   const ephemeris = read('sites/apollo-12/ephemeris.json');
+  // Una fila con una fecha posterior al fin de los datos (2027-12-31T23:00Z).
+  const [row] = validation.rows.filter((r) => r.site_id === 'apollo-12' && r.body === 'sun' && r.time_utc === '2027-06-21T00:00:00Z');
   const [res] = compareRows(
-    validation.rows.filter((r) => r.site_id === 'apollo-12' && r.body === 'sun' && r.time_utc === '2027-06-21T00:00:00Z'),
+    [{ ...row, time_utc: '2028-01-01T00:00:00Z' }],
     { tolerance: validation.tolerance_deg, ephemerisBySite: { 'apollo-12': ephemeris } },
   );
   assert.equal(res.status, 'outOfRange');
   assert.equal(res.web, null);
+});
+
+test('las referencias de 2027-06-21 (rango ampliado hasta 2027-12-31) coinciden con Horizons dentro de tolerancia', () => {
+  const rows = validation.rows.filter((r) => r.time_utc.startsWith('2027-06-21'));
+  assert.ok(rows.length > 0);
+  const ephemerisBySite = Object.fromEntries(
+    [...new Set(rows.map((r) => r.site_id))].map((id) => [id, read(`sites/${id}/ephemeris.json`)]),
+  );
+  for (const res of compareRows(rows, { tolerance: validation.tolerance_deg, ephemerisBySite })) {
+    assert.equal(res.status, 'within', `${res.site_id} ${res.body} ${res.time_utc}`);
+  }
 });
 
 test('diferencia mayor que la tolerancia: status outside', () => {

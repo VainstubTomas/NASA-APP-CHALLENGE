@@ -129,11 +129,12 @@ def test_si_agota_los_reintentos_lo_informa_y_sigue_con_el_resto(tmp_path):
     assert [(o["site"], o["body"]) for o in informe["ok"]] == [("a", "earth")]
 
 
-def test_rango_por_defecto_son_2880_muestras_horarias():
+def test_rango_por_defecto_son_10224_muestras_horarias():
     t0 = datetime.strptime(dl.DEFAULT_START, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
     t1 = datetime.strptime(dl.DEFAULT_STOP, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-    assert (t1 - t0) // timedelta(hours=1) + 1 == 2880
+    assert (t1 - t0) // timedelta(hours=1) + 1 == 10224  # 426 días: del 2026-11-01 al 2027-12-31
     assert re.fullmatch(r"2026-11-01T00:00:00Z", dl.DEFAULT_START)
+    assert dl.DEFAULT_STOP == "2027-12-31T23:00:00Z"
 
 
 def test_main_devuelve_distinto_de_cero_si_algo_falla(tmp_path, sitios_json, monkeypatch):

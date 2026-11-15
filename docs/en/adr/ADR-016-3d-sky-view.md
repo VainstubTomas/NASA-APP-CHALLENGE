@@ -23,3 +23,4 @@ The 3D **sky** view is in scope. It uses the same data as the rest of the web ap
 - The web app lazy-loads three.js (about 120 kB gzipped) and, if the browser has no WebGL, falls back to the 2D compass and elevation ruler.
 - three.js (MIT) is listed in the README credits.
 - The 3D view shows the ideal horizon; the "ideal horizon, no terrain" notice is still required.
+- Update (C5-08, #52): for sites with `dem` the view draws the silhouette of the 360° profile in `horizon.json` and marks what the terrain hides; the silhouette reacts to the light of the Sun and the Earth like the ground does. The ground is still illustrative: it is no longer flagged on screen, but it is stated here and in the README. The "no terrain" notice remains only for sites without `dem`. A realistic terrain render stays out of scope.

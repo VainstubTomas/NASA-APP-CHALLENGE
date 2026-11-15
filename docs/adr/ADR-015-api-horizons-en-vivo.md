@@ -20,7 +20,7 @@ Se verificó el 2026-11-14 con `curl` que la API de Horizons (`ssd.jpl.nasa.gov/
    - `lat` en [-90, 90] (planetocéntrica), `lon` en [-180, 180] (este-positiva), `start` ISO 8601 en UTC, `days` de 1 a 14 (por defecto 7, la ventana de la línea de tiempo).
    - Entradas inválidas: error 422 con el motivo. Si Horizons falla o no responde: error 502 con mensaje claro. **Nunca se devuelven datos inventados ni de otro sitio.**
    - Dos consultas a Horizons por pedido (Sol y Tierra), con el caché de `data/raw/horizons/` que ya usa el cliente.
-4. **Horizonte del sitio libre: Luna lisa** (360 ceros, ADR-011). La web arma ese horizonte en el cliente y muestra "horizonte ideal, sin relieve".
+4. **Horizonte del sitio libre: Luna lisa** (360 ceros, ADR-011). La web arma ese horizonte en el cliente y muestra "horizonte ideal, sin relieve". *Reemplazado por el [ADR-018](ADR-018-relieve-en-vivo.md): la API calcula el relieve con `GET /horizon`.*
 5. **La web decide por sitio**: los de `sites.json` siguen leyendo los JSON precalculados, sin API. El input de latitud y longitud solo aparece si hay una URL de API configurada (`VITE_API_URL`). Sin ella, la web funciona como hoy, sin conexión.
 6. **CORS en nuestra API**: permite solo el origen de la web desplegada y el de desarrollo local.
 7. **Documentación y pruebas manuales: Swagger.** FastAPI publica la documentación interactiva en `/docs` (Swagger UI), con descripciones y ejemplos de cada parámetro, para probar la API sin pasar por la web.

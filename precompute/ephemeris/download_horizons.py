@@ -20,9 +20,9 @@ import requests
 from precompute.ephemeris import horizons_client as hc
 
 SITES_PATH = hc.ROOT / "data" / "public" / "sites.json"
-# Rango del contrato (docs/03-DATA-CONTRACT.md): 120 días, una muestra por hora = 2880 muestras.
+# Rango del contrato (docs/03-DATA-CONTRACT.md): 426 días (del 2026-11-01 al 2027-12-31), una muestra por hora = 10224 muestras.
 DEFAULT_START = "2026-11-01T00:00:00Z"
-DEFAULT_STOP = "2027-02-28T23:00:00Z"
+DEFAULT_STOP = "2027-12-31T23:00:00Z"
 DEFAULT_STEP_S = 3600
 
 

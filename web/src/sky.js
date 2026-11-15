@@ -16,13 +16,14 @@ import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
 import { sampleAt, nextVisibilityChange, elevationDisplay, compassLabel } from './ephemeris.js';
-import { horizonAt, hasRelief } from './horizon.js';
+import { horizonAt, hasRelief, visibilityState } from './horizon.js';
+import { skylinePoints, chartProfile, skylineLight, skylineEdge, lightColor } from './sky-skyline-core.js';
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
-  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter,
+  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter, tiltToCenter,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -95,7 +96,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const air = el('div', 'sky-air'); // recorta los discos en el horizonte
   const ground = el('div', 'sky-ground');
   let groundPano = false; // true cuando el fallback usa el panorama generado (sin WebGL)
-  ground.style.backgroundImage = `url("${groundImg}")`;
+  // Sin imagen al arrancar: evita ver la foto en mosaico mientras carga el suelo 3D
+  ground.style.backgroundColor = '#000';
   const horizon = el('div', 'sky-horizon');
   const ticks = el('div', 'sky-ticks');
   const overlay = el('div', 'sky-overlay');
@@ -110,7 +112,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const bodies = [earth, sun];
   const stars = el('canvas', 'sky-stars');
   stars.setAttribute('aria-hidden', 'true');
-  air.append(stars, earth.disc, sun.disc);
+  // Silueta del relieve real (C5-08): se dibuja encima de los discos, así lo que el terreno tapa no se ve.
+  const skyline = el('canvas', 'sky-skyline');
+  skyline.setAttribute('aria-hidden', 'true');
+  air.append(stars, earth.disc, sun.disc, skyline);
   overlay.append(earth.ghost, sun.ghost, earth.stem, sun.stem, earth.name, sun.name, earth.label, sun.label);
 
 
@@ -234,6 +239,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const hy = v.horizonY + tilt * k; // horizonte en pantalla (baja al mirar hacia arriba)
     air.style.height = `${Math.max(0, hy)}px`;
     drawStars(v, k, hy);
+    drawSkyline(v, k, hy);
     scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
     for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
     if (groundPano) {
@@ -313,7 +319,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
             ground.style.backgroundColor = edgeColor;
             draw();
           } catch (e) {
-            console.warn('[sky] no se pudo generar el suelo, queda la foto:', e.message);
+            console.warn('[sky] no se pudo generar el suelo, se usa la foto:', e.message);
+            ground.style.backgroundImage = `url("${groundImg}")`;
           }
         }, 0);
       });
@@ -367,6 +374,53 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       ctx.fill();
     }
     ctx.globalAlpha = 1;
+  }
+
+  // Silueta del relieve (C5-08, #52): las montañas y bordes de cráter del horizon.json sobre el suelo plano.
+  // Solo con relieve real (campo `dem`); con Luna lisa el canvas queda vacío. Reacciona a la luz como el suelo:
+  // cada tramo se ilumina según dónde están el Sol y la Tierra ahora (skylineLight) y el borde se aviva donde el Sol
+  // está justo detrás de la cresta (skylineEdge). Se redibuja con cada cambio de hora, rumbo, zoom o inclinación.
+  function drawSkyline(v, k, hy) {
+    const dpr = window.devicePixelRatio || 1;
+    const h = Math.max(0, Math.round(hy));
+    const w = Math.round(v.width);
+    if (skyline.width !== w * dpr || skyline.height !== h * dpr) {
+      skyline.width = w * dpr;
+      skyline.height = h * dpr;
+      skyline.style.width = `${w}px`;
+      skyline.style.height = `${h}px`;
+    }
+    const ctx = skyline.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    if (!hasRelief(data?.horizon) || h === 0) return;
+    const pts = skylinePoints(data.horizon, { heading, width: v.width, k, hy });
+    const sample = data.sample;
+    const light = sample ? { sun: sample.sun, earth: sample.earth } : null;
+    const radii = data.ephemeris.angular_radius_deg;
+    const azAt = (x) => heading + (x - v.width / 2) / k;
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < pts.length - 1; i += 1) {
+      const a = pts[i];
+      const b = pts[i + 1];
+      const az = azAt((a.x + b.x) / 2);
+      // Relleno del tramo hasta el horizonte plano (0,5 px de más para que no queden costuras entre tramos).
+      ctx.beginPath();
+      ctx.moveTo(a.x, hy);
+      ctx.lineTo(a.x, a.y);
+      ctx.lineTo(b.x + 0.5, b.y);
+      ctx.lineTo(b.x + 0.5, hy);
+      ctx.closePath();
+      ctx.fillStyle = lightColor(skylineLight(az, light, radii));
+      ctx.fill();
+      // Borde del tramo: más brillante donde el Sol está detrás de la cresta.
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = `rgba(255, 255, 255, ${(0.7 * skylineEdge(az, light, radii)).toFixed(3)})`;
+      ctx.stroke();
+    }
   }
 
   // Flecha del centro hacia un cuerpo. Se atenúa si el cuerpo ya se ve en pantalla y se
@@ -431,7 +485,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const stemHeight = above ? hy - (p.y + r) : Math.max(0, p.y - r - hy);
     Object.assign(b.stem.style, { left: `${p.x}px`, top: `${stemTop}px`, height: `${stemHeight}px` });
     const { value, side } = elevationDisplay(pos.elevation_deg);
-    b.label.textContent = t(side === 'below' ? 'sky.below' : 'sky.above', { value: fmt1(value) });
+    // Con relieve, un cuerpo sobre 0° puede estar tapado por el terreno: la etiqueta lo dice (C5-08).
+    const blocked = visibilityState(pos, radiusDeg, data.horizon) === 'blocked';
+    b.label.textContent = t(side === 'below' ? 'sky.below' : blocked ? 'sky.blocked' : 'sky.above', { value: fmt1(value) });
+    b.label.classList.toggle('is-blocked', blocked);
     Object.assign(b.label.style, { left: `${p.x + Math.max(box / 2, 14) + 14}px`, top: `${p.y}px` });
   }
 
@@ -443,7 +500,13 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const Y0 = 14;
     const Y1 = 160;
     const sample = data?.sample;
-    const { min, max } = chartRange(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]);
+    const relief = hasRelief(data?.horizon);
+    const profile = relief ? chartProfile(data.horizon) : null;
+    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
+    const { min, max } = chartRange([
+      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
+      ...(profile ? profile.map((p) => p.elevation) : []),
+    ]);
     const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
     const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
     const step = max <= 15 ? 5 : max <= 45 ? 10 : 15;
@@ -453,8 +516,16 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       svg('line', { x1: X0, x2: X1, y1: ay(v), y2: ay(v), class: 'sky-chart__grid' }, chart);
       svg('text', { x: X0 - 6, y: ay(v) + 4, 'text-anchor': 'end' }, chart).textContent = `${v}°`;
     }
-    svg('rect', { x: X0, y: ay(0), width: X1 - X0, height: Y1 - ay(0), class: 'sky-chart__ground' }, chart);
-    svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__horizon' }, chart);
+    if (profile) {
+      // Silueta real del sitio (LOLA): el suelo sigue el perfil de 360° y el 0° queda como referencia.
+      const line = profile.map((p) => `${ax(p.az === 360 ? 360 : p.az)},${ay(p.elevation)}`);
+      svg('polygon', { points: `${X0},${Y1} ${line.join(' ')} ${X1},${Y1}`, class: 'sky-chart__ground' }, chart);
+      svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__grid' }, chart);
+      svg('polyline', { points: line.join(' '), class: 'sky-chart__horizon sky-chart__profile' }, chart);
+    } else {
+      svg('rect', { x: X0, y: ay(0), width: X1 - X0, height: Y1 - ay(0), class: 'sky-chart__ground' }, chart);
+      svg('line', { x1: X0, x2: X1, y1: ay(0), y2: ay(0), class: 'sky-chart__horizon' }, chart);
+    }
     svg('text', { x: X0 - 6, y: ay(0) + 4, 'text-anchor': 'end' }, chart).textContent = '0°';
     for (let i = 0; i <= 8; i += 1) {
       const a = i * 45;
@@ -463,7 +534,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       const lbl = `${t(`compass.${compassLabel(a)}`)} ${a}°`;
       svg('text', { x, y: 190, 'text-anchor': i === 0 ? 'start' : i === 8 ? 'end' : 'middle' }, chart).textContent = lbl;
     }
-    svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
+    if (!relief) svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
 
     // Recuadro de lo que muestra la vista (puede cruzar el norte: dos rectángulos)
     const from = normAz(heading - fov / 2);
@@ -480,7 +551,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       const pos = sample[key];
       const x = ax(pos.azimuth_deg);
       const y = ay(pos.elevation_deg);
-      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}` }, chart);
+      // Si el relieve lo tapa o está bajo el horizonte, el punto se dibuja hueco (no se ve desde el sitio).
+      const state = visibilityState(pos, data.ephemeris.angular_radius_deg[key], data.horizon);
+      const hidden = state === 'blocked' || state === 'down' ? ' is-hidden' : '';
+      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}${hidden}` }, chart);
       svg('text', { x, y: y - 11, 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart)
         .textContent = bodyName(key);
     }
@@ -599,12 +673,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const maxT = tiltMax(v.horizonY, k);
     const minT = nadirTilt(v, k);
     const visibleDeg = (v.horizonY - 60) / k;
+    const centered = tiltToCenter(pos.elevation_deg, v.horizonY, v.height, k);
     let tiltTo = tilt;
     if (pos.elevation_deg < 0) {
       // Bajo el horizonte: baja la mirada para verlo sobre el piso, a media pantalla.
-      tiltTo = clampTilt(pos.elevation_deg + (v.height / 2 - v.horizonY) / k, maxT, minT);
+      tiltTo = clampTilt(centered, maxT, minT);
     } else if (zoom || pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
-      tiltTo = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxT, minT);
+      // Sobre el horizonte: lo deja a media pantalla (sin redondear a pasos de TILT_STEP_DEG: con
+      // zoom fuerte, redondear hacia arriba lo mandaba debajo del borde inferior y no se veía).
+      tiltTo = clampTilt(centered, maxT, 0);
     }
     animateTo(normAz(pos.azimuth_deg), { fovTo, tiltTo });
   }
@@ -767,6 +844,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     update({ ephemeris, horizon: hz, utcMs, siteName, key, lat }) {
       const sample = sampleAt(ephemeris, utcMs);
       data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
+      // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
       smooth.style.display = hasRelief(hz) ? 'none' : '';
       if (key !== siteKey && sample) {
         siteKey = key;

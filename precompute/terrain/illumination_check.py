@@ -17,7 +17,7 @@ La posición se calcula con pyproj (nunca a mano). Se piden solo las filas del s
 Orientación verificada: con la misma convención, LDEM_75S_240M da 5323 m en IM-2 y 2600 m en Odysseus;
 Moon Trek (LRO_LOLA_DEM_Global_128ppd_v04, identify) da 5326,5 m y 2594,5 m.
 
-Límites: metrics.json cubre unos 120 días; LOLA promedia 2009-2013. Nuestro horizonte llega a 20 km.
+Límites: metrics.json cubre unos 426 días; LOLA promedia 2009-2013. Nuestro horizonte llega a 20 km.
 Se espera el mismo orden de magnitud, no el mismo número.
 
 Uso:

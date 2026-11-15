@@ -43,6 +43,12 @@ export const clampTilt = (tilt, max, min = 0) => Math.min(max, Math.max(min, til
 export const pxPerDeg = (width, fov = FOV_DEG) => width / fov;
 
 /**
+ * Inclinación que deja un cuerpo de elevación `elevation` a media altura de la pantalla
+ * (inversa de la `y` de project). Sin redondear: con zoom fuerte, un paso de más lo saca de la vista.
+ */
+export const tiltToCenter = (elevation, horizonY, height, k) => elevation - (horizonY - height / 2) / k;
+
+/**
  * Posición en pantalla de un cuerpo.
  * @param {{azimuth_deg:number, elevation_deg:number}} pos
  * @param {{heading:number, tilt:number, width:number, horizonY:number, fov?:number}} view

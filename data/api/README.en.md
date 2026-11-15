@@ -1,6 +1,6 @@
 > 🇪🇸 [Leer en español](README.md)
 
-# Live ephemeris API (issue #104, ADR-015)
+# Live ephemeris and horizon API (issue #104, ADR-015 and ADR-018)
 
 FastAPI service that queries **JPL Horizons** for a free position on the Moon (latitude, longitude) and returns the Sun and Earth azimuth and elevation in **the same format as `ephemeris.json`** (`docs/en/03-DATA-CONTRACT.md`). The web app does not call Horizons: Horizons does not allow CORS, so it goes through this API. The sites in `sites.json` keep using the precomputed JSON files. A full usage guide is in [`docs/en/09-API.md`](../../docs/en/09-API.md).
 
@@ -24,8 +24,8 @@ From the **repo root**:
 |---|---|---|
 | `lat` | planetocentric latitude, degrees | -90 to 90 |
 | `lon` | east-positive longitude, degrees | -180 to 180 |
-| `start` | start, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 to 2027-02-28 |
-| `days` | window length in days, 1-hour step (default 7) | 1 to 14; trimmed if it goes past 2027-02-28 |
+| `start` | start, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 to 2027-12-31 |
+| `days` | window length in days, 1-hour step (default 7) | 1 to 14; trimmed if it goes past 2027-12-31 |
 
 | Code | When |
 |---|---|
@@ -35,6 +35,8 @@ From the **repo root**:
 | 504 | Horizons did not answer in time. |
 
 The API **never returns made-up data**: if Horizons fails, it answers the error. Every query is saved in `data/raw/horizons/` (not versioned); repeating it does not call Horizons again.
+
+`GET /horizon?lat=<deg>&lon=<deg>` (ADR-018): horizon with relief in `horizon.json` format, from NASA Moon Trek's LOLA map (30 m polar south of -75.7°, 128 ppd global up to 85° N; further north, flat Moon without `dem`). The first query of a point downloads the crop to `data/raw/` (~2–3 s, ~30 s at the south pole); later ones take ~0.1 s. Errors: 422 (invalid input), 502 (Moon Trek failed or the crop could not be read), 504 (Moon Trek did not answer in time).
 
 ## Connect the web app
 The latitude and longitude box in the web app appears **only if there is an API URL**. Locally, create `web/.env.local` (not committed):
@@ -54,6 +56,6 @@ CORS allows `localhost:5173`, `localhost:4173`, `https://vainstubtomas.github.io
 
 ## Tests
 ```bash
-.venv/bin/python -m pytest tests/test_api_ephemeris.py
+.venv/bin/python -m pytest tests/test_api_ephemeris.py tests/test_api_horizon.py
 ```
 They run offline with a fake Horizons (synthetic values that only test format, validation, errors and cache). The known case (lat 0, lon 30 E, 2026-11-30T06:00:00Z) against the saved Horizons response carries the `network` marker: it queries Horizons the first time and then reads from the cache.

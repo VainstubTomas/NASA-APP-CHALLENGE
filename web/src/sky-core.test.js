@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, groundLight, pointerAngle, nearCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, groundLight, pointerAngle, nearCenter, tiltToCenter,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -230,4 +230,17 @@ test('tiltMin y clampTilt: se puede bajar la mirada para ver el piso, con un lí
   assert.equal(clampTilt(-4, 60), 0);
   assert.equal(tiltDown(0, -30), -10);
   assert.equal(tiltDown(-25, -30), -30);
+});
+
+test('tiltToCenter deja el cuerpo a media pantalla, también con el zoom máximo', () => {
+  // Zoom máximo (FOV_MIN_DEG) en una pantalla de 1400 × 800, horizonte al 80 % de la altura.
+  const width = 1400;
+  const height = 800;
+  const horizonY = height * 0.8;
+  const k = pxPerDeg(width, FOV_MIN_DEG);
+  for (const elevation of [0.5, 5, 13, 15, 27, 45, 63]) {
+    const tilt = tiltToCenter(elevation, horizonY, height, k);
+    const p = project({ azimuth_deg: 90, elevation_deg: elevation }, { heading: 90, tilt, width, horizonY, fov: FOV_MIN_DEG });
+    assert.ok(Math.abs(p.y - height / 2) < 1e-9, `elevación ${elevation}°: y=${p.y}`);
+  }
 });

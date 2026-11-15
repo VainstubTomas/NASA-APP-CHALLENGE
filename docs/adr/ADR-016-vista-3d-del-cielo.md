@@ -23,3 +23,4 @@ La vista 3D del **cielo** queda dentro del alcance. Usa los mismos datos que el 
 - La web carga three.js en diferido (unos 120 kB comprimidos) y, si el navegador no tiene WebGL, vuelve a la brújula y la regla en 2D.
 - three.js (MIT) va en los créditos del README.
 - La vista 3D muestra el horizonte ideal; el aviso "horizonte ideal, sin relieve" sigue siendo obligatorio.
+- Actualización (C5-08, #52): en los sitios con `dem` la vista dibuja la silueta del perfil de 360° de `horizon.json` y marca lo que el relieve tapa; la silueta reacciona a la luz del Sol y de la Tierra como el suelo. El suelo sigue siendo ilustrativo: ya no se avisa en pantalla, pero consta acá y en el README. El aviso "sin relieve" queda solo para los sitios sin `dem`. Sigue fuera de alcance el render realista del terreno.
