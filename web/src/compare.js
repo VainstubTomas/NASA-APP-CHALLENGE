@@ -1,4 +1,5 @@
 // Comparación de escenarios (capa 4). C4-01b (#92): selector de 2 o 3 escenarios (sitio + fecha UTC).
+// C4-01c (#93): debajo del selector, una tarjeta por escenario (compare-cards.js).
 // La lógica de límites está en scenarios-core.js (probada con `npm test`); acá solo se dibuja.
 // Sin estado en la URL (eso es C4-04): la lista vive mientras la página está abierta.
 import './compare.css';
@@ -7,6 +8,7 @@ import {
 } from './scenarios-core.js';
 import { toInputValue, fromInputValue } from './state.js';
 import { t, siteName } from './i18n.js';
+import { summarizeAll, renderCompareCards } from './compare-cards.js';
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -99,10 +101,28 @@ export function initCompare(container, { sites, range, current, onChange }) {
     return box;
   }
 
+  // Cada cambio vuelve a calcular las tarjetas; si llega una respuesta vieja (cambio rápido), se descarta.
+  let request = 0;
+  async function showResults() {
+    const mine = (request += 1);
+    results.replaceChildren(el('p', 'compare__loading', t('compare.loading')));
+    let items;
+    try {
+      items = await summarizeAll(scenarios);
+    } catch (err) {
+      if (mine === request) results.replaceChildren(el('p', 'compare__loading', t('app.siteError', { error: err.message })));
+      return;
+    }
+    if (mine !== request) return;
+    results.replaceChildren();
+    renderCompareCards(results, items);
+  }
+
   function render() {
     list.replaceChildren(...scenarios.map((s, i) => row(s, i + 1)));
     addBtn.disabled = !canAdd(scenarios);
-    onChange?.(scenarios, results);
+    showResults();
+    onChange?.(scenarios);
   }
 
   addBtn.addEventListener('click', () => set(addScenario(scenarios, range)));
