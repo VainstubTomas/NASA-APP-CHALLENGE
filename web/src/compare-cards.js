@@ -92,7 +92,8 @@ function scenarioTable(items, leaders) {
     tr.append(th);
     for (const item of items) {
       const more = metric !== null && leaders[metric].includes(item.id);
-      const td = el('td', numeric ? 'info-num' : '');
+      // Horas con Sol en amarillo y con la Tierra en celeste, como en el cielo y el panel.
+      const td = el('td', [numeric ? 'info-num' : '', metric ? `compare-table__${metric}` : ''].filter(Boolean).join(' '));
       // El valor mayor va en negrita (<strong>), sin texto extra.
       td.append(more ? el('strong', 'compare-table__more', fn(item)) : document.createTextNode(fn(item)));
       tr.append(td);
