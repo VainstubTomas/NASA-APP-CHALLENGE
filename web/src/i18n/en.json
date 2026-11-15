@@ -190,6 +190,8 @@
   "sky.below": "{value}° below the horizon",
   "sky.blocked": "{value}° above the horizon, hidden by the terrain",
   "sky.goTo": "Turn towards {body} (azimuth {az}°)",
+  "sky.lock.sun": "Locked to the Sun · click to release",
+  "sky.lock.earth": "Locked to Earth · click to release",
   "sky.slider": "Move the date · {site}",
   "sky.cd.sunSets": "Sunset in",
   "sky.cd.sunRises": "Sunrise in",

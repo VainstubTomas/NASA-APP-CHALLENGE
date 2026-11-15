@@ -190,6 +190,8 @@
   "sky.below": "低于地平线 {value}°",
   "sky.blocked": "高于地平线 {value}°，被地形遮挡",
   "sky.goTo": "转向{body}（方位角 {az}°）",
+  "sky.lock.sun": "已锁定太阳 · 点击解除",
+  "sky.lock.earth": "已锁定地球 · 点击解除",
   "sky.slider": "调整日期 · {site}",
   "sky.cd.sunSets": "日落还有",
   "sky.cd.sunRises": "日出还有",
