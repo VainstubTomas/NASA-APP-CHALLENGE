@@ -1,0 +1,103 @@
+/* Consulta en vivo de un sitio libre (#104). Usa los mismos tokens que .controls (theme.css). */
+.live {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.live-title {
+  margin: 0 0 var(--space-1);
+  font-size: var(--fs-lg, 1.1rem);
+}
+
+.live-intro {
+  margin: 0 0 var(--space-3);
+  color: var(--color-muted);
+}
+
+.live-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+}
+
+.live-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  align-self: end;
+  margin-top: 1.7rem;
+  padding: var(--space-2) var(--space-6);
+  font: inherit;
+  font-weight: 700;
+  color: #1a1304;
+  background: linear-gradient(180deg, #ffd472, var(--color-sun));
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 10px rgba(255, 197, 77, 0.28);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.live-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 197, 77, 0.4);
+  filter: brightness(1.05);
+}
+
+.live-submit:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 6px rgba(255, 197, 77, 0.3);
+}
+
+.live-submit:disabled {
+  cursor: progress;
+  filter: saturate(0.5) brightness(0.85);
+}
+
+.live-submit.is-busy .live-submit__icon {
+  animation: live-spin 0.9s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes live-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-submit,
+  .live-submit.is-busy .live-submit__icon {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media (max-width: 36rem) {
+  .live-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .live-submit {
+    margin-top: 0;
+    width: 100%;
+  }
+}
+
+.live-error,
+.live-status--error {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--color-danger, #ff8a80);
+}
+
+.live-status {
+  margin: var(--space-2) 0 0;
+  min-height: 1.2em;
+  color: var(--color-muted);
+}

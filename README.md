@@ -98,7 +98,7 @@ We used AI tools, as the Space Apps rules allow, and we say where:
 
 **Open source software**
 - Web: [three.js](https://threejs.org/) (MIT) for the 3D view, [Vite](https://vite.dev/) (MIT) for the build.
-- Python: [NumPy](https://numpy.org/) (BSD-3-Clause), [Requests](https://requests.readthedocs.io/) (Apache-2.0), [rasterio](https://rasterio.readthedocs.io/) (BSD-3-Clause), [pyproj](https://pyproj4.github.io/pyproj/) (MIT), [Matplotlib](https://matplotlib.org/) (Matplotlib license), [pytest](https://pytest.org/) (MIT), [jsonschema](https://python-jsonschema.readthedocs.io/) (MIT).
+- Python: [NumPy](https://numpy.org/) (BSD-3-Clause), [Requests](https://requests.readthedocs.io/) (Apache-2.0), [rasterio](https://rasterio.readthedocs.io/) (BSD-3-Clause), [pyproj](https://pyproj4.github.io/pyproj/) (MIT), [Matplotlib](https://matplotlib.org/) (Matplotlib license), [pytest](https://pytest.org/) (MIT), [jsonschema](https://python-jsonschema.readthedocs.io/) (MIT); for the live API (ADR-015): [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Uvicorn](https://www.uvicorn.org/) (BSD-3-Clause), [HTTPX](https://www.python-httpx.org/) (BSD-3-Clause).
 
 No NASA logos or other NASA branding are used.
 

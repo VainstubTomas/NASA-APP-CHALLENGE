@@ -24,6 +24,7 @@ Lunar Landing Site Navigator answers one question in a single screen: if I land 
 - Time: a time player, a 7-day timeline of when the Sun and Earth are above the horizon, and a live countdown to the next sunset/sunrise and Earthset/Earthrise.
 - Scenario comparison: 2 or 3 site-date scenarios side by side with hours of Sun and of Earth in view over 7 days. A one-sentence summary names the better one (more Sun hours; if tied, more Earth hours; full ties are reported as ties).
 - Validation panel: our values next to JPL Horizons reference values, with the difference.
+- [Only if the live API is deployed (ADR-015): custom coordinates. Any latitude and longitude on the Moon are sent to our own API, which queries JPL Horizons live.]
 - Plain-language texts, mobile layout, and four languages (English, Spanish, Hindi, Simplified Chinese).
 
 **How it works**
@@ -38,7 +39,7 @@ When a launch slips, planners need to know fast how a new date or a nearby site 
 [Next steps: real LOLA terrain for south-pole sites, custom coordinates, a "best landing windows" finder.]
 
 **Tools**
-Python (NumPy, Requests, pytest, jsonschema), JavaScript with Vite and three.js, GitHub Actions, Vercel and GitHub Pages.
+Python (NumPy, Requests, pytest, jsonschema, FastAPI), JavaScript with Vite and three.js, GitHub Actions, Vercel and GitHub Pages.
 
 ## Use of Super Intelligence (SI)
 Yes. We used Claude (Anthropic) as a coding assistant to write and review code, tests and documentation; every change went through a pull request reviewed by a team member, and commits where it took part carry a `Co-Authored-By: Claude` line. The English, Hindi and Simplified Chinese interface texts were translated with AI and were not reviewed by native speakers; the app says so in its footer. The idea and the design of the solution are the team's. The numbers are not AI-generated: they come from JPL Horizons and are checked by automated tests. No images, video or audio were generated with AI. Details in the README, section "Use of AI".
@@ -51,5 +52,5 @@ Yes. We used Claude (Anthropic) as a coding assistant to write and review code, 
 ## Space Agency Partner Data and Other References
 - CSA (Canadian Space Agency), Moon Exploration portal, https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/ : context for the pitch.
 - Landing site coordinates: each site in `data/public/sites.json` lists its own source.
-- Open source software: three.js (MIT), Vite (MIT), NumPy (BSD-3-Clause), Requests (Apache-2.0), rasterio (BSD-3-Clause), pyproj (MIT), Matplotlib (Matplotlib license), pytest (MIT), jsonschema (MIT).
+- Open source software: three.js (MIT), Vite (MIT), NumPy (BSD-3-Clause), Requests (Apache-2.0), rasterio (BSD-3-Clause), pyproj (MIT), Matplotlib (Matplotlib license), pytest (MIT), jsonschema (MIT), FastAPI (MIT), Uvicorn (BSD-3-Clause), HTTPX (BSD-3-Clause).
 - [Add any other external code, text or image used in the slides or the video.]
