@@ -62,6 +62,7 @@ Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source`
 - La web interpola linealmente entre muestras y cierra el círculo (el azimut 359 conecta con el 0).
 - **Luna lisa (ADR-011)**: hasta que haya relieve, `elevation_deg` son 360 ceros y se omite `dem` (es opcional). Es el mismo formato; la web no distingue y, cuando falta `dem`, muestra el aviso "horizonte ideal, sin relieve".
 - `dem.name` y `dem.pixel_m` describen el mapa realmente usado (la fuente se fija en el ADR-006; el ejemplo muestra el plan B).
+- **Consulta en vivo (ADR-018)**: la API de `data/api/` (`GET /horizon?lat&lon`) responde con este mismo formato para un punto libre, con el `site_id` `live-<lat>-<lon>` de sus efemérides. Sin mapa para esa latitud (al norte de 85°) responde la Luna lisa, sin `dem`. El contrato y su esquema no cambian.
 
 ## `ephemeris.json`
 ```json

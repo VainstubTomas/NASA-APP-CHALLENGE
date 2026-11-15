@@ -65,16 +65,37 @@ async function showLive(utcMs) {
   live.setBusy(true);
   sky.setLoading(true);
   live.setStatus(i18nT('live.loading'));
+  // El relieve (ADR-018) se pide en paralelo y no frena el cielo: hasta que llega se ve el horizonte
+  // liso y después se dibuja encima. La primera vez de un punto del polo sur puede tardar ~30 s.
+  const reliefPromise = liveLoader.loadHorizon(lat, lon);
+  reliefPromise.catch(() => {}); // el error se informa abajo, si el cielo llegó a mostrarse
   try {
-    const { ephemeris, horizon } = await liveLoader.load(lat, lon, utcMs);
+    const { ephemeris, horizon: flat } = await liveLoader.load(lat, lon, utcMs);
     if (seq !== liveSeq || !liveSite) return;
     console.log('[live] consulta OK', { lat, lon, utc: new Date(utcMs).toISOString(), site_id: ephemeris.site_id, muestras: ephemeris.time.count });
     const liveName = i18nT('live.siteName', { lat, lon });
-    renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
-    sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
-    renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
+    const render = (horizon) => {
+      renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
+      sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
+      renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
+    };
+    const relief = liveLoader.readyHorizon(lat, lon);
+    render(relief ?? flat);
     validationBody.replaceChildren(); // no hay valores de referencia de Horizons para un punto libre
-    live.setStatus(i18nT('live.active'));
+    live.setStatus(i18nT(relief ? 'live.active' : 'live.reliefLoading'));
+    if (!relief) {
+      reliefPromise.then((horizon) => {
+        if (seq !== liveSeq || !liveSite) return;
+        if (horizon.site_id !== ephemeris.site_id) throw new Error(`relieve de otro punto (${horizon.site_id})`);
+        console.log('[live] relieve OK', { lat, lon, dem: horizon.dem?.name ?? 'sin mapa (Luna lisa)' });
+        render(horizon);
+        live.setStatus(i18nT('live.active'));
+      }).catch((err) => {
+        if (seq !== liveSeq || !liveSite) return;
+        console.log('[live] relieve con error', { lat, lon, error: err.message });
+        live.setStatus(i18nT('live.reliefError', { error: err.message }), true);
+      });
+    }
   } catch (err) {
     if (seq !== liveSeq || !liveSite) return;
     console.log('[live] consulta con error', { lat, lon, utc: new Date(utcMs).toISOString(), error: err.message });

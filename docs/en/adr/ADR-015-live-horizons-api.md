@@ -20,7 +20,7 @@ On 2026-11-14 we checked with `curl` that the Horizons API (`ssd.jpl.nasa.gov/ap
    - `lat` in [-90, 90] (planetocentric), `lon` in [-180, 180] (east-positive), `start` ISO 8601 in UTC, `days` from 1 to 14 (default 7, the timeline window).
    - Invalid input: 422 error with the reason. If Horizons fails or does not answer: 502 error with a clear message. **Made-up data, or data from another site, is never returned.**
    - Two Horizons queries per request (Sun and Earth), using the `data/raw/horizons/` cache the client already has.
-4. **Horizon for a free site: smooth Moon** (360 zeros, ADR-011). The web app builds that horizon on the client and shows "ideal horizon, no relief".
+4. **Horizon for a free site: smooth Moon** (360 zeros, ADR-011). The web app builds that horizon on the client and shows "ideal horizon, no relief". *Replaced by [ADR-018](ADR-018-live-relief.md): the API computes the relief with `GET /horizon`.*
 5. **The web app decides per site**: those in `sites.json` keep reading the precomputed JSON files, with no API. The latitude and longitude input only appears if an API URL is configured (`VITE_API_URL`). Without it, the web app works as today, offline.
 6. **CORS on our API**: allows only the deployed web app origin and the local development one.
 7. **Documentation and manual testing: Swagger.** FastAPI publishes interactive documentation at `/docs` (Swagger UI), with descriptions and examples for every parameter, so the API can be tested without going through the web app.

@@ -25,5 +25,6 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | [015](ADR-015-api-horizons-en-vivo.md) | API propia en `data/api/` para consultar Horizons en vivo con un sitio elegido por el usuario | Propuesto |
 | [016](ADR-016-vista-3d-del-cielo.md) | Vista 3D del cielo con el horizonte liso (el render del terreno sigue fuera de alcance) | Propuesto |
 | [017](ADR-017-comparacion-sin-veredicto.md) | La comparación no elige un "mejor": marca más Sol y más Tierra y decide la persona | Propuesto |
+| [018](ADR-018-relieve-en-vivo.md) | Relieve real para una posición libre: `GET /horizon` en la API y carga en dos etapas en la web | Propuesto |
 
 Estados: Propuesto, Aceptado, Reemplazado.

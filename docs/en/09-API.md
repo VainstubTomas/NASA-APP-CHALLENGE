@@ -1,8 +1,8 @@
 > 🇪🇸 [Leer en español](../09-API.md)
 
-# 09. Live ephemeris API
+# 09. Live ephemeris and horizon API
 
-Last update: 2026-11-15 · Decision: [ADR-015](adr/ADR-015-live-horizons-api.md) · Code: [`data/api/`](../../data/api/) · Issue: #104
+Last update: 2026-11-15 · Decisions: [ADR-015](adr/ADR-015-live-horizons-api.md) and [ADR-018](adr/ADR-018-live-relief.md) · Code: [`data/api/`](../../data/api/) · Issue: #104
 
 ## What it is for
 The sites in `data/public/sites.json` have precomputed ephemerides. For **any** point on the Moon (a latitude and longitude chosen by the user) there is no stored data, so the web app asks this API for it. The API queries **JPL Horizons** and answers in the same format as `ephemeris.json` ([contract](03-DATA-CONTRACT.md)).
@@ -19,6 +19,7 @@ python -m uvicorn data.api.main:app --reload --port 8000
 - **curl**:
   ```bash
   curl "http://localhost:8000/ephemeris?lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1"
+  curl "http://localhost:8000/horizon?lat=0&lon=30"
   ```
 - OpenAPI schema: <http://localhost:8000/openapi.json>.
 
@@ -60,10 +61,27 @@ For `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (only the first 3 of the 24
 
 **The API never returns made-up data**: if Horizons fails, it answers the error and there is no data.
 
+## The relief: `GET /horizon` (ADR-018)
+`GET /horizon?lat=<°>&lon=<°>` answers the horizon with relief around the point, in the `horizon.json` format and with the same `site_id` as `/ephemeris`. It uses the same computation as the saved sites (`precompute/terrain/lola_horizon.py`): 360 elevations, one per degree of azimuth, with the relief up to 20 km.
+
+| Latitude | Map (NASA Moon Trek, LOLA) | First query (measured) |
+|---|---|---|
+| south of -75.7° | 30 m polar (~9 MB) | ~30 s |
+| -75.7° to 85° | 128 ppd global, ~237 m (~260 KB) | ~2–3 s |
+| north of 85° | no map: flat Moon, no `dem` | immediate |
+
+The crop stays in `data/raw/` (not versioned): repeating the same point takes ~0.1 s.
+
+| Code | When |
+|---|---|
+| 422 | Latitude or longitude out of range or invalid. Nothing is downloaded. |
+| 502 | Moon Trek failed or the crop could not be read (it is deleted so the next request retries). |
+| 504 | Moon Trek did not answer in time. |
+
 ## How the web app uses it
 - If an API URL is configured (`VITE_API_URL`), the web app shows the "Free position on the Moon" section: two inputs (latitude and longitude) that use the date from the selector.
 - The web app validates the ranges before calling the API and shows the error if it fails. Each query asks for the 7 days from the start of the chosen UTC day and is kept while the person stays on that day.
-- The horizon of a free position is **ideal** (smooth Moon, 360 zeros, ADR-011): the web app warns "ideal horizon, no relief". The Sun and Earth hours are those of a Moon without mountains, not the real ones.
+- **Two-stage loading** (ADR-018): the web app requests the relief (`/horizon`) in parallel with the ephemerides. The sky appears as soon as the ephemerides arrive, with the ideal horizon (flat Moon); when the relief arrives it is redrawn without moving the view. The relief is cached per point. If it fails, the ideal horizon stays and the query status says so.
 - Without `VITE_API_URL` the section does not appear and the web app works only with the precomputed sites.
 - Code: `web/src/live-core.js` (logic, tested with `npm test`) and `web/src/live.js` (form).
 
@@ -75,7 +93,7 @@ For `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (only the first 3 of the 24
 
 ## Tests
 ```bash
-python -m pytest tests/test_api_ephemeris.py     # API
+python -m pytest tests/test_api_ephemeris.py tests/test_api_horizon.py     # API
 cd web && npm test                               # web logic (live-core.test.js)
 ```
 The API tests run offline with a fake Horizons (synthetic values that only test format, validation, errors and cache). The known case (lat 0, lon 30 E, 2026-11-30T06:00:00Z) is compared against the saved Horizons response (`docs/adr/evidencia/ADR-006-horizons-web/`) and carries the `network` marker.
