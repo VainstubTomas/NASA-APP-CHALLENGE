@@ -719,7 +719,14 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     pose = currentPose();
     // Seguir: la mirada sigue al cuerpo en cada cuadro (incluidas las transiciones y la vista previa
     // del deslizador). Durante un giro animado (anim) manda la animación; al terminar, vuelve a seguir.
-    if (follow && pose && !anim) heading = normAz(pose[follow].azimuth_deg);
+    if (follow && pose && !anim) {
+      // Centra el cuerpo en horizontal y en vertical (misma regla que el clic en la flecha).
+      const body = pose[follow];
+      const v = view();
+      const k = pxPerDeg(v.width, fov);
+      heading = normAz(body.azimuth_deg);
+      tilt = clampTilt(tiltToCenter(body.elevation_deg, v.horizonY, v.height, k), maxTilt(), minTilt());
+    }
     drawStage();
     drawChart();
     if (move && !moveQueued) {
@@ -879,6 +886,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
         setDetail(key, pinned.has(key));
       }
       lookAt(key, true);
+      setFollow(key); // clic en el cuerpo: lo mira y queda bloqueado
     }
     drag = null;
     stage.classList.remove('is-dragging');
