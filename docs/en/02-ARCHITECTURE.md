@@ -54,7 +54,8 @@ The web serves `data/public/` as a static folder (Vite `publicDir`), so there is
 ## Web
 - Vite + JavaScript, no heavy framework. Horizon drawing in SVG or canvas (see ADR-004).
 - State in the URL (`?site=...&t=...`) so it can be shared.
-- Works offline during the demo (everything is static).
+- Works offline during the demo (everything is static) for the precomputed sites.
+- **Live query (ADR-015, #104)**: if `VITE_API_URL` is set, the web app adds a latitude and longitude input that asks the API in `data/api/` (FastAPI, see its README) for the ephemerides; the API queries Horizons and answers in the `ephemeris.json` format. It is the only exception to "Python and the web app only talk through the JSON files in `data/public/`"; it needs network and the API running.
 - Deployment: GitHub Pages or Vercel from `main`.
 
 ## Validation
