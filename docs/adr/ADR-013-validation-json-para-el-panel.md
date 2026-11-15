@@ -17,4 +17,4 @@ Se agrega un archivo nuevo al contrato: `data/public/validation.json`, generado 
 ## Consecuencias
 - El contrato suma un archivo. `tests/test_contract.py` lo valida contra el esquema.
 - Si Horizons cambia y se regenera `tests/reference/`, hay que correr el script de nuevo y commitear `data/public/validation.json`.
-- Las fechas fuera del rango de la web (después de 2027-02-28, `DATA_END_MS`) se muestran como "fuera de rango" y no cuentan como error.
+- Las fechas fuera del rango de la web (después de 2027-12-31, `DATA_END_MS`) se muestran como "fuera de rango" y no cuentan como error.

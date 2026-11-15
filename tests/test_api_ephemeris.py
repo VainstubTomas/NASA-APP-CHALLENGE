@@ -137,8 +137,8 @@ def test_repeated_request_is_served_from_cache(client, fake):
 
 
 def test_window_is_trimmed_at_the_end_of_the_data_range(client):
-    doc = _ok(client, start="2027-02-28T00:00:00Z", days=7).json()
-    assert doc["time"]["count"] == 24  # hasta 2027-02-28T23:00:00Z, el fin del rango del contrato
+    doc = _ok(client, start="2027-12-31T00:00:00Z", days=7).json()
+    assert doc["time"]["count"] == 24  # hasta 2027-12-31T23:00:00Z, el fin del rango del contrato
 
 
 # ------------------------------------------------------------------ entradas inválidas

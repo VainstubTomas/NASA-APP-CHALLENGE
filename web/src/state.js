@@ -2,8 +2,8 @@
 // Convenciones del contrato (docs/03-DATA-CONTRACT.md): tiempo en UTC, una muestra por hora.
 
 export const HOUR_MS = 3600 * 1000;
-// Fin del rango descargado de Horizons (C0-13): 2027-02-28T23:00:00Z.
-export const DATA_END_MS = Date.UTC(2027, 1, 28, 23, 0, 0);
+// Fin del rango descargado de Horizons (C0-13): 2027-12-31T23:00:00Z.
+export const DATA_END_MS = Date.UTC(2027, 11, 31, 23, 0, 0);
 
 // Inicio del dia UTC de `nowMs`: no se puede elegir una fecha pasada.
 export function startOfUtcDay(nowMs) {

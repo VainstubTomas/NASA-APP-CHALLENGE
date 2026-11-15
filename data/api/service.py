@@ -16,7 +16,7 @@ from precompute.ephemeris.build_ephemeris import ANGULAR_RADIUS_DEG, round_azimu
 STEP_S = 3600
 # Mismo rango que los datos precalculados y que el selector de fecha de la web (DATA_END_MS).
 RANGE_START = datetime(2026, 11, 1, 0, 0, tzinfo=timezone.utc)
-RANGE_END = datetime(2027, 2, 28, 23, 0, tzinfo=timezone.utc)
+RANGE_END = datetime(2027, 12, 31, 23, 0, tzinfo=timezone.utc)
 MIN_DAYS, MAX_DAYS, DEFAULT_DAYS = 1, 14, 7
 _ISO = "%Y-%m-%dT%H:%M:%SZ"
 

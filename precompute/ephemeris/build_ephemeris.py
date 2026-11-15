@@ -18,9 +18,9 @@ from precompute.ephemeris import horizons_client as hc
 
 SITES_PATH = hc.ROOT / "data" / "public" / "sites.json"
 OUT_DIR = hc.ROOT / "data" / "public" / "sites"
-# Mismo rango que la descarga de C0-13 (download_horizons): 120 días, una muestra por hora.
+# Mismo rango que la descarga de C0-13 (download_horizons): 426 días, una muestra por hora.
 DEFAULT_START = "2026-11-01T00:00:00Z"
-DEFAULT_STOP = "2027-02-28T23:00:00Z"
+DEFAULT_STOP = "2027-12-31T23:00:00Z"
 DEFAULT_STEP_S = 3600
 # Radios angulares nominales del contrato v1 (Sol ~0,5° de diámetro, Tierra ~2°).
 ANGULAR_RADIUS_DEG = {"sun": 0.25, "earth": 1.0}

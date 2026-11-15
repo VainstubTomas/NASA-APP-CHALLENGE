@@ -70,7 +70,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 {
   "schema_version": "1.0",
   "site_id": "demo-sintetico",
-  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 3600, "count": 2880 },
+  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 3600, "count": 10224 },
   "sun":   { "azimuth_deg": [], "elevation_deg": [] },
   "earth": { "azimuth_deg": [], "elevation_deg": [] },
   "angular_radius_deg": { "sun": 0.25, "earth": 1.0 },
@@ -86,7 +86,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 {
   "schema_version": "1.0",
   "site_id": "demo-sintetico",
-  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 86400, "count": 120 },
+  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 86400, "count": 426 },
   "daily": {
     "sun_hours": [],
     "earth_hours": [],
