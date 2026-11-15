@@ -176,6 +176,54 @@ export function makeStars(count, seed = 1) {
 }
 
 /**
+ * Brillo (0,06 a 1) de la textura plana del suelo según la elevación del Sol: de noche queda casi
+ * negra (solo la luz de la Tierra) y a partir de ~25° está a pleno. Sin dato del Sol, a pleno.
+ */
+export function groundLight(sunElDeg) {
+  if (!Number.isFinite(sunElDeg)) return 1;
+  const t = Math.min(1, Math.max(0, sunElDeg / 25));
+  return 0.06 + 0.94 * t * t * (3 - 2 * t);
+}
+
+/** Un giro completo de la Luna respecto de las estrellas (mes sidéreo), en días. */
+export const SIDEREAL_MONTH_DAYS = 27.321661;
+
+/**
+ * Campo de estrellas sobre la esfera celeste entera (ascensión recta `ra` y declinación `dec`, en
+ * grados), con el brillo y color de makeStars. Decorativo: no es un catálogo.
+ */
+export function makeCelestialStars(count, seed = 1) {
+  const rand = rng(seed ^ 0x9e3779b9);
+  return makeStars(count, seed).map((s) => ({
+    ra: rand() * 360,
+    dec: (Math.asin(2 * rand() - 1) * 180) / Math.PI, // uniforme sobre la esfera
+    alpha: s.alpha,
+    size: s.size,
+    color: s.color,
+  }));
+}
+
+/**
+ * Azimut y elevación (grados, azimut 0° = norte, horario) de una estrella de makeCelestialStars,
+ * vista desde la latitud `latDeg` cuando pasaron `days` días desde el origen del cielo. El cielo
+ * gira una vuelta por mes sidéreo, de este a oeste (la Luna gira hacia el este). El eje es el de
+ * la Luna, que casi no se inclina, así que el polo celeste queda a `latDeg` de elevación.
+ * El giro es una aproximación decorativa: no está calculado con Horizons ni con una efeméride.
+ */
+export function starAzEl(star, latDeg, days) {
+  const rad = Math.PI / 180;
+  const hour = (days / SIDEREAL_MONTH_DAYS) * 2 * Math.PI - star.ra * rad; // ángulo horario
+  const dec = star.dec * rad;
+  const lat = latDeg * rad;
+  const sinEl = Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(hour);
+  const az = Math.atan2(
+    -Math.cos(dec) * Math.sin(hour),
+    Math.cos(lat) * Math.sin(dec) - Math.sin(lat) * Math.cos(dec) * Math.cos(hour),
+  );
+  return { az: normAz(az / rad), el: Math.asin(Math.max(-1, Math.min(1, sinEl))) / rad };
+}
+
+/**
  * Ángulo de la flecha que va del punto (x0, y0) al (x1, y1) en pantalla: 0° = arriba,
  * sentido horario, en [0, 360). Sirve también para cuerpos fuera de la vista (project los deja
  * fuera del ancho de la pantalla, del lado hacia el que hay que girar).
@@ -190,6 +238,27 @@ export function pointerAngle(x0, y0, x1, y1) {
  */
 export function nearCenter(x, y, width, height, fraction = 0.5) {
   return Math.abs(x - width / 2) <= (width * fraction) / 2 && Math.abs(y - height / 2) <= (height * fraction) / 2;
+}
+
+/** Diferencia de azimut por el camino corto, en grados (-180, 180]. */
+export const azDelta = (from, to) => ((((to - from) % 360) + 540) % 360) - 180;
+
+/**
+ * Pose intermedia entre dos muestras de cuerpos ({ azimuth_deg, elevation_deg }), con t en [0, 1].
+ * El azimut va por el camino corto (no da la vuelta entera al cruzar el norte); ease-out cúbico.
+ */
+export function tweenPose(from, to, t) {
+  const e = 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
+  return {
+    azimuth_deg: normAz(from.azimuth_deg + azDelta(from.azimuth_deg, to.azimuth_deg) * e),
+    elevation_deg: from.elevation_deg + (to.elevation_deg - from.elevation_deg) * e,
+  };
+}
+
+/** ¿Hay que recalcular el mapa de sombras? Sí si alguna componente de la dirección cambió más de eps. */
+export function needsMaskBake(prev, next, eps = 1e-4) {
+  if (!prev) return true;
+  return next.some((v, i) => Math.abs(v - prev[i]) > eps);
 }
 
 /**

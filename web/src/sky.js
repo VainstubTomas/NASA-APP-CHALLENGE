@@ -11,6 +11,11 @@ import './sky.css';
 import sunImg from './assets/sky/sun.png';
 import earthImg from './assets/sky/earth.png';
 import groundImg from './assets/sky/ground.png';
+import { makeGroundPanorama, PANO_DEP_MIN_DEG, PANO_DEP_MAX_DEG } from './ground-texture.js';
+import { createDebugOverlay } from './debug-overlay.js';
+
+// ?debug en la URL activa el overlay de FPS y estadísticas (F3 lo oculta)
+const DEBUG_OVERLAY = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
 import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
@@ -22,9 +27,13 @@ import { initSkyPanel } from './sky-panel.js';
 import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, chartXToAz, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
-  countdownAction,
+  compassTicks, shortDuration, chartRange, chartXToAz, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter, tiltToCenter,
+  tweenPose, countdownAction,
 } from './sky-core.js';
+
+/** Duración del movimiento de Sol, Tierra y suelo al cambiar la fecha o la hora. */
+const MOVE_MS = 600;
+const DAY_MS = 86400000;
 
 // Márgenes horizontales del gráfico de 360° (en unidades del viewBox).
 const CHART_X0 = 44;
@@ -40,7 +49,7 @@ const CLICK_SLOP_PX = 4;
 // Al hacer clic en un cuerpo se centra y la vista se acerca hasta este campo de visión (°).
 const ZOOM_ON_BODY_FOV = 45;
 // Estrellas decorativas (sky-core.js): fijas en el cielo del sitio, giran con la vista.
-const STARS = makeStars(1400, 2026);
+const STARS = makeCelestialStars(2800, 2026);
 // Flechas del centro: a qué distancia del centro se dibuja cada una. Radios distintos para que
 // no se pisen cuando el Sol y la Tierra quedan para el mismo lado.
 const POINTER_RADIUS_PX = { sun: 58, earth: 96 };
@@ -99,7 +108,9 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   const stage = el('div', 'sky-stage');
   const air = el('div', 'sky-air'); // recorta los discos en el horizonte
   const ground = el('div', 'sky-ground');
-  ground.style.backgroundImage = `url("${groundImg}")`;
+  let groundPano = false; // true cuando el fallback usa el panorama generado (sin WebGL)
+  // Sin imagen al arrancar: evita ver la foto en mosaico mientras carga el suelo 3D
+  ground.style.backgroundColor = '#000';
   const horizon = el('div', 'sky-horizon');
   const ticks = el('div', 'sky-ticks');
   const overlay = el('div', 'sky-overlay');
@@ -143,7 +154,12 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   loading.append(loadingBox);
   root.append(loading);
 
-  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
+  // Indicador de bloqueo: aparece bajo las flechas mientras la vista sigue a un cuerpo. Clic = soltar.
+  const lockBtn = el('button', 'sky-lock');
+  lockBtn.type = 'button';
+  lockBtn.hidden = true;
+  lockBtn.addEventListener('click', () => stopFollow());
+  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers, lockBtn);
 
   // --- Arriba a la izquierda: logo, búsqueda y fecha ---
   const topLeft = el('div', 'sky-topleft');
@@ -221,6 +237,10 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   let tilt = 0;
   let fov = FOV_DEG; // cambia con la rueda del mouse (zoom)
   let data = null; // { ephemeris, horizon, utcMs, siteName, sample }
+  let move = null; // { from, to, t0 }: transición en curso de la pose de Sol y Tierra
+  let follow = null; // null | 'sun' | 'earth': la vista acompaña a ese cuerpo
+  let pose = null; // pose mostrada este cuadro (interpolada durante la transición)
+  let moveQueued = false;
   let siteKey = null;
   let anim = null;
   let cdTimer = null;
@@ -250,6 +270,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   const nadirTilt = (v, k) => tiltMin(v.horizonY, k, v.height - 90 * k);
 
   // --- Dibujo de la vista ---
+  let lastTicksKey = null;
   function drawStage() {
     const v = view();
     const k = pxPerDeg(v.width, fov);
@@ -258,25 +279,45 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     drawStars(v, k, hy);
     drawSkyline(v, k, hy);
     scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
-    for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
-    const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
-    ground.style.backgroundSize = `${tileW}px auto`;
-    ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    const top = `${hy}px`;
+    for (const node of [ground, horizon, ticks, headingLabel, smooth]) {
+      if (node.style.top !== top) node.style.top = top;
+    }
+    if (groundPano) {
+      // Panorama de 360° ya en perspectiva: columna = azimut, fila = grados bajo el horizonte
+      ground.style.backgroundSize = `${360 * k}px ${(PANO_DEP_MAX_DEG - PANO_DEP_MIN_DEG) * k}px`;
+      ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+      ground.style.backgroundPositionY = `${PANO_DEP_MIN_DEG * k}px`;
+      ground.style.backgroundRepeat = 'repeat-x';
+    } else {
+      const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
+      ground.style.backgroundSize = `${tileW}px auto`;
+      ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    }
+    ground.style.setProperty('--ground-light', groundLight(pose?.sun?.elevation_deg).toFixed(3));
     drawGround(v, k, hy);
     root.classList.toggle('is-tilted', tilt !== 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
 
     // Brújula sobre la línea
-    ticks.replaceChildren();
-    for (const tk of compassTicks(heading, fov)) {
-      const mark = el('span', `sky-tick${tk.point ? ' sky-tick--major' : ''}`);
-      mark.style.left = `${v.width / 2 + tk.rel * k}px`;
+    // Solo se reconstruyen si cambian posiciones (0,5 px) o etiquetas: mirando fijo al suelo no se toca el DOM.
+    const marks = compassTicks(heading, fov).map((tk) => ({
+      left: Math.round((v.width / 2 + tk.rel * k) * 2) / 2,
+      major: Boolean(tk.point),
       // Sin etiqueta cerca del centro: ahí ya está el rumbo actual en grande.
       // y tampoco si es el mismo punto cardinal que el rumbo central (dos "E" juntas confunden).
-      if (tk.point && Math.abs(tk.rel) * k > 70 && tk.point !== compassLabel(heading)) {
-        mark.dataset.label = t(`compass.${tk.point}`);
+      label: tk.point && Math.abs(tk.rel) * k > 70 && tk.point !== compassLabel(heading) ? t(`compass.${tk.point}`) : '',
+    }));
+    const ticksKey = marks.map((m) => `${m.left}${m.major ? 'M' : ''}${m.label}`).join('|');
+    if (ticksKey !== lastTicksKey) {
+      lastTicksKey = ticksKey;
+      ticks.replaceChildren();
+      for (const m of marks) {
+        const mark = el('span', `sky-tick${m.major ? ' sky-tick--major' : ''}`);
+        mark.style.left = `${m.left}px`;
+        if (m.label) mark.dataset.label = m.label;
+        ticks.append(mark);
       }
-      ticks.append(mark);
     }
     headingName.textContent = t(`compass.${compassLabel(heading)}`);
     headingDeg.textContent = `${Math.round(normAz(heading))}°`;
@@ -289,35 +330,86 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     }
     const radii = data.ephemeris.angular_radius_deg;
     discs = [];
-    for (const b of bodies) drawBody(b, data.sample[b.key], radii[b.key], v, k, hy);
+    for (const b of bodies) drawBody(b, pose[b.key], radii[b.key], v, k, hy);
     hidePointersOverDiscs(v);
   }
 
   // Suelo 3D ilustrativo (sky-ground.js, three.js): se carga después del primer dibujo. Hasta
   // entonces, o si el navegador no tiene WebGL2, queda la textura plana del Figma.
   let ground3d = null;
+  // Si nada de lo que pinta el suelo cambió (mirada, tamaño, Sol, Tierra), no se vuelve a renderizar:
+  // el WebGL a pantalla completa es lo más caro cuando se mira hacia el suelo.
+  let groundKey = '';
   function drawGround(v, k, hy) {
     if (!ground3d) return;
-    const sample = data?.sample;
-    ground3d.render({
+    const args = {
       width: Math.round(v.width),
       groundHeight: Math.max(0, Math.round(v.height - hy)),
       pxPerDeg: k,
       heading,
-      sun: sample?.sun ?? null,
-      earth: sample?.earth ?? null,
+      sun: pose?.sun ?? null,
+      earth: pose?.earth ?? null,
       radii: data?.ephemeris?.angular_radius_deg,
-    });
+    };
+    const key = [args.width, args.groundHeight, k, heading, args.sun?.azimuth_deg, args.sun?.elevation_deg,
+      args.earth?.azimuth_deg, args.earth?.elevation_deg, args.radii?.sun, args.radii?.earth].join('|');
+    if (key === groundKey) return;
+    groundKey = key;
+    ground3d.render(args);
   }
   setTimeout(() => {
     import('./sky-ground.js')
       .then(({ createGround }) => {
         ground3d = createGround(ground);
         root.classList.add('has-ground-3d');
+        if (DEBUG_OVERLAY) {
+          createDebugOverlay(root, {
+            getStats: () => ground3d?.stats() ?? null,
+            onWireframe: (on) => ground3d?.setWireframe(on),
+          });
+        }
         draw();
       })
-      .catch((err) => console.warn('[sky] suelo 3D no disponible, se usa la textura plana:', err.message));
+      .catch((err) => {
+        console.warn('[sky] suelo 3D no disponible, se usa el suelo generado:', err.message);
+        // Panorama con perspectiva en lugar de la foto cenital en mosaico (tarda ~1 s, una vez)
+        setTimeout(() => {
+          try {
+            const { canvas, edgeColor } = makeGroundPanorama();
+            groundPano = true;
+            ground.style.backgroundImage = `url("${canvas.toDataURL('image/jpeg', 0.9)}")`;
+            ground.style.backgroundColor = edgeColor;
+            draw();
+          } catch (e) {
+            console.warn('[sky] no se pudo generar el suelo, se usa la foto:', e.message);
+            ground.style.backgroundImage = `url("${groundImg}")`;
+          }
+        }, 0);
+      });
   }, 0);
+
+  // Posición de cada estrella en el cielo del sitio. El cielo gira con la fecha (una vuelta por mes
+  // sidéreo), así que se recalcula solo cuando cambian la fecha o la latitud, no en cada cuadro.
+  // Días (con fracción) que muestran las estrellas. Durante una transición usan el mismo easing que
+  // Sol y Tierra: el cielo se desliza en vez de saltar.
+  function starDays(now = performance.now()) {
+    if (move?.days) {
+      const t = Math.min(1, (now - move.t0) / MOVE_MS);
+      const e = 1 - (1 - t) ** 3;
+      return move.days[0] + (move.days[1] - move.days[0]) * e;
+    }
+    return (data?.utcMs ?? 0) / DAY_MS;
+  }
+  let starCache = { key: '', pos: STARS.map(() => ({ az: 0, el: 0 })) };
+  function starPositions() {
+    const lat = data?.lat ?? 0;
+    const days = starDays();
+    const key = `${lat}|${days}`;
+    if (starCache.key !== key) {
+      starCache = { key, pos: STARS.map((st) => starAzEl(st, lat, days)) };
+    }
+    return starCache.pos;
+  }
 
   // Estrellas: un canvas del tamaño del cielo; solo se dibujan las que caen en la vista.
   function drawStars(v, k, hy) {
@@ -337,11 +429,15 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     const half = fov / 2 + 1;
     // Al acercar, las estrellas crecen un poco (como en una foto con más aumento).
     const grow = Math.min(1.6, Math.max(0.8, Math.sqrt(FOV_DEG / fov)));
-    for (const st of STARS) {
-      const rel = relAz(st.az, heading);
+    const sky = starPositions();
+    for (let i = 0; i < STARS.length; i += 1) {
+      const st = STARS[i];
+      const pos = sky[i];
+      if (pos.el < -1) continue; // bajo el horizonte
+      const rel = relAz(pos.az, heading);
       if (Math.abs(rel) > half) continue;
       const x = w / 2 + rel * k;
-      const y = hy - st.el * k;
+      const y = hy - pos.el * k;
       if (y < -2 || y > h) continue;
       ctx.globalAlpha = st.alpha;
       ctx.fillStyle = st.color;
@@ -372,8 +468,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     ctx.clearRect(0, 0, w, h);
     if (!hasRelief(data?.horizon) || h === 0) return;
     const pts = skylinePoints(data.horizon, { heading, width: v.width, k, hy });
-    const sample = data.sample;
-    const light = sample ? { sun: sample.sun, earth: sample.earth } : null;
+    const light = pose ? { sun: pose.sun, earth: pose.earth } : null;
     const radii = data.ephemeris.angular_radius_deg;
     const azAt = (x) => heading + (x - v.width / 2) / k;
     ctx.lineWidth = 1.5;
@@ -431,7 +526,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     b.classList.toggle('is-in-view', inView);
     b.classList.toggle('is-centered', inView && nearCenter(p.x, p.y, v.width, v.height));
     const name = bodyName(key);
-    const az = Math.round(data.sample[key].azimuth_deg);
+    const az = Math.round((pose ?? data.sample)[key].azimuth_deg);
     b.setAttribute('aria-label', t('sky.goTo', { body: name, az }));
     b.title = name;
   }
@@ -469,22 +564,11 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   }
 
   // --- Gráfico de 360° (como "Cómo leer los números" del artifact) ---
-  function drawChart() {
+  // La parte fija del gráfico (grilla, silueta, etiquetas) se arma solo cuando cambian el horizonte,
+  // el rango o el idioma. En cada cuadro solo se mueven el recuadro de la vista y los dos cuerpos.
+  let chartCache = null;
+  function buildChartStatic(ax, ay, { X0, X1, Y0, Y1, min, max, relief, profile }) {
     chart.replaceChildren();
-    const X0 = CHART_X0;
-    const X1 = CHART_X1;
-    const Y0 = 14;
-    const Y1 = 160;
-    const sample = data?.sample;
-    const relief = hasRelief(data?.horizon);
-    const profile = relief ? chartProfile(data.horizon) : null;
-    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
-    const { min, max } = chartRange([
-      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
-      ...(profile ? profile.map((p) => p.elevation) : []),
-    ]);
-    const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
-    const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
     const step = max <= 15 ? 5 : max <= 45 ? 10 : 15;
     // Marcas en múltiplos del paso (con escala grande, −5° no lleva etiqueta: se pisaba con 0°)
     for (let v = Math.ceil(min / step) * step; v <= max; v += step) {
@@ -512,27 +596,78 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     }
     if (!relief) svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
 
-    // Recuadro de lo que muestra la vista (puede cruzar el norte: dos rectángulos)
+    // Recuadro de la vista (puede cruzar el norte: dos rectángulos; el segundo queda en ancho 0 si no hace falta)
+    const views = [
+      svg('rect', { y: Y0, height: Y1 - Y0, class: 'sky-chart__view' }, chart),
+      svg('rect', { y: Y0, height: Y1 - Y0, class: 'sky-chart__view' }, chart),
+    ];
+    // Cuerpos: van al final para quedar encima; la posición se pone en cada cuadro
+    const bodies = {};
+    for (const key of ['earth', 'sun']) {
+      const c = svg('circle', { r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}` }, chart);
+      const tx = svg('text', { 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart);
+      tx.textContent = bodyName(key);
+      bodies[key] = { c, tx };
+    }
+    return { views, bodies };
+  }
+
+  function drawChart() {
+    const X0 = CHART_X0;
+    const X1 = CHART_X1;
+    const Y0 = 14;
+    const Y1 = 160;
+    const sample = pose;
+    if (!chartCache || chartCache.horizon !== data?.horizon) {
+      const relief = hasRelief(data?.horizon);
+      chartCache = { horizon: data?.horizon, relief, profile: relief ? chartProfile(data.horizon) : null, key: null, nodes: null };
+    }
+    const { relief, profile } = chartCache;
+    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
+    const { min, max } = chartRange([
+      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
+      ...(profile ? profile.map((p) => p.elevation) : []),
+    ]);
+    const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
+    const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
+
+    const labels = [0, 45, 90, 135, 180, 225, 270, 315, 360].map((a) => t(`compass.${compassLabel(a)}`));
+    const key = [min, max, relief, labels.join('|'), bodyName('sun'), bodyName('earth'), t('sky.chart.ground')].join('|');
+    if (chartCache.key !== key) {
+      chartCache.key = key;
+      chartCache.nodes = buildChartStatic(ax, ay, { X0, X1, Y0, Y1, min, max, relief, profile });
+    }
+    const { views, bodies } = chartCache.nodes;
+
     const from = normAz(heading - fov / 2);
     const to = from + fov;
-    const win = (a0, a1) => svg('rect', {
-      x: X0 + (a0 / 360) * (X1 - X0), y: Y0, width: ((a1 - a0) / 360) * (X1 - X0), height: Y1 - Y0,
-      class: 'sky-chart__view',
-    }, chart);
-    if (to <= 360) win(from, to);
-    else { win(from, 360); win(0, to - 360); }
+    const setView = (node, a0, a1) => {
+      node.setAttribute('x', X0 + (a0 / 360) * (X1 - X0));
+      node.setAttribute('width', ((a1 - a0) / 360) * (X1 - X0));
+    };
+    if (to <= 360) {
+      setView(views[0], from, to);
+      setView(views[1], 0, 0);
+    } else {
+      setView(views[0], from, 360);
+      setView(views[1], 0, to - 360);
+    }
 
-    if (!sample) return;
     for (const key of ['earth', 'sun']) {
+      const { c, tx } = bodies[key];
+      c.style.display = sample ? '' : 'none';
+      tx.style.display = sample ? '' : 'none';
+      if (!sample) continue;
       const pos = sample[key];
       const x = ax(pos.azimuth_deg);
       const y = ay(pos.elevation_deg);
       // Si el relieve lo tapa o está bajo el horizonte, el punto se dibuja hueco (no se ve desde el sitio).
       const state = visibilityState(pos, data.ephemeris.angular_radius_deg[key], data.horizon);
-      const hidden = state === 'blocked' || state === 'down' ? ' is-hidden' : '';
-      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}${hidden}` }, chart);
-      svg('text', { x, y: y - 11, 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart)
-        .textContent = bodyName(key);
+      c.classList.toggle('is-hidden', state === 'blocked' || state === 'down');
+      c.setAttribute('cx', x);
+      c.setAttribute('cy', y);
+      tx.setAttribute('x', x);
+      tx.setAttribute('y', y - 11);
     }
   }
 
@@ -635,12 +770,67 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     }
   }
 
+  // Pose de Sol y Tierra de este cuadro: la muestra actual, o la interpolación si hay transición.
+  function currentPose(now = performance.now()) {
+    if (!move) return data?.sample ?? null;
+    const t = (now - move.t0) / MOVE_MS;
+    if (t >= 1) {
+      move = null;
+      return data?.sample ?? null;
+    }
+    return {
+      sun: tweenPose(move.from.sun, move.to.sun, t),
+      earth: tweenPose(move.from.earth, move.to.earth, t),
+    };
+  }
+
   function draw() {
+    pose = currentPose();
+    // Seguir: la mirada sigue al cuerpo en cada cuadro (incluidas las transiciones y la vista previa
+    // del deslizador). Durante un giro animado (anim) manda la animación; al terminar, vuelve a seguir.
+    if (follow && pose && !anim) {
+      // Centra el cuerpo en horizontal y en vertical (misma regla que el clic en la flecha).
+      const body = pose[follow];
+      const v = view();
+      const k = pxPerDeg(v.width, fov);
+      heading = normAz(body.azimuth_deg);
+      tilt = clampTilt(tiltToCenter(body.elevation_deg, v.horizonY, v.height, k), maxTilt(), minTilt());
+    }
     drawStage();
     drawChart();
+    if (move && !moveQueued) {
+      moveQueued = true;
+      requestAnimationFrame(() => {
+        moveQueued = false;
+        draw();
+      });
+    }
+  }
+
+  // Al arrastrar llegan muchos pointermove por cuadro (un mouse de 1000 Hz manda ~16). Se junta todo en
+  // un solo draw() por cuadro: el estado (heading, tilt) ya está actualizado cuando se dibuja.
+  let drawQueued = false;
+  function drawSoon() {
+    if (drawQueued) return;
+    drawQueued = true;
+    requestAnimationFrame(() => {
+      drawQueued = false;
+      draw();
+    });
   }
 
   // --- Interacción ---
+  // Seguir: la vista acompaña al Sol o a la Tierra al cambiar fecha, sitio o misión. Girar, arrastrar o
+  // mirar otro cuerpo lo corta. Solo rota (heading): la altura de la mirada no cambia.
+  // Solo cambia el estado y el indicador: el giro hacia el cuerpo lo hace lookAt (flecha) antes.
+  function setFollow(next) {
+    follow = next;
+    if (next) lockBtn.textContent = t('sky.lock.' + next);
+    lockBtn.hidden = next === null;
+  }
+  function stopFollow() {
+    if (follow) setFollow(null);
+  }
   // Gira hasta `target`; opcionalmente también acerca (fovTo) y mueve la mirada vertical (tiltTo).
   function animateTo(target, { fovTo = fov, tiltTo = tilt } = {}) {
     if (anim) cancelAnimationFrame(anim);
@@ -663,8 +853,19 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     };
     anim = requestAnimationFrame(step);
   }
-  const turn = (delta) => animateTo(rotate(heading, delta));
-  const setTilt = (value) => { tilt = clampTilt(value, maxTilt(), minTilt()); draw(); };
+  const turn = (delta) => {
+    stopFollow();
+    animateTo(rotate(heading, delta));
+  };
+  // Las flechas verticales animan igual que las laterales. Se encadenan desde el destino anterior,
+  // no desde la posición a mitad de camino, para que varias pulsaciones seguidas sumen sus pasos.
+  let tiltGoal = null;
+  const stepTilt = (stepFn, limit) => {
+    stopFollow();
+    const from = anim && tiltGoal !== null ? tiltGoal : tilt;
+    tiltGoal = clampTilt(stepFn(from, limit), maxTilt(), minTilt());
+    animateTo(heading, { tiltTo: tiltGoal });
+  };
 
   // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
   // ecuador), también sube la mirada para que entre.
@@ -680,6 +881,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
 
   function lookAt(key, zoom = false) {
     if (!data?.sample) return;
+    if (follow && follow !== key) stopFollow();
     const pos = data.sample[key];
     const v = view();
     const fovTo = zoom ? Math.max(FOV_MIN_DEG, Math.min(fov, ZOOM_ON_BODY_FOV)) : fov;
@@ -704,6 +906,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     b.addEventListener('click', () => {
       root.classList.remove(`is-pointing-${key}`);
       lookAt(key, true);
+      setFollow(key); // clic en la flecha: mira al cuerpo y queda bloqueado
     });
     // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
     b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
@@ -737,9 +940,10 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     stage.classList.add('is-dragging');
     if (anim) cancelAnimationFrame(anim);
     const k = pxPerDeg(stage.clientWidth, fov);
+    stopFollow();
     heading = normAz(drag.heading - dx / k);
     tilt = clampTilt(drag.tilt + dy / k, maxTilt(), minTilt());
-    draw();
+    drawSoon();
   });
   const endDrag = () => {
     if (drag && !drag.moved && drag.body) {
@@ -751,6 +955,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
         setDetail(key, pinned.has(key));
       }
       lookAt(key, true);
+      setFollow(key); // clic en el cuerpo: lo mira y queda bloqueado
     }
     drag = null;
     stage.classList.remove('is-dragging');
@@ -811,8 +1016,8 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     if (e.target.closest('input, select, textarea, .sky-panel')) return;
     if (e.key === 'ArrowLeft') turn(-ROTATE_STEP_DEG);
     else if (e.key === 'ArrowRight') turn(ROTATE_STEP_DEG);
-    else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt, maxTilt()));
-    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt, minTilt()));
+    else if (e.key === 'ArrowUp') stepTilt(tiltUp, maxTilt());
+    else if (e.key === 'ArrowDown') stepTilt(tiltDown, minTilt());
     else if ((e.key === 'f' || e.key === 'F') && canFullscreen && !e.metaKey && !e.ctrlKey) toggleFullscreen();
     else return;
     e.preventDefault();
@@ -882,12 +1087,19 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
      * Muestra un sitio en un instante. `key` identifica el sitio (o la posición libre):
      * al cambiar, la vista vuelve a mirar hacia el Sol (o la Tierra).
      */
-    update({ ephemeris, horizon: hz, utcMs, siteName, key }) {
+    update({ ephemeris, horizon: hz, utcMs, siteName, key, lat }) {
       const sample = sampleAt(ephemeris, utcMs);
-      data = { ephemeris, horizon: hz, utcMs, siteName, sample };
+      // Misma sitio: los cuerpos se deslizan desde donde están hasta la nueva muestra. Sitio nuevo: salto.
+      const sameSite = key === siteKey;
+      // Al interrumpir una transición, el nuevo movimiento arranca desde la pose y los días que se ven ahora.
+      const fromDays = starDays();
+      const from = sameSite && data?.sample && sample ? currentPose() : null;
+      data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
+      move = from ? { from, to: sample, t0: performance.now(), days: [fromDays, utcMs / DAY_MS] } : null;
       // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
       smooth.style.display = hasRelief(hz) ? 'none' : '';
-      if (key !== siteKey && sample) {
+      const newSite = key !== siteKey;
+      if (newSite && sample) {
         siteKey = key;
         const radii = ephemeris.angular_radius_deg;
         heading = normAz(initialHeading(sample.sun, sample.earth, radii.sun, radii.earth));
@@ -916,6 +1128,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     /** Sin datos para mostrar: el cielo queda vacío (se conserva el sitio y la fecha). */
     clear({ siteName = data?.siteName ?? '', utcMs = data?.utcMs ?? null } = {}) {
       data = { siteName, utcMs, sample: null };
+      move = null;
       drawTime();
       drawCountdown();
       draw();

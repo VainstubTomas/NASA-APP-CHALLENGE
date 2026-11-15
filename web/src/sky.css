@@ -45,6 +45,19 @@
   background-position-y: 25%;
   background-color: #6f7176;
 }
+/* Fallback sin WebGL: la foto plana se ilumina según la elevación del Sol (--ground-light, que
+   pone sky.js) y gana profundidad con un degradado: más oscura pegada al horizonte, donde la
+   vista es rasante, y en el borde de abajo, donde se ve más cerca. */
+.sky:not(.has-ground-3d) .sky-ground {
+  filter: brightness(var(--ground-light, 1)) contrast(1.08);
+}
+.sky:not(.has-ground-3d) .sky-ground::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.12) 22%, transparent 45%, transparent 72%, rgba(0, 0, 0, 0.4) 100%);
+}
 .sky.is-ground-hidden .sky-ground { display: none; }
 /* Suelo 3D (sky-ground.js): reemplaza a la textura plana cuando carga */
 .sky.has-ground-3d .sky-ground { background-image: none !important; background-color: #000; }
@@ -104,6 +117,28 @@
 }
 
 /* Aviso obligatorio: Luna lisa (ADR-011) */
+/* Indicador de bloqueo (cielo): bajo el centro, cuando la vista sigue a un cuerpo. Clic = soltar */
+.sky-lock {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, 64px);
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sky-lock[hidden] {
+  display: none;
+}
+
 .sky-smooth {
   position: absolute;
   right: 16px;
@@ -688,6 +723,17 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 }
 /* El puntero se ubica en % del tamaño de la imagen: sigue al mapa si se redimensiona */
 .sky-map__stage { position: relative; cursor: crosshair; touch-action: manipulation; }
+/* Overlay de debug (?debug): FPS y estadísticas del render 3D */
+.sky-debug {
+  position: absolute; top: 8px; left: 8px; z-index: 30; min-width: 220px;
+  padding: 6px 8px; border-radius: 4px; background: rgba(0, 0, 0, 0.72); color: #cfe;
+  font: 11px/1.5 ui-monospace, Consolas, monospace; pointer-events: auto;
+}
+.sky-debug[hidden] { display: none; }
+.sky-debug__title { color: #8ab; margin-bottom: 2px; }
+.sky-debug__row { display: flex; justify-content: space-between; gap: 12px; }
+.sky-debug__row b { font-weight: 600; color: #fff; }
+.sky-debug__check input { margin: 0; }
 .sky-map__marker {
   position: absolute;
   width: 16px;

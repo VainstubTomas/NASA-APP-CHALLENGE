@@ -190,6 +190,8 @@
   "sky.below": "{value}° bajo el horizonte",
   "sky.blocked": "{value}° sobre el horizonte, tapado por el relieve",
   "sky.goTo": "Girar hacia {body} (azimut {az}°)",
+  "sky.lock.sun": "Fijado al Sol · clic para soltar",
+  "sky.lock.earth": "Fijado a la Tierra · clic para soltar",
   "sky.slider": "Mové la fecha · {site}",
   "sky.cd.sunSets": "El Sol se pone en",
   "sky.cd.sunRises": "El Sol sale en",
