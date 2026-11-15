@@ -15,7 +15,7 @@ Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y 
 
 Además, una **API en vivo** (FastAPI, [`data/api/`](data/api/)) permite elegir cualquier latitud y longitud de la Luna: consulta a Horizons y responde en el mismo formato. Es opcional; sin ella la web usa solo los sitios precalculados. Guía: [`docs/09-API.md`](docs/09-API.md).
 
-En la vista del cielo, la silueta del horizonte es relieve real (LOLA) en los sitios con datos de elevación, y se ilumina con el Sol y la Tierra en el momento elegido. El suelo dibujado debajo del horizonte (cráteres y textura) es **ilustrativo**, no topografía real (ADR-016).
+En la vista del cielo, la silueta del horizonte es relieve real (LOLA) en los sitios con datos de elevación, y se ilumina con el Sol y la Tierra en el momento elegido. El suelo dibujado debajo del horizonte (cráteres y textura) es **ilustrativo**, no topografía real (ADR-016). Las estrellas también son decorativas: su giro con la fecha es aproximado y no sale de Horizons. Al cambiar la fecha, el Sol y la Tierra se deslizan 600 ms entre dos muestras reales, y los números terminan en el valor de Horizons.
 
 **La comparación de escenarios no elige un ganador.** Pone 2 o 3 escenarios de sitio y fecha lado a lado y, por cada métrica por separado, marca cuál tiene más horas de Sol (energía) y cuál más horas con la Tierra visible (comunicación). Cuál conviene depende de los requisitos de la misión, así que esa decisión la toma la persona que usa la herramienta (ADR-017).
 
