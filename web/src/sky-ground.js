@@ -278,18 +278,37 @@ export function createGround(container) {
   container.append(renderer.domElement);
 
   // Fracción visible del disco (0 = bajo el horizonte, 1 = entero arriba)
-  const size = { w: 0, h: 0 }; // último tamaño aplicado al canvas
+  const size = { w: 0, h: 0, ratio: 0 }; // último tamaño aplicado al canvas
 
   const visibleFraction = (el, r) => Math.min(1, Math.max(0, (el + r) / (2 * r)));
 
-  return {
-    render({ width, groundHeight, pxPerDeg, heading, sun, earth, radii }) {
-      if (groundHeight < 1 || width < 1) return;
+  // Resolución adaptativa: mientras se arrastra (cuadros seguidos) se dibuja a ratio 1, que en una
+  // GPU integrada cuesta ~2,25 veces menos que 1,5; al soltar, un cuadro final a calidad completa.
+  const FULL_RATIO = Math.min(window.devicePixelRatio || 1, 1.5);
+  const BUSY_MS = 120; // dos render() separados por menos que esto cuentan como movimiento
+  const SETTLE_MS = 180;
+  let lastRenderAt = 0;
+  let lastArgs = null;
+  let settleTimer = 0;
+
+  function render(args, forceFull = false) {
+    const { width, groundHeight, pxPerDeg, heading, sun, earth, radii } = args;
+    if (groundHeight < 1 || width < 1) return;
+    const now = performance.now();
+    const busy = !forceFull && now - lastRenderAt < BUSY_MS;
+    lastRenderAt = now;
+    lastArgs = args;
+    clearTimeout(settleTimer);
+    if (busy && FULL_RATIO > 1) settleTimer = setTimeout(() => render(lastArgs, true), SETTLE_MS);
+    const ratio = busy ? 1 : FULL_RATIO;
+    {
       const cam = groundCamera({ width, groundHeight, pxPerDeg });
       // setSize reasigna canvas.width/height, lo que borra el buffer: solo si el tamaño cambió.
-      if (width !== size.w || groundHeight !== size.h) {
+      if (width !== size.w || groundHeight !== size.h || ratio !== size.ratio) {
         size.w = width;
         size.h = groundHeight;
+        size.ratio = ratio;
+        renderer.setPixelRatio(ratio);
         renderer.setSize(width, groundHeight, false);
         renderer.domElement.style.width = `${width}px`;
         renderer.domElement.style.height = `${groundHeight}px`;
@@ -314,6 +333,8 @@ export function createGround(container) {
       // no se modela); acá se realza a propósito para que la noche no quede totalmente negra.
       setLight(earth, uniforms.earthDir, uniforms.earthI, 0.06, radii?.earth ?? 1);
       renderer.render(scene, camera);
-    },
-  };
+    }
+  }
+
+  return { render: (args) => render(args) };
 }
