@@ -9,10 +9,10 @@
 import * as THREE from 'three';
 import { directionFromAzEl } from './dials-core.js';
 import { EYE_M, MAX_HEIGHT_M, createTerrain, curvatureDrop, groundCamera } from './sky-terrain-core.js';
-import { FINE_N, pickRingCount, stitchRings, ringToleranceM } from './sky-mesh-core.js';
 import { needsMaskBake } from './sky-core.js';
 
 const RINGS = 220; // anillos de la malla, más densos cerca del observador
+const SEGMENTS = 540; // divisiones alrededor de cada anillo
 const R_MIN = 0.6;
 const R_MAX = 4200; // más allá del horizonte geométrico (~2,4 km)
 const NEAR_SIZE = 512; // m: mapa de alturas fino (1 m por texel) para las sombras cercanas
@@ -235,35 +235,23 @@ function heightTexture(terrain, sizeM, res, linear) {
 }
 
 /**
- * Malla en anillos (más densos cerca) con cantidad de segmentos adaptativa por anillo: donde la
- * altura casi no cambia usa 135, donde hay cráteres usa hasta 540 (ver sky-mesh-core.js). Los
- * anillos vecinos de distinta cantidad se unen con stitchRings, sin grietas.
+ * Malla en anillos (más densos cerca) con SEGMENTS divisiones fijas por anillo.
  */
 function terrainMesh(terrain, material) {
-  const maxVerts = (RINGS + 1) * FINE_N;
-  const pos = new Float32Array(maxVerts * 3);
-  const hRaw = new Float32Array(maxVerts);
-  const albedo = new Float32Array(maxVerts * 3);
+  const count = (RINGS + 1) * SEGMENTS;
+  const pos = new Float32Array(count * 3);
+  const hRaw = new Float32Array(count);
+  const albedo = new Float32Array(count * 3);
   // Tono del suelo: gris de las tierras altas, con manchas suaves y eyecta clara en cráteres frescos
   const fresh = terrain.craters.filter((c) => c.fresh > 0.75);
-  const fineH = new Float32Array(FINE_N);
-  const rings = [];
   let v = 0;
   for (let ring = 0; ring <= RINGS; ring += 1) {
     const r = R_MIN * (R_MAX / R_MIN) ** (ring / RINGS);
-    for (let k = 0; k < FINE_N; k += 1) {
-      const a = (k / FINE_N) * Math.PI * 2;
-      fineH[k] = terrain.height(r * Math.sin(a), -r * Math.cos(a));
-    }
-    const n = pickRingCount(fineH, FINE_N, ringToleranceM(r));
-    const step = FINE_N / n;
-    rings.push({ base: v, n, step });
-    for (let s = 0; s < n; s += 1) {
-      const k = s * step;
-      const a = (k / FINE_N) * Math.PI * 2;
+    for (let s = 0; s < SEGMENTS; s += 1) {
+      const a = (s / SEGMENTS) * Math.PI * 2;
       const x = r * Math.sin(a);
       const z = -r * Math.cos(a);
-      const h = fineH[k];
+      const h = terrain.height(x, z);
       pos[v * 3] = x;
       pos[v * 3 + 1] = h - curvatureDrop(r) - EYE_M; // el observador está en y = 0
       pos[v * 3 + 2] = z;
@@ -281,13 +269,19 @@ function terrainMesh(terrain, material) {
   }
   const index = [];
   for (let ring = 0; ring < RINGS; ring += 1) {
-    // Sentido antihorario visto desde arriba: normales hacia +y (arriba) y caras visibles
-    stitchRings(rings[ring], rings[ring + 1], index);
+    for (let s = 0; s < SEGMENTS; s += 1) {
+      const a = ring * SEGMENTS + s;
+      const b = ring * SEGMENTS + ((s + 1) % SEGMENTS);
+      const c = a + SEGMENTS;
+      const d = b + SEGMENTS;
+      // Sentido antihorario visto desde arriba: normales hacia +y (arriba) y caras visibles
+      index.push(a, b, c, b, d, c);
+    }
   }
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos.subarray(0, v * 3), 3));
-  geo.setAttribute('hRaw', new THREE.BufferAttribute(hRaw.subarray(0, v), 1));
-  geo.setAttribute('albedo', new THREE.BufferAttribute(albedo.subarray(0, v * 3), 3));
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute('hRaw', new THREE.BufferAttribute(hRaw, 1));
+  geo.setAttribute('albedo', new THREE.BufferAttribute(albedo, 3));
   geo.setIndex(index);
   geo.computeVertexNormals();
   return new THREE.Mesh(geo, material);
