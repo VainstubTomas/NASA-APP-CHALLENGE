@@ -261,6 +261,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   const nadirTilt = (v, k) => tiltMin(v.horizonY, k, v.height - 90 * k);
 
   // --- Dibujo de la vista ---
+  let lastTicksKey = null;
   function drawStage() {
     const v = view();
     const k = pxPerDeg(v.width, fov);
@@ -269,7 +270,10 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     drawStars(v, k, hy);
     drawSkyline(v, k, hy);
     scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
-    for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
+    const top = `${hy}px`;
+    for (const node of [ground, horizon, ticks, headingLabel, smooth]) {
+      if (node.style.top !== top) node.style.top = top;
+    }
     if (groundPano) {
       // Panorama de 360° ya en perspectiva: columna = azimut, fila = grados bajo el horizonte
       ground.style.backgroundSize = `${360 * k}px ${(PANO_DEP_MAX_DEG - PANO_DEP_MIN_DEG) * k}px`;
@@ -287,16 +291,24 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
 
     // Brújula sobre la línea
-    ticks.replaceChildren();
-    for (const tk of compassTicks(heading, fov)) {
-      const mark = el('span', `sky-tick${tk.point ? ' sky-tick--major' : ''}`);
-      mark.style.left = `${v.width / 2 + tk.rel * k}px`;
+    // Solo se reconstruyen si cambian posiciones (0,5 px) o etiquetas: mirando fijo al suelo no se toca el DOM.
+    const marks = compassTicks(heading, fov).map((tk) => ({
+      left: Math.round((v.width / 2 + tk.rel * k) * 2) / 2,
+      major: Boolean(tk.point),
       // Sin etiqueta cerca del centro: ahí ya está el rumbo actual en grande.
       // y tampoco si es el mismo punto cardinal que el rumbo central (dos "E" juntas confunden).
-      if (tk.point && Math.abs(tk.rel) * k > 70 && tk.point !== compassLabel(heading)) {
-        mark.dataset.label = t(`compass.${tk.point}`);
+      label: tk.point && Math.abs(tk.rel) * k > 70 && tk.point !== compassLabel(heading) ? t(`compass.${tk.point}`) : '',
+    }));
+    const ticksKey = marks.map((m) => `${m.left}${m.major ? 'M' : ''}${m.label}`).join('|');
+    if (ticksKey !== lastTicksKey) {
+      lastTicksKey = ticksKey;
+      ticks.replaceChildren();
+      for (const m of marks) {
+        const mark = el('span', `sky-tick${m.major ? ' sky-tick--major' : ''}`);
+        mark.style.left = `${m.left}px`;
+        if (m.label) mark.dataset.label = m.label;
+        ticks.append(mark);
       }
-      ticks.append(mark);
     }
     headingName.textContent = t(`compass.${compassLabel(heading)}`);
     headingDeg.textContent = `${Math.round(normAz(heading))}°`;
@@ -316,9 +328,12 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   // Suelo 3D ilustrativo (sky-ground.js, three.js): se carga después del primer dibujo. Hasta
   // entonces, o si el navegador no tiene WebGL2, queda la textura plana del Figma.
   let ground3d = null;
+  // Si nada de lo que pinta el suelo cambió (mirada, tamaño, Sol, Tierra), no se vuelve a renderizar:
+  // el WebGL a pantalla completa es lo más caro cuando se mira hacia el suelo.
+  let groundKey = '';
   function drawGround(v, k, hy) {
     if (!ground3d) return;
-    ground3d.render({
+    const args = {
       width: Math.round(v.width),
       groundHeight: Math.max(0, Math.round(v.height - hy)),
       pxPerDeg: k,
@@ -326,7 +341,12 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
       sun: pose?.sun ?? null,
       earth: pose?.earth ?? null,
       radii: data?.ephemeris?.angular_radius_deg,
-    });
+    };
+    const key = [args.width, args.groundHeight, k, heading, args.sun?.azimuth_deg, args.sun?.elevation_deg,
+      args.earth?.azimuth_deg, args.earth?.elevation_deg, args.radii?.sun, args.radii?.earth].join('|');
+    if (key === groundKey) return;
+    groundKey = key;
+    ground3d.render(args);
   }
   setTimeout(() => {
     import('./sky-ground.js')
