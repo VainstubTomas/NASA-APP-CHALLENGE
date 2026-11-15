@@ -27,13 +27,16 @@ import { initSkyPanel } from './sky-panel.js';
 import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter, tiltToCenter,
-  tweenPose,
+  compassTicks, shortDuration, chartRange, chartXToAz, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter, tiltToCenter,
+  tweenPose, countdownAction,
 } from './sky-core.js';
 
 /** Duración del movimiento de Sol, Tierra y suelo al cambiar la fecha o la hora. */
 const MOVE_MS = 600;
 
+// Márgenes horizontales del gráfico de 360° (en unidades del viewBox).
+const CHART_X0 = 44;
+const CHART_X1 = 704;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // Altura del horizonte en la pantalla (fracción del alto), como en el Figma: 1082 / 1346.
 const HORIZON_FRACTION = 0.8;
@@ -91,12 +94,13 @@ function createBody(key) {
  * @param {object} opts
  * @param {{minMs:number, maxMs:number}} opts.range rango de fechas del selector
  * @param {(ms:number) => void} opts.onTime el deslizador pide un instante nuevo
+ * @param {() => void} [opts.onMissionExit] la persona pide salir del modo misión (ADR-019)
  * @param {() => boolean} [opts.isLive] hay una posición libre (API): el deslizador pide recién al soltarse
  * @param {() => void} [opts.onUserInput] la persona tocó la fecha (pausar el reproductor)
  * @param {HTMLElement} [opts.drawer] cajón "Más información" (Figma frame 2)
  * @param {boolean} [opts.liveEnabled] hay API en vivo (ubicación específica)
  */
-export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
+export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
   const panelEl = root.querySelector('#sky-panel');
 
   // --- Escenario: cielo, suelo, horizonte ---
@@ -183,13 +187,19 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   slider.max = String(timeToSlider(range.maxMs, range.minMs));
   slider.step = '1';
   const when = el('p', 'sky-time__when');
-  time.append(timeLabel, slider, when);
+  // Modo misión (ADR-019): aviso con la hora del alunizaje y botón para volver a las fechas actuales.
+  const missionBar = el('div', 'sky-time__mission');
+  const missionText = el('span', 'sky-time__mission-text');
+  const missionExit = el('button', 'sky-time__mission-exit');
+  missionExit.type = 'button';
+  missionBar.append(missionText, missionExit);
+  missionBar.hidden = true;
+  time.append(timeLabel, slider, when, missionBar);
   topLeft.append(brandRow, time);
 
   // --- Arriba a la derecha: cuenta regresiva ---
   const topRight = el('div', 'sky-topright');
   const countdown = el('div', 'sky-countdown');
-  countdown.setAttribute('role', 'status');
   topRight.append(countdown);
 
   // --- Abajo a la izquierda: horizonte de 360° ---
@@ -510,8 +520,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   // --- Gráfico de 360° (como "Cómo leer los números" del artifact) ---
   function drawChart() {
     chart.replaceChildren();
-    const X0 = 44;
-    const X1 = 704;
+    const X0 = CHART_X0;
+    const X1 = CHART_X1;
     const Y0 = 14;
     const Y1 = 160;
     const sample = data?.sample;
@@ -583,10 +593,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (!data?.sample) return;
     const rows = ['sun', 'earth'].map((key) => {
       const change = nextVisibilityChange(data.ephemeris, data.utcMs, key, horizonFn());
-      const row = el('p', `sky-cd sky-cd--${key}`);
+      // Cada fila es un botón: salta a la salida o a la puesta del cuerpo, o gira la vista hacia él si no hay cruce.
+      const row = el('button', `sky-cd sky-cd--${key}`);
+      row.type = 'button';
       const text = el('span', 'sky-cd__text');
       const value = el('span', 'sky-cd__value');
       row.append(el('span', 'sky-cd__dot'), text, value);
+      row.addEventListener('click', () => activateCountdown(key, change));
+      row.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
+      row.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
       countdown.append(row);
       if (!change?.event) {
         // Sin cruce del horizonte en los datos: queda siempre visible o nunca, según el estado de ahora.
@@ -606,6 +621,58 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     };
     tick();
     if (rows.length) cdTimer = setInterval(tick, 1000);
+  }
+
+  function drawMission(landingMs) {
+    missionBar.hidden = landingMs == null;
+    if (landingMs == null) return;
+    missionText.textContent = t('sky.mission.badge', { landing: fmtUtc(landingMs) });
+    missionExit.textContent = t('sky.mission.back');
+  }
+  missionExit.addEventListener('click', () => {
+    onUserInput?.();
+    onMissionExit?.();
+  });
+
+  // Clic en la cuenta regresiva: salto animado a la salida del cuerpo, o solo girar si ya está visible.
+  let timeAnim = null;
+  const cancelTimeAnim = () => {
+    if (timeAnim) cancelAnimationFrame(timeAnim);
+    timeAnim = null;
+  };
+  // Mueve la fecha en pantalla sin pedirla todavía: cada cuadro recalcula la posición de los cuerpos.
+  function previewTime(ms) {
+    data = { ...data, utcMs: ms, sample: sampleAt(data.ephemeris, ms) };
+    drawTime();
+    draw();
+  }
+  function animateTime(targetMs, key) {
+    cancelTimeAnim();
+    const startMs = data.utcMs;
+    const delta = targetMs - startMs;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduce ? 0 : 900;
+    const t0 = performance.now();
+    const step = (now) => {
+      const f = dur ? Math.min(1, (now - t0) / dur) : 1;
+      if (f < 1) {
+        const e = 1 - (1 - f) ** 3;
+        previewTime(Math.round(startMs + delta * e));
+        timeAnim = requestAnimationFrame(step);
+        return;
+      }
+      timeAnim = null;
+      previewTime(targetMs);
+      onTime(targetMs);
+      lookAt(key, true);
+    };
+    timeAnim = requestAnimationFrame(step);
+  }
+  function activateCountdown(key, change) {
+    if (!data?.sample) return;
+    const action = countdownAction(change);
+    if (action.type === 'jump') animateTime(action.ms, key);
+    else lookAt(key, true);
   }
 
   function drawTime() {
@@ -781,6 +848,32 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   stage.addEventListener('pointerup', endDrag);
   stage.addEventListener('pointercancel', endDrag);
 
+  // Gráfico de 360°: clic o arrastre centra la cámara en ese azimut (mismo efecto que arrastrar el cielo).
+  let chartDrag = false;
+  const chartPointToAz = (e) => {
+    const m = chart.getScreenCTM();
+    if (!m) return null;
+    const x = (e.clientX - m.e) / m.a; // px de pantalla → unidades del viewBox
+    return chartXToAz(x, CHART_X0, CHART_X1);
+  };
+  const aimFromChart = (e) => {
+    const az = chartPointToAz(e);
+    if (az == null) return;
+    if (anim) cancelAnimationFrame(anim);
+    heading = az;
+    draw();
+  };
+  chart.addEventListener('pointerdown', (e) => {
+    chartDrag = true;
+    chart.setPointerCapture(e.pointerId);
+    chartBox.classList.add('is-dragging');
+    aimFromChart(e);
+  });
+  chart.addEventListener('pointermove', (e) => { if (chartDrag) aimFromChart(e); });
+  const endChartDrag = () => { chartDrag = false; chartBox.classList.remove('is-dragging'); };
+  chart.addEventListener('pointerup', endChartDrag);
+  chart.addEventListener('pointercancel', endChartDrag);
+
   // Zoom con la rueda del mouse (o el gesto de pellizcar del touchpad)
   stage.addEventListener('wheel', (e) => {
     e.preventDefault();
@@ -820,6 +913,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   // Con una posición libre (API en vivo) cada instante nuevo es una consulta: mientras se arrastra
   // solo se actualiza la fecha en pantalla y se pide una vez, al soltar.
   slider.addEventListener('input', () => {
+    cancelTimeAnim();
     onUserInput?.();
     const ms = sliderToTime(slider.value, range.minMs, range.maxMs);
     if (isLive()) {
@@ -897,6 +991,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       drawTime();
       drawCountdown();
       draw();
+    },
+    /**
+     * Cambia el rango del deslizador (ADR-019): en modo misión es la ventana alrededor del alunizaje
+     * (`landingMs`); fuera de él, el rango normal. El instante se redibuja con el próximo `update`.
+     */
+    setRange({ minMs, maxMs, mission = false, landingMs = null }) {
+      range = { minMs, maxMs };
+      slider.max = String(timeToSlider(maxMs, minMs));
+      drawMission(mission ? landingMs : null);
     },
     /** Loader central mientras se consulta la API: bloquea la vista y el deslizador. */
     setLoading(on) {

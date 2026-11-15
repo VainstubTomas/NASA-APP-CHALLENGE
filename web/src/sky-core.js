@@ -260,3 +260,25 @@ export function needsMaskBake(prev, next, eps = 1e-4) {
   if (!prev) return true;
   return next.some((v, i) => Math.abs(v - prev[i]) > eps);
 }
+
+/**
+ * Azimut (0° a 360°) que corresponde a una posición horizontal del gráfico de 360°.
+ * x0 y x1 son los bordes del gráfico en las mismas unidades que x; fuera de ellos se recorta al borde.
+ */
+export function chartXToAz(x, x0, x1) {
+  const f = Math.max(0, Math.min(1, (x - x0) / (x1 - x0)));
+  return normAz(f * 360);
+}
+
+/**
+ * Qué hace el clic en un indicador de la cuenta regresiva (Sol o Tierra).
+ * Con un cruce del horizonte en los datos salta a ese momento (`atMs`): la primera hora con el cuerpo
+ * visible si está oculto (sale), o la primera hora con el cuerpo ya oculto si está visible (se pone).
+ * Sin cruce en los datos: solo gira la vista hacia el cuerpo.
+ * @param {{visible:boolean, event:string|null, atMs:number|null}|null} change resultado de nextVisibilityChange
+ * @returns {{type:'jump', ms:number} | {type:'look'}}
+ */
+export function countdownAction(change) {
+  if (change?.event && change.atMs != null) return { type: 'jump', ms: change.atMs };
+  return { type: 'look' };
+}

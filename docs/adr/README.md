@@ -26,5 +26,6 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | [016](ADR-016-vista-3d-del-cielo.md) | Vista 3D del cielo con el horizonte liso (el render del terreno sigue fuera de alcance) | Propuesto |
 | [017](ADR-017-comparacion-sin-veredicto.md) | La comparación no elige un "mejor": marca más Sol y más Tierra y decide la persona | Propuesto |
 | [018](ADR-018-relieve-en-vivo.md) | Relieve real para una posición libre: `GET /horizon` en la API y el loader espera el relieve | Propuesto |
+| [019](ADR-019-ventana-de-mision.md) | Ir al día de una misión histórica con una ventana de efemérides precalculada (`mission.json`, ±3 días) | Propuesto |
 
 Estados: Propuesto, Aceptado, Reemplazado.

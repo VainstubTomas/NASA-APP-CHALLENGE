@@ -87,12 +87,13 @@ function scenarioTable(items, leaders) {
   const tbody = el('tbody');
   for (const [key, fn, numeric, metric] of rows) {
     const tr = el('tr');
-    const th = el('th', 'info-table__key', t(key, { days: WINDOW_DAYS }));
+    const th = el('th', ['info-table__key', metric ? `compare-table__${metric}` : ''].filter(Boolean).join(' '), t(key, { days: WINDOW_DAYS }));
     th.scope = 'row';
     tr.append(th);
     for (const item of items) {
       const more = metric !== null && leaders[metric].includes(item.id);
-      const td = el('td', numeric ? 'info-num' : '');
+      // Horas con Sol en amarillo y con la Tierra en celeste, como en el cielo y el panel.
+      const td = el('td', [numeric ? 'info-num' : '', metric ? `compare-table__${metric}` : ''].filter(Boolean).join(' '));
       // El valor mayor va en negrita (<strong>), sin texto extra.
       td.append(more ? el('strong', 'compare-table__more', fn(item)) : document.createTextNode(fn(item)));
       tr.append(td);

@@ -23,6 +23,11 @@
         <div class="sky-pane field" data-pane="historical" hidden>
           <label for="sky-site" data-i18n="sky.panel.historical"></label>
           <select id="sky-site"></select>
+          <!-- ADR-019: las misiones con fecha de alunizaje ofrecen ir a ese día (ventana de ±3 días). -->
+          <div class="sky-mission" data-mission hidden>
+            <button type="button" class="sky-mission__go" data-mission-go data-i18n="sky.panel.missionGo"></button>
+            <p class="field-hint" data-mission-hint></p>
+          </div>
         </div>
         <div class="sky-pane" data-pane="location" hidden>
           <section id="live" class="live" hidden></section>
@@ -72,8 +77,8 @@
 
       <main>
         <p id="notice" hidden></p>
-        <section id="panel" aria-live="polite"></section>
         <section id="timeline"></section>
+        <section id="panel" aria-live="polite"></section>
         <section id="compare" class="compare" aria-live="polite"></section>
 
         <details class="validation">

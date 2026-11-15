@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, groundLight, pointerAngle, nearCenter, tiltToCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, chartXToAz, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, groundLight, pointerAngle, nearCenter, tiltToCenter, countdownAction,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -243,4 +243,27 @@ test('tiltToCenter deja el cuerpo a media pantalla, también con el zoom máximo
     const p = project({ azimuth_deg: 90, elevation_deg: elevation }, { heading: 90, tilt, width, horizonY, fov: FOV_MIN_DEG });
     assert.ok(Math.abs(p.y - height / 2) < 1e-9, `elevación ${elevation}°: y=${p.y}`);
   }
+});
+
+test('chartXToAz traduce la posición en el gráfico a azimut y recorta en los bordes', () => {
+  assert.equal(chartXToAz(44, 44, 704), 0);
+  assert.equal(chartXToAz(374, 44, 704), 180);
+  assert.equal(chartXToAz(539, 44, 704), 270);
+  assert.equal(chartXToAz(0, 44, 704), 0); // a la izquierda del gráfico
+  assert.equal(chartXToAz(900, 44, 704), 0); // 360° es el mismo norte: normAz lo deja en 0
+});
+
+test('countdownAction: clic en un cuerpo oculto que sale salta a su salida', () => {
+  const change = { visible: false, event: 'rises', atMs: 1_700_000_000_000, crossMs: 1_699_999_000_000 };
+  assert.deepEqual(countdownAction(change), { type: 'jump', ms: 1_700_000_000_000 });
+});
+
+test('countdownAction: clic en un cuerpo visible que se pone salta a su puesta', () => {
+  const change = { visible: true, event: 'sets', atMs: 1_700_000_000_000, crossMs: 1_699_999_000_000 };
+  assert.deepEqual(countdownAction(change), { type: 'jump', ms: 1_700_000_000_000 });
+});
+
+test('countdownAction: sin cruce en los datos solo gira la vista', () => {
+  assert.deepEqual(countdownAction({ visible: false, event: null, atMs: null, crossMs: null }), { type: 'look' });
+  assert.deepEqual(countdownAction(null), { type: 'look' });
 });
