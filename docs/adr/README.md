@@ -20,5 +20,7 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | [010](ADR-010-automatizacion-cierre-issues.md) | Action post-merge que cierra issues y seguimiento entre los proyectos "Hackaton" y "Main migrate" | Propuesto |
 | [011](ADR-011-luna-lisa-fecha-relieve-al-final.md) | Luna lisa primero, fecha desde el inicio y relieve al final (capa 5) | Propuesto |
 | [012](ADR-012-premio-objetivo.md) | Premio objetivo: Best Use of Data y, en segundo lugar, Best Use of Science | Propuesto |
+| [013](ADR-013-validation-json-para-el-panel.md) | validation.json en data/public/ para el panel de validación (C3-06) | Propuesto |
+| [014](ADR-014-criterio-comparacion-escenarios.md) | Criterio de "cuál conviene" en la comparación de escenarios (Sol, luego Tierra) | Propuesto |
 
 Estados: Propuesto, Aceptado, Reemplazado.

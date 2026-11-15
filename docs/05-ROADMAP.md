@@ -101,6 +101,7 @@ Orden: primero los extras y **último de todo el relieve** (ADR-011).
 | E-01 | Repo listo para entrega: README final y limpieza de datos sintéticos | Producto | S |
 | E-02 | Guion de la demo y ensayo | Producto | M |
 | E-03 | Presentación y video de respaldo | Producto | M |
+| E-04 | Diapositiva Luna frente a Tierra: horas de Sol en un sitio lunar y en una ciudad | Producto | S |
 
 ## Cómo se divide el trabajo
 

@@ -13,3 +13,27 @@ import { createFetchJson, createSiteLoader } from './data-core.js';
 const loader = createSiteLoader(createFetchJson(import.meta.env.BASE_URL, (url) => fetch(url)));
 
 export const { loadSite, loadSites } = loader;
+
+// Panel de validación (#39, ADR-013): valores de referencia de Horizons y horas de metrics.json.
+const fetchJson = createFetchJson(import.meta.env.BASE_URL, (url) => fetch(url));
+let validationPromise = null;
+
+/** validation.json (una sola descarga; si falla, el próximo pedido reintenta). */
+export function loadValidation() {
+  if (!validationPromise) {
+    validationPromise = fetchJson('validation.json').catch((err) => {
+      validationPromise = null;
+      throw err;
+    });
+  }
+  return validationPromise;
+}
+
+/** metrics.json del sitio, o null si todavía no existe (pendiente C3-01). */
+export async function loadMetrics(siteId) {
+  try {
+    return await fetchJson(`sites/${siteId}/metrics.json`);
+  } catch {
+    return null;
+  }
+}

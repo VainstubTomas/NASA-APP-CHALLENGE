@@ -8,6 +8,7 @@ import { statusAgainstHorizon } from './horizon.js';
 import { t, locale } from './i18n.js';
 import { sunIcon, earthIcon } from './icons.js';
 import { compassChart, elevationRuler } from './dials.js';
+import { renderCountdown, stopCountdown } from './countdown.js';
 
 const fmtDeg = (value, decimals) => {
   // Evita mostrar "-0,0°": si redondeado da cero, se muestra como cero.
@@ -76,7 +77,14 @@ function loadViewer() {
   return viewerPromise;
 }
 
+/** Limpia el panel y detiene el contador (cuando no hay datos que mostrar). */
+export function clearPanel(container) {
+  stopCountdown();
+  container.replaceChildren();
+}
+
 export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) {
+  stopCountdown();
   container.replaceChildren();
   container.classList.add('panel');
 
@@ -127,5 +135,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) 
 
   const note = el('p', 'panel-note', t('panel.note'));
 
-  container.append(header, dials, hint, cards, note);
+  container.append(header, dials, hint, cards);
+  renderCountdown(container, { ephemeris, horizon, utcMs: sample.utcMs });
+  container.append(note);
 }
