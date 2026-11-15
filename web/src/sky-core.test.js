@@ -130,7 +130,7 @@ test('applyPlan: ubicación específica fija la fecha y después consulta la API
     { type: 'live' },
   ]);
   assert.deepEqual(applyPlan({ mode: 'location', current, chosen: { ...current } }), [{ type: 'live' }]);
-  assert.deepEqual(applyPlan({ mode: 'map', current, chosen: { ...current } }), []);
+  assert.deepEqual(applyPlan({ mode: 'map', current, chosen: { ...current } }), [{ type: 'live' }]);
   assert.deepEqual(applyPlan({ mode: null, current, chosen: { ...current } }), []);
 });
 

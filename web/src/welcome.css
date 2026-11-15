@@ -1,0 +1,127 @@
+/* Modal de bienvenida: vidrio azul espacial (el azul del logo de NASA Space Apps, #1e2b80) */
+.welcome {
+  --welcome-blue: 30, 43, 128;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(var(--welcome-blue), 0.35), rgba(2, 4, 20, 0.78) 70%);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+  animation: welcome-fade 0.35s ease-out both;
+}
+.welcome.is-closing { animation: welcome-fade 0.25s ease-in reverse both; }
+
+.welcome__card {
+  position: relative;
+  box-sizing: border-box;
+  width: min(580px, 100%);
+  max-height: calc(100svh - 32px);
+  overflow: auto;
+  padding: 40px clamp(22px, 5vw, 44px) 34px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 26px;
+  color: #fff;
+  text-align: center;
+  /* vidrio: azul translúcido con brillo arriba a la izquierda y desenfoque de lo que hay detrás */
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(140, 165, 255, 0.28), transparent 55%),
+    linear-gradient(150deg, rgba(58, 80, 205, 0.5), rgba(var(--welcome-blue), 0.62) 48%, rgba(12, 18, 70, 0.72));
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  backdrop-filter: blur(24px) saturate(165%);
+  box-shadow:
+    0 28px 90px rgba(3, 6, 40, 0.7),
+    0 0 60px rgba(70, 100, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 0 70px rgba(120, 150, 255, 0.12);
+  animation: welcome-rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+/* Estrellas sutiles dentro del vidrio */
+.welcome__card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.8;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 18%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 28% 72%, rgba(255, 255, 255, 0.85), transparent 60%),
+    radial-gradient(1.6px 1.6px at 46% 10%, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 63% 84%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1.3px 1.3px at 78% 26%, #fff, transparent 60%),
+    radial-gradient(1px 1px at 90% 62%, rgba(255, 255, 255, 0.85), transparent 60%),
+    radial-gradient(1px 1px at 6% 52%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1.2px 1.2px at 54% 48%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 35% 38%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1.2px 1.2px at 84% 92%, rgba(255, 255, 255, 0.7), transparent 60%);
+}
+.welcome__card > * { position: relative; }
+
+.welcome__close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0 0 3px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font: 400 26px/1 var(--font-sky, system-ui, sans-serif);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.welcome__close:hover { background: rgba(255, 255, 255, 0.24); transform: scale(1.06); }
+.welcome__close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+.welcome__logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 24px);
+  margin-bottom: 26px;
+}
+.welcome__viz {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: clamp(64px, 14vw, 84px);
+  height: clamp(64px, 14vw, 84px);
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25), 0 6px 22px rgba(0, 0, 0, 0.4);
+}
+.welcome__viz img { width: 100%; height: 100%; object-fit: contain; }
+.welcome__sep { width: 1px; height: clamp(48px, 10vw, 64px); background: rgba(255, 255, 255, 0.35); }
+.welcome__nasa { height: clamp(52px, 11vw, 72px); width: auto; filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35)); }
+
+.welcome__title {
+  margin: 0 0 14px;
+  font-size: clamp(24px, 5.2vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 18px rgba(100, 130, 255, 0.55);
+}
+.welcome__text {
+  margin: 0;
+  font-size: clamp(14.5px, 2.8vw, 16.5px);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+@keyframes welcome-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes welcome-rise {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome, .welcome__card, .welcome.is-closing { animation: none; }
+}

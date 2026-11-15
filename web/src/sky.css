@@ -410,11 +410,13 @@
   font-size: 13px;
   color: var(--sky-text-dim);
 }
-.sky-cd { margin: 0; display: flex; align-items: baseline; gap: 8px; }
+.sky-cd { margin: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; }
 .sky-cd__dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; opacity: 0.45; }
 .sky-cd.is-visible .sky-cd__dot { opacity: 1; }
 .sky-cd--sun .sky-cd__dot { background: var(--color-sun); }
 .sky-cd--earth .sky-cd__dot { background: var(--sky-earth); }
+/* Filas sin cuenta (siempre visible / no sale): sin hueco vacío a la derecha, el texto queda en el margen */
+.sky-cd__value:empty { display: none; }
 .sky-cd__value {
   min-width: 9.5em;
   text-align: right;
@@ -426,7 +428,7 @@
 /* Horizonte de 360° abajo a la izquierda: recuadro con borde blanco difuminado */
 .sky-chart {
   position: absolute;
-  left: clamp(64px, 5vw, 121px);
+  left: 20px; /* alineado con el bloque del slider (.sky-topleft) */
   bottom: 10px;
   height: calc(20% - 22px); /* entra en el suelo, debajo del horizonte */
   max-width: calc(100% - 140px);
@@ -539,9 +541,36 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1;
-  object-fit: contain;
+  user-select: none;
 }
+/* El puntero se ubica en % del tamaño de la imagen: sigue al mapa si se redimensiona */
+.sky-map__stage { position: relative; cursor: crosshair; touch-action: manipulation; }
+.sky-map__marker {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #e5202a;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.55), 0 0 10px 2px rgba(229, 32, 42, 0.8);
+  pointer-events: none;
+  animation: sky-map-drop 0.25s ease-out;
+}
+.sky-map__marker::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 2px solid #e5202a;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sky-map-pulse 1.8s ease-out infinite;
+}
+.sky-map__marker[hidden] { display: none; }
+@keyframes sky-map-drop { from { transform: scale(2.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes sky-map-pulse { 0% { transform: scale(0.6); opacity: 0.9; } 100% { transform: scale(1.8); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sky-map__marker, .sky-map__marker::after { animation: none; } }
+.sky-map__coords { margin: 0; min-height: 2.4em; font-size: 14px; font-variant-numeric: tabular-nums; color: #000; }
 .sky-map__image[hidden] { display: none; }
 .sky-map__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sky-map__label { margin: 0; font-size: 15px; }
@@ -599,7 +628,7 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 
 /* Pantallas angostas: el gráfico y la cuenta regresiva se acomodan */
 @media (max-width: 760px) {
-  .sky-chart { left: 8px; max-width: calc(100% - 16px); }
+  .sky-chart { left: 20px; max-width: calc(100% - 16px); }
   .sky-topright { top: auto; bottom: calc(20% + 56px); }
   .sky-countdown { font-size: 12px; }
   .sky-more { top: 30%; }
@@ -681,6 +710,14 @@ body.is-drawer-open .sky-drawer {
   cursor: progress;
 }
 .sky-loading[hidden] { display: none; }
+.sky-loading__box { display: grid; justify-items: center; gap: 12px; }
+.sky-loading__text {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  text-align: center;
+  text-shadow: 0 0 6px #000;
+}
 .sky-loading__ring {
   width: 44px;
   height: 44px;

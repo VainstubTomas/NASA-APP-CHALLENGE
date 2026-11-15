@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,13 +30,19 @@
         </div>
         <div class="sky-pane sky-map" data-pane="map" data-pole="south" hidden>
           <!-- Mapas de los polos (originales: psur.png y pnorte.png, achicados a 720 px). -->
-          <img class="sky-map__image" data-pole-image="south" src="./src/assets/sky/pole-south.png" data-i18n-label="sky.panel.poleSouthImage" alt="" />
-          <img class="sky-map__image" data-pole-image="north" src="./src/assets/sky/pole-north.png" data-i18n-label="sky.panel.poleNorthImage" alt="" hidden />
+          <!-- Proyección estereográfica polar hasta 55° de latitud: ver src/map-core.js. -->
+          <div class="sky-map__stage" data-map-stage>
+            <img class="sky-map__image" data-pole-image="south" src="./src/assets/sky/pole-south.png" data-i18n-label="sky.panel.poleSouthImage" alt="" draggable="false" />
+            <img class="sky-map__image" data-pole-image="north" src="./src/assets/sky/pole-north.png" data-i18n-label="sky.panel.poleNorthImage" alt="" draggable="false" hidden />
+            <span class="sky-map__marker" data-map-marker data-i18n-label="sky.panel.mapMarker" role="img" hidden></span>
+          </div>
+          <p class="sky-map__coords" data-map-coords aria-live="polite"></p>
           <div class="sky-map__row">
             <p class="sky-map__label" data-pole-label aria-live="polite" data-i18n="sky.panel.poleSouth"></p>
             <button type="button" class="sky-map__rotate" data-pole-rotate data-i18n="sky.panel.rotate"></button>
           </div>
-          <p class="sky-panel__note" data-i18n="sky.panel.soon"></p>
+          <p class="sky-panel__note" data-i18n="sky.panel.mapNote"></p>
+          <p class="sky-panel__note" data-no-api data-i18n="sky.panel.noApi" hidden></p>
         </div>
         <div class="sky-pane field" data-pane="date" hidden>
           <label for="sky-time" data-i18n="sky.panel.date"></label>

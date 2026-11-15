@@ -129,3 +129,16 @@ test('cuenta regresiva: crossMs interpola el cruce entre muestras horarias', () 
 test('cuenta regresiva: sin evento no hay crossMs', () => {
   assert.equal(nextVisibilityChange(mini, T0 + 5 * H, 'earth').crossMs, null);
 });
+
+test('cuenta regresiva: entre muestras usa el estado del instante pedido (no el de la muestra más cercana)', () => {
+  // Horizonte 0,5°: margen del Sol 0,25 en la muestra 2 y -0,15 en la 3; el cruce cae a 2,625 h.
+  // A las 2 h 45 min el Sol ya está oculto aunque la muestra más cercana (3 h) también lo está: sale, no se pone.
+  const after = nextVisibilityChange(mini, T0 + 2.75 * H, 'sun', 0.5);
+  assert.equal(after.visible, false);
+  assert.notEqual(after.event, 'sets');
+  // A las 2 h 15 min todavía está visible y se pone a las 2,625 h, a 0,375 h de distancia.
+  const before = nextVisibilityChange(mini, T0 + 2.25 * H, 'sun', 0.5);
+  assert.equal(before.visible, true);
+  assert.equal(before.event, 'sets');
+  assert.ok(Math.abs(before.crossMs - (T0 + 2.625 * H)) < 1);
+});

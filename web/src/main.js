@@ -11,8 +11,10 @@ import { initLive } from './live.js';
 import { createLiveLoader } from './live-core.js';
 import { initSky } from './sky.js';
 import { getRange } from './state.js';
+import { initWelcome } from './welcome.js';
 
 applyStaticTexts();
+initWelcome(); // modal de bienvenida (una vez por sesión)
 initLangSelect(document.getElementById('lang'));
 
 const panel = document.getElementById('panel');

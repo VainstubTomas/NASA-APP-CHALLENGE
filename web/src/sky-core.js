@@ -100,7 +100,7 @@ export function initialHeading(sun, earth, sunRadius, earthRadius) {
 
 /**
  * Qué hacer al tocar "Aplicar" en el panel de búsqueda (nada se aplica antes).
- * mode: 'historical' (sitio de sites.json), 'location' (latitud y longitud, API en vivo) o 'map'.
+ * mode: 'historical' (sitio de sites.json), 'location' (latitud y longitud, API en vivo) o 'map' (clic en el mapa).
  * current / chosen: { site, time } con time en el formato de <input type="datetime-local"> (UTC).
  * Devuelve los pasos en orden: { type: 'site' | 'time', value } y { type: 'live' } (consultar la API).
  */
@@ -110,7 +110,8 @@ export function applyPlan({ mode, current, chosen }) {
   if (mode === 'historical') {
     if (chosen.site && chosen.site !== current.site) steps.push({ type: 'site', value: chosen.site });
     if (timeChanged) steps.push({ type: 'time', value: chosen.time });
-  } else if (mode === 'location') {
+  } else if (mode === 'location' || mode === 'map') {
+    // El mapa completa latitud y longitud y, de ahí en adelante, es igual que la ubicación específica.
     if (timeChanged) steps.push({ type: 'time', value: chosen.time });
     steps.push({ type: 'live' });
   }

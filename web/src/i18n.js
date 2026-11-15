@@ -20,7 +20,7 @@ function storedLang() {
 }
 
 // `?lang=en` fuerza el idioma (link de la entrega a Space Apps, #110). Se lee una sola vez, al cargar.
-export const lang = detectLang(navigator.languages ?? [navigator.language], storedLang(), langFromSearch(window.location.search));
+export const lang = detectLang(storedLang(), langFromSearch(window.location.search));
 export const locale = LOCALES[lang];
 export const t = createTranslator(dicts, lang);
 

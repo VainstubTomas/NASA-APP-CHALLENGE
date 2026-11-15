@@ -129,7 +129,9 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   loading.hidden = true;
   loading.setAttribute('role', 'status');
   loading.setAttribute('aria-label', t('live.loading'));
-  loading.append(el('div', 'sky-loading__ring'));
+  const loadingBox = el('div', 'sky-loading__box');
+  loadingBox.append(el('div', 'sky-loading__ring'), el('p', 'sky-loading__text', t('live.loadingCloud')));
+  loading.append(loadingBox);
   root.append(loading);
 
   stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
@@ -450,15 +452,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (!data?.sample) return;
     const rows = ['sun', 'earth'].map((key) => {
       const change = nextVisibilityChange(data.ephemeris, data.utcMs, key, horizonFn());
-      // Tierra sin cambios en los datos: no se muestra la fila (el detalle está en "Más información").
-      if (key === 'earth' && !change?.event) return null;
       const row = el('p', `sky-cd sky-cd--${key}`);
       const text = el('span', 'sky-cd__text');
       const value = el('span', 'sky-cd__value');
       row.append(el('span', 'sky-cd__dot'), text, value);
       countdown.append(row);
       if (!change?.event) {
-        text.textContent = t(`sky.cd.${key}None`);
+        // Sin cruce del horizonte en los datos: queda siempre visible o nunca, según el estado de ahora.
+        text.textContent = t(`sky.cd.${key}${change?.visible ? 'Always' : 'Never'}`);
+        row.classList.toggle('is-visible', Boolean(change?.visible));
         return null;
       }
       text.textContent = t(`sky.cd.${key}${change.event === 'sets' ? 'Sets' : 'Rises'}`);
@@ -508,6 +510,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       tilt = clampTilt(tilt0 + (tiltTo - tilt0) * e, maxTilt(), minTilt());
       draw();
       anim = f < 1 ? requestAnimationFrame(step) : null;
+      if (f >= 1) refreshHover();
     };
     anim = requestAnimationFrame(step);
   }
@@ -517,6 +520,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
   // ecuador), también sube la mirada para que entre.
   // `zoom`: además acerca un poco (clic en el cuerpo); nunca más cerca que ZOOM_ON_BODY_FOV.
+  // Al terminar de moverse la vista, el cuerpo o la flecha pueden haber salido de debajo del cursor sin
+  // que el navegador avise: el resaltado solo queda si el cursor realmente está encima.
+  function refreshHover() {
+    for (const b of bodies) setDetail(b.key, b.disc.matches(':hover') || b.ghost.matches(':hover'));
+    for (const [key, btn] of Object.entries(pointerFor)) {
+      if (!btn.matches(':hover')) root.classList.remove(`is-pointing-${key}`);
+    }
+  }
+
   function lookAt(key, zoom = false) {
     if (!data?.sample) return;
     const pos = data.sample[key];
@@ -537,7 +549,10 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   }
 
   for (const [key, b] of Object.entries(pointerFor)) {
-    b.addEventListener('click', () => lookAt(key, true));
+    b.addEventListener('click', () => {
+      root.classList.remove(`is-pointing-${key}`);
+      lookAt(key, true);
+    });
     // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
     b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
     b.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
@@ -558,7 +573,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   let drag = null;
   stage.addEventListener('pointerdown', (e) => {
     if (e.target.closest('button')) return;
-    drag = { x: e.clientX, y: e.clientY, heading, tilt, moved: false, body: e.target.closest('.sky-body, .sky-ghost') };
+    drag = { x: e.clientX, y: e.clientY, heading, tilt, moved: false, touch: e.pointerType !== 'mouse', body: e.target.closest('.sky-body, .sky-ghost') };
     stage.setPointerCapture(e.pointerId);
   });
   stage.addEventListener('pointermove', (e) => {
@@ -578,8 +593,11 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (drag && !drag.moved && drag.body) {
       // Clic sobre un cuerpo: fija o suelta su detalle (sirve también en pantallas táctiles).
       const key = drag.body.classList.contains('sky-body--sun') || drag.body.classList.contains('sky-ghost--sun') ? 'sun' : 'earth';
-      if (pinned.has(key)) pinned.delete(key); else pinned.add(key);
-      setDetail(key, pinned.has(key));
+      // El detalle se fija solo con toque (no hay hover); con mouse queda el hover normal, sin clavarse.
+      if (drag.touch) {
+        if (pinned.has(key)) pinned.delete(key); else pinned.add(key);
+        setDetail(key, pinned.has(key));
+      }
       lookAt(key, true);
     }
     drag = null;
