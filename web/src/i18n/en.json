@@ -73,6 +73,7 @@
   "help.dials.text": "The compass (seen from above) tells you which way to turn: north is up. The ruler tells you how high to look: 0° is the horizon and 90° is straight above your head.",
   "footer.data": "Sun and Earth positions computed with JPL Horizons (NASA/JPL). A NASA Space Apps Challenge 2026 project.",
   "footer.ai": "The English, Hindi and Chinese translations were made with AI and have not been reviewed by native speakers.",
+  "footer.logo": "The team logo was generated with ChatGPT (OpenAI).",
   "timeline.title": "Sun and Earth over the next days",
   "timeline.aria": "Sun and Earth timeline: {days} days from {start} (UTC)",
   "timeline.legend": "Colored: the Sun or the Earth is above the horizon. The white line marks the chosen date and time. Days in UTC.",
