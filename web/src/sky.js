@@ -21,7 +21,7 @@ import { initSkyPanel } from './sky-panel.js';
 import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, pointerAngle, nearCenter,
+  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeCelestialStars, starAzEl, groundLight, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -237,6 +237,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
     ground.style.backgroundSize = `${tileW}px auto`;
     ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    ground.style.setProperty('--ground-light', groundLight(data?.sample?.sun?.elevation_deg).toFixed(3));
     drawGround(v, k, hy);
     root.classList.toggle('is-tilted', tilt !== 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);

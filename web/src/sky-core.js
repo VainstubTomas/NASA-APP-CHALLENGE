@@ -169,6 +169,16 @@ export function makeStars(count, seed = 1) {
   return stars;
 }
 
+/**
+ * Brillo (0,06 a 1) de la textura plana del suelo según la elevación del Sol: de noche queda casi
+ * negra (solo la luz de la Tierra) y a partir de ~25° está a pleno. Sin dato del Sol, a pleno.
+ */
+export function groundLight(sunElDeg) {
+  if (!Number.isFinite(sunElDeg)) return 1;
+  const t = Math.min(1, Math.max(0, sunElDeg / 25));
+  return 0.06 + 0.94 * t * t * (3 - 2 * t);
+}
+
 /** Un giro completo de la Luna respecto de las estrellas (mes sidéreo), en días. */
 export const SIDEREAL_MONTH_DAYS = 27.321661;
 

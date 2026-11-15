@@ -5,7 +5,7 @@ import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
-  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, pointerAngle, nearCenter,
+  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, makeCelestialStars, starAzEl, SIDEREAL_MONTH_DAYS, groundLight, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -167,6 +167,14 @@ test('starAzEl: una estrella del ecuador sale por el este y se pone por el oeste
   const set = starAzEl(s, 0, SIDEREAL_MONTH_DAYS / 4);
   assert.ok(Math.abs(rise.az - 90) < 1e-6 && Math.abs(rise.el) < 1e-6);
   assert.ok(Math.abs(set.az - 270) < 1e-6 && Math.abs(set.el) < 1e-6);
+});
+
+test('groundLight: noche casi negra, sube con el Sol, tope en 1 y sin dato a pleno', () => {
+  assert.equal(groundLight(-10), 0.06);
+  assert.equal(groundLight(0), 0.06);
+  assert.ok(groundLight(10) > groundLight(5));
+  assert.equal(groundLight(40), 1);
+  assert.equal(groundLight(undefined), 1);
 });
 
 test('makeCelestialStars: repartidas por toda la esfera y siempre las mismas', () => {
