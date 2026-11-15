@@ -56,15 +56,15 @@
   left: 0;
   right: 0;
   height: 0;
-  border-top: 4px solid var(--sky-horizon);
-  transform: translateY(-2px);
-  /* brillo hacia el cielo y un borde oscuro fino para que se lea sobre el suelo iluminado */
-  box-shadow: 0 0 12px var(--sky-horizon-glow), 0 2px 3px rgba(0, 0, 0, 0.75);
+  /* Sin línea sólida: el horizonte lo marca el borde del suelo y las marcas de la brújula van arriba */
+  border-top: 0;
+  pointer-events: none;
 }
 .sky-ticks { position: absolute; left: 0; right: 0; height: 0; pointer-events: none; }
 .sky-tick {
   position: absolute;
-  top: 2px;
+  /* La brújula va sobre el horizonte, separada de la línea blanca */
+  bottom: 48px;
   width: 2px;
   height: 7px;
   margin-left: -1px;
@@ -88,7 +88,7 @@
   position: absolute;
   left: 50%;
   margin: 0;
-  transform: translate(-50%, calc(-100% - 6px));
+  transform: translate(-50%, calc(-100% - 84px));
   color: var(--sky-horizon);
   font-size: clamp(18px, 1.5vw, 26px);
   font-weight: 600;
@@ -670,3 +670,24 @@ body.is-drawer-open .sky-drawer {
 @media (prefers-reduced-motion: reduce) {
   .sky-drawer, .sky-more, .sky-body__glow, .sky-stem, .sky-label, .sky-pointer { transition: none; }
 }
+
+/* Loader no invasivo: círculo blanco girando en el centro; bloquea el movimiento mientras carga */
+.sky-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  cursor: progress;
+}
+.sky-loading[hidden] { display: none; }
+.sky-loading__ring {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  animation: sky-loading-spin 0.9s linear infinite;
+}
+@keyframes sky-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .sky-loading__ring { animation-duration: 2.4s; } }

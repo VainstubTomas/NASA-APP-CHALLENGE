@@ -19,8 +19,8 @@ import { horizonAt, hasRelief } from './horizon.js';
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
-  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
-  normAz, relAz, rotate, tiltMax, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
+  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter,
 } from './sky-core.js';
 
@@ -32,6 +32,8 @@ const SUN_DISC_FRACTION = 0.75;
 const EARTH_DISC_FRACTION = 0.89;
 // Un arrastre menor a esto es un clic (fija o suelta el detalle del cuerpo).
 const CLICK_SLOP_PX = 4;
+// Al hacer clic en un cuerpo se centra y la vista se acerca hasta este campo de visión (°).
+const ZOOM_ON_BODY_FOV = 45;
 // Estrellas decorativas (sky-core.js): fijas en el cielo del sitio, giran con la vista.
 const STARS = makeStars(1400, 2026);
 // Flechas del centro: a qué distancia del centro se dibuja cada una. Radios distintos para que
@@ -79,11 +81,12 @@ function createBody(key) {
  * @param {object} opts
  * @param {{minMs:number, maxMs:number}} opts.range rango de fechas del selector
  * @param {(ms:number) => void} opts.onTime el deslizador pide un instante nuevo
+ * @param {() => boolean} [opts.isLive] hay una posición libre (API): el deslizador pide recién al soltarse
  * @param {() => void} [opts.onUserInput] la persona tocó la fecha (pausar el reproductor)
  * @param {HTMLElement} [opts.drawer] cajón "Más información" (Figma frame 2)
  * @param {boolean} [opts.liveEnabled] hay API en vivo (ubicación específica)
  */
-export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false }) {
+export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled = false, isLive = () => false }) {
   const panelEl = root.querySelector('#sky-panel');
 
   // --- Escenario: cielo, suelo, horizonte ---
@@ -120,6 +123,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     pointerFor[key] = b;
     pointers.append(b);
   }
+
+  // Cargando (consulta a la API): círculo blanco en el centro; el overlay bloquea la interacción.
+  const loading = el('div', 'sky-loading');
+  loading.hidden = true;
+  loading.setAttribute('role', 'status');
+  loading.setAttribute('aria-label', t('live.loading'));
+  loading.append(el('div', 'sky-loading__ring'));
+  root.append(loading);
 
   stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
 
@@ -204,6 +215,14 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     return tiltMax(v.horizonY, pxPerDeg(v.width, fov));
   }
 
+  // Hasta dónde se puede bajar la mirada (negativo): se ve el piso y el recorrido bajo el horizonte.
+  function minTilt() {
+    const v = view();
+    return nadirTilt(v, pxPerDeg(v.width, fov));
+  }
+  // Se puede bajar hasta ver el nadir (−90°) en el borde de abajo: todo el recorrido bajo el horizonte.
+  const nadirTilt = (v, k) => tiltMin(v.horizonY, k, v.height - 90 * k);
+
   // --- Dibujo de la vista ---
   function drawStage() {
     const v = view();
@@ -217,7 +236,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     ground.style.backgroundSize = `${tileW}px auto`;
     ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
     drawGround(v, k, hy);
-    root.classList.toggle('is-tilted', tilt > 0);
+    root.classList.toggle('is-tilted', tilt !== 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
 
     // Brújula sobre la línea
@@ -431,6 +450,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (!data?.sample) return;
     const rows = ['sun', 'earth'].map((key) => {
       const change = nextVisibilityChange(data.ephemeris, data.utcMs, key, horizonFn());
+      // Tierra sin cambios en los datos: no se muestra la fila (el detalle está en "Más información").
+      if (key === 'earth' && !change?.event) return null;
       const row = el('p', `sky-cd sky-cd--${key}`);
       const text = el('span', 'sky-cd__text');
       const value = el('span', 'sky-cd__value');
@@ -469,39 +490,54 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   }
 
   // --- Interacción ---
-  function animateTo(target) {
+  // Gira hasta `target`; opcionalmente también acerca (fovTo) y mueve la mirada vertical (tiltTo).
+  function animateTo(target, { fovTo = fov, tiltTo = tilt } = {}) {
     if (anim) cancelAnimationFrame(anim);
     const start = heading;
+    const fov0 = fov;
+    const tilt0 = tilt;
     const delta = relAz(target, start);
     const t0 = performance.now();
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const dur = reduce ? 0 : 350;
     const step = (now) => {
       const f = dur ? Math.min(1, (now - t0) / dur) : 1;
-      heading = normAz(start + delta * (1 - (1 - f) ** 3));
+      const e = 1 - (1 - f) ** 3;
+      heading = normAz(start + delta * e);
+      fov = fov0 + (fovTo - fov0) * e;
+      tilt = clampTilt(tilt0 + (tiltTo - tilt0) * e, maxTilt(), minTilt());
       draw();
       anim = f < 1 ? requestAnimationFrame(step) : null;
     };
     anim = requestAnimationFrame(step);
   }
   const turn = (delta) => animateTo(rotate(heading, delta));
-  const setTilt = (value) => { tilt = value; draw(); };
+  const setTilt = (value) => { tilt = clampTilt(value, maxTilt(), minTilt()); draw(); };
 
   // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
   // ecuador), también sube la mirada para que entre.
-  function lookAt(key) {
+  // `zoom`: además acerca un poco (clic en el cuerpo); nunca más cerca que ZOOM_ON_BODY_FOV.
+  function lookAt(key, zoom = false) {
     if (!data?.sample) return;
     const pos = data.sample[key];
     const v = view();
-    const visibleDeg = (v.horizonY - 60) / pxPerDeg(v.width, fov);
-    if (pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
-      tilt = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxTilt());
+    const fovTo = zoom ? Math.max(FOV_MIN_DEG, Math.min(fov, ZOOM_ON_BODY_FOV)) : fov;
+    const k = pxPerDeg(v.width, fovTo);
+    const maxT = tiltMax(v.horizonY, k);
+    const minT = nadirTilt(v, k);
+    const visibleDeg = (v.horizonY - 60) / k;
+    let tiltTo = tilt;
+    if (pos.elevation_deg < 0) {
+      // Bajo el horizonte: baja la mirada para verlo sobre el piso, a media pantalla.
+      tiltTo = clampTilt(pos.elevation_deg + (v.height / 2 - v.horizonY) / k, maxT, minT);
+    } else if (zoom || pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
+      tiltTo = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxT, minT);
     }
-    animateTo(normAz(pos.azimuth_deg));
+    animateTo(normAz(pos.azimuth_deg), { fovTo, tiltTo });
   }
 
   for (const [key, b] of Object.entries(pointerFor)) {
-    b.addEventListener('click', () => lookAt(key));
+    b.addEventListener('click', () => lookAt(key, true));
     // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
     b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
     b.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
@@ -535,7 +571,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (anim) cancelAnimationFrame(anim);
     const k = pxPerDeg(stage.clientWidth, fov);
     heading = normAz(drag.heading - dx / k);
-    tilt = clampTilt(drag.tilt + dy / k, maxTilt());
+    tilt = clampTilt(drag.tilt + dy / k, maxTilt(), minTilt());
     draw();
   });
   const endDrag = () => {
@@ -544,6 +580,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       const key = drag.body.classList.contains('sky-body--sun') || drag.body.classList.contains('sky-ghost--sun') ? 'sun' : 'earth';
       if (pinned.has(key)) pinned.delete(key); else pinned.add(key);
       setDetail(key, pinned.has(key));
+      lookAt(key, true);
     }
     drag = null;
     stage.classList.remove('is-dragging');
@@ -569,7 +606,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const k1 = pxPerDeg(v.width, fov);
     if (anim) cancelAnimationFrame(anim);
     heading = normAz(azCursor - (mx - v.width / 2) / k1);
-    tilt = clampTilt(elCursor - (v.horizonY - my) / k1, maxTilt());
+    tilt = clampTilt(elCursor - (v.horizonY - my) / k1, maxTilt(), minTilt());
     draw();
   }, { passive: false });
 
@@ -579,7 +616,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     if (e.key === 'ArrowLeft') turn(-ROTATE_STEP_DEG);
     else if (e.key === 'ArrowRight') turn(ROTATE_STEP_DEG);
     else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt, maxTilt()));
-    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt));
+    else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt, minTilt()));
     else if ((e.key === 'f' || e.key === 'F') && canFullscreen && !e.metaKey && !e.ctrlKey) toggleFullscreen();
     else return;
     e.preventDefault();
@@ -587,9 +624,19 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   stage.tabIndex = 0;
   stage.setAttribute('aria-label', t('sky.aria'));
 
+  // Con una posición libre (API en vivo) cada instante nuevo es una consulta: mientras se arrastra
+  // solo se actualiza la fecha en pantalla y se pide una vez, al soltar.
   slider.addEventListener('input', () => {
     onUserInput?.();
-    onTime(sliderToTime(slider.value, range.minMs, range.maxMs));
+    const ms = sliderToTime(slider.value, range.minMs, range.maxMs);
+    if (isLive()) {
+      when.textContent = fmtUtc(ms);
+      return;
+    }
+    onTime(ms);
+  });
+  slider.addEventListener('change', () => {
+    if (isLive()) onTime(sliderToTime(slider.value, range.minMs, range.maxMs));
   });
 
   search.addEventListener('click', () => panel?.toggle());
@@ -652,6 +699,12 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
       drawTime();
       drawCountdown();
       draw();
+    },
+    /** Loader central mientras se consulta la API: bloquea la vista y el deslizador. */
+    setLoading(on) {
+      loading.hidden = !on;
+      slider.disabled = on;
+      root.classList.toggle('is-loading', on);
     },
     /** Sin datos para mostrar: el cielo queda vacío (se conserva el sitio y la fecha). */
     clear({ siteName = data?.siteName ?? '', utcMs = data?.utcMs ?? null } = {}) {

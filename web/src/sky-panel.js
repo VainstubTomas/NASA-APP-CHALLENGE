@@ -68,10 +68,11 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     return inputs?.length >= 2 && validateCoords(inputs[0].value, inputs[1].value).ok;
   }
 
-  // "Aplicar": histórico siempre; ubicación específica cuando hay API y las coordenadas son válidas;
+  // "Aplicar": histórico siempre; ubicación específica cuando hay API (si las coordenadas no son válidas,
+  // runApply muestra el error de cada campo en vez de dejar el botón apagado sin explicación);
   // el mapa todavía no permite elegir un lugar.
   function updateApply() {
-    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled && coordsValid());
+    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled);
     apply.disabled = !canApply;
   }
 

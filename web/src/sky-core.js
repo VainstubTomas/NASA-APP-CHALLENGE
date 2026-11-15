@@ -34,9 +34,11 @@ export const rotate = (heading, delta) => normAz(heading + delta);
  */
 export const tiltMax = (horizonY, k) => Math.max(0, 90 - horizonY / k);
 export const tiltUp = (tilt, max) => Math.min(max, tilt + TILT_STEP_DEG);
-export const tiltDown = (tilt) => Math.max(0, tilt - TILT_STEP_DEG);
-/** Inclinación al arrastrar el cielo: entre el horizonte (0°) y el máximo. */
-export const clampTilt = (tilt, max) => Math.min(max, Math.max(0, tilt));
+/** Inclinación mínima (negativa = mirar hacia abajo): deja el horizonte a `margin` px del borde de arriba. */
+export const tiltMin = (horizonY, k, margin = 150) => Math.min(0, -(horizonY - margin) / k) || 0;
+export const tiltDown = (tilt, min = 0) => Math.max(min, tilt - TILT_STEP_DEG);
+/** Inclinación al arrastrar el cielo: entre `min` (por defecto el horizonte, 0°) y el máximo. */
+export const clampTilt = (tilt, max, min = 0) => Math.min(max, Math.max(min, tilt));
 
 export const pxPerDeg = (width, fov = FOV_DEG) => width / fov;
 
