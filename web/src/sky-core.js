@@ -191,3 +191,15 @@ export function pointerAngle(x0, y0, x1, y1) {
 export function nearCenter(x, y, width, height, fraction = 0.5) {
   return Math.abs(x - width / 2) <= (width * fraction) / 2 && Math.abs(y - height / 2) <= (height * fraction) / 2;
 }
+
+/**
+ * Qué hace el clic en un indicador de la cuenta regresiva (Sol o Tierra).
+ * Oculto y con salida en los datos: salta a la primera hora con el cuerpo visible (`atMs`).
+ * Visible, o sin cruce en los datos: solo gira la vista hacia el cuerpo.
+ * @param {{visible:boolean, event:string|null, atMs:number|null}|null} change resultado de nextVisibilityChange
+ * @returns {{type:'jump', ms:number} | {type:'look'}}
+ */
+export function countdownAction(change) {
+  if (change?.event && !change.visible && change.atMs != null) return { type: 'jump', ms: change.atMs };
+  return { type: 'look' };
+}

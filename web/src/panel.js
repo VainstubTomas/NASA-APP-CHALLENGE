@@ -170,8 +170,12 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
   const first = Date.parse(ephemeris.time.start_utc);
   const last = first + (ephemeris.time.count - 1) * ephemeris.time.step_s * 1000;
   const hp = (n) => ({ text: `${n} h · ${pct(n, sum.samples)}`, className: 'info-num' });
+  const periodFrom = fmtUtc(first).slice(0, 10);
+  const periodTo = fmtUtc(last).slice(0, 10);
+  // Origen del resumen: sale de todo el archivo de efemérides, no de la fecha elegida.
+  const periodSource = el('p', 'info-note', t('info.periodSource', { from: periodFrom, to: periodTo, hours: sum.samples }));
   const summary = table(
-    t('info.period', { from: fmtUtc(first).slice(0, 10), to: fmtUtc(last).slice(0, 10), hours: sum.samples }),
+    t('info.period', { from: periodFrom, to: periodTo, hours: sum.samples }),
     ['', t('info.value')],
     [
       [label('info.sunVisible'), hp(sum.sun)],
@@ -185,7 +189,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
   );
 
   const note = el('p', 'info-note', t(hasRelief(horizon) ? 'info.noteRelief' : 'info.note'));
-  container.append(header, position, windowsTable, summary, note);
+  container.append(header, position, windowsTable, periodSource, summary, note);
 
   // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza
   // con el reloj real.
