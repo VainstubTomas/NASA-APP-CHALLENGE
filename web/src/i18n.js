@@ -6,7 +6,7 @@ import es from './i18n/es.json';
 import en from './i18n/en.json';
 import hi from './i18n/hi.json';
 import zh from './i18n/zh.json';
-import { LANGS, LOCALES, detectLang, createTranslator, siteLabel } from './i18n-core.js';
+import { LANGS, LOCALES, detectLang, langFromSearch, createTranslator, siteLabel } from './i18n-core.js';
 
 const STORAGE_KEY = 'llsn.lang';
 const dicts = { es, en, hi, zh };
@@ -19,7 +19,8 @@ function storedLang() {
   }
 }
 
-export const lang = detectLang(navigator.languages ?? [navigator.language], storedLang());
+// `?lang=en` fuerza el idioma (link de la entrega a Space Apps, #110). Se lee una sola vez, al cargar.
+export const lang = detectLang(navigator.languages ?? [navigator.language], storedLang(), langFromSearch(window.location.search));
 export const locale = LOCALES[lang];
 export const t = createTranslator(dicts, lang);
 
@@ -52,6 +53,9 @@ export function initLangSelect(select) {
     } catch {
       // sin almacenamiento la elección dura solo esta carga
     }
-    window.location.reload();
+    // También va en la URL: así un `?lang=` anterior no pisa la elección, y funciona sin localStorage.
+    const url = new URL(window.location.href);
+    url.searchParams.set('lang', select.value);
+    window.location.replace(url);
   });
 }
