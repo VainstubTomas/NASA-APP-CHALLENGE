@@ -46,6 +46,7 @@
 .info-state--up { color: var(--color-text); }
 .info-state--partial { color: var(--color-sun); }
 .info-state--down { color: var(--color-muted); }
+.info-state--blocked { color: var(--color-muted); font-style: italic; }
 
 .info-note,
 .info-empty { margin: 0; font-size: var(--fs-xs); color: var(--color-muted); }

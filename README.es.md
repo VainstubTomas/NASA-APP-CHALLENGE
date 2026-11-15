@@ -6,14 +6,16 @@
 
 **¿Si aterrizo en este lugar de la Luna en esta fecha, voy a tener Sol y voy a poder hablar con la Tierra?**
 
-Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y cualquier montaña los tapa. Esta herramienta toma un sitio y una fecha, busca dónde están el Sol y la Tierra, los dibuja sobre el horizonte del lugar y muestra cuándo hay energía y cuándo hay comunicación. Por ahora el horizonte es ideal (Luna lisa, sin relieve) y la web lo avisa; el relieve real de LOLA es el paso siguiente (ADR-011).
+Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y cualquier montaña los tapa. Esta herramienta toma un sitio y una fecha, busca dónde están el Sol y la Tierra, los dibuja sobre el horizonte del lugar y muestra cuándo hay energía y cuándo hay comunicación. El horizonte usa el relieve real de LOLA en los sitios con datos de elevación, así que una montaña puede tapar el Sol o la Tierra; los sitios sin esos datos (por ejemplo una latitud y longitud libres de la API en vivo) siguen con horizonte ideal (Luna lisa, sin relieve) y la web lo avisa (ADR-011).
 
 ## Cómo funciona
 1. **Efemérides** (Python + API de JPL Horizons): azimut y elevación del Sol y la Tierra por sitio y por hora.
-2. **Terreno** (Python): perfil de horizonte de 360 direcciones por sitio. Hoy es plano (0°); el mapa de elevación LOLA va al final (ADR-011).
+2. **Terreno** (Python): perfil de horizonte de 360 direcciones por sitio. Sale del mapa de elevación LOLA en los sitios que cubre y queda plano (0°) en el resto (ADR-011).
 3. **Web**: lee esos datos precalculados y compara cada cuerpo contra el horizonte.
 
 Además, una **API en vivo** (FastAPI, [`data/api/`](data/api/)) permite elegir cualquier latitud y longitud de la Luna: consulta a Horizons y responde en el mismo formato. Es opcional; sin ella la web usa solo los sitios precalculados. Guía: [`docs/09-API.md`](docs/09-API.md).
+
+En la vista del cielo, la silueta del horizonte es relieve real (LOLA) en los sitios con datos de elevación, y se ilumina con el Sol y la Tierra en el momento elegido. El suelo dibujado debajo del horizonte (cráteres y textura) es **ilustrativo**, no topografía real (ADR-016).
 
 **La comparación de escenarios no elige un ganador.** Pone 2 o 3 escenarios de sitio y fecha lado a lado y, por cada métrica por separado, marca cuál tiene más horas de Sol (energía) y cuál más horas con la Tierra visible (comunicación). Cuál conviene depende de los requisitos de la misión, así que esa decisión la toma la persona que usa la herramienta (ADR-017).
 

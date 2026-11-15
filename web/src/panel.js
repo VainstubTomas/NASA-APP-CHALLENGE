@@ -5,7 +5,7 @@
 // contra horizon.json (#32) con la regla del contrato; las horas, con visibilitySeries.
 import './panel.css';
 import { sampleAt, compassLabel, nextVisibilityChange } from './ephemeris.js';
-import { horizonAt, statusAgainstHorizon, hasRelief } from './horizon.js';
+import { horizonAt, visibilityState, hasRelief } from './horizon.js';
 import { visibilitySeries } from './visibility.js';
 import { windowHours, periodSummary } from './info-core.js';
 import { t, locale } from './i18n.js';
@@ -139,7 +139,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
     row('info.azimuth', (b) => `${num(sample[b].azimuth_deg, 2)}° ${t(`compass.${compassLabel(sample[b].azimuth_deg)}`)}`),
     row('info.elevation', (b) => signedDeg(sample[b].elevation_deg)),
     row('info.state', (b) => {
-      const s = statusAgainstHorizon(sample[b], radius[b], horizon);
+      const s = visibilityState(sample[b], radius[b], horizon);
       return { text: t(`panel.status.${s}`), className: `info-state info-state--${s}` };
     }),
     row('info.next', (b) => {
@@ -147,7 +147,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
       if (!c?.event) {
         // Sin cruce del horizonte en toda la ventana: dice si el cuerpo queda siempre visible o nunca (la Tierra
         // está fija en el cielo de la cara visible, y no sale en la oculta; solo sube y baja cerca del borde).
-        return t(statusAgainstHorizon(sample[b], radius[b], horizon) === 'down' ? 'info.alwaysDown' : 'info.alwaysUp');
+        return t(['up', 'partial'].includes(visibilityState(sample[b], radius[b], horizon)) ? 'info.alwaysUp' : 'info.alwaysDown');
       }
       return `${t(c.event === 'sets' ? 'info.sets' : 'info.rises')} · ${fmtUtc(c.crossMs)}`;
     }),
