@@ -4,6 +4,7 @@ El porcentaje de tiempo con Sol sale de metrics.json (C3-01): horas con Sol sobr
 período. Se usa para comparar a grandes rasgos con la iluminación media de LOLA en Quickmap.
 """
 import json
+import math
 
 import pytest
 
@@ -44,6 +45,41 @@ def test_solo_se_listan_sitios_reales_al_sur_del_limite():
         {"id": "demo", "lat_deg": -89.5, "synthetic": True},
     ]
     assert [s["id"] for s in ic.south_pole_sites(sites, max_lat=-60.0)] == ["a"]
+
+
+def test_pixel_del_polo_es_el_centro_del_mapa():
+    pytest.importorskip("pyproj")
+    m = ic.LOLA_MAPS["65S_240M"]
+    line, sample = ic.map_pixel(m, -90.0, 0.0)
+    assert (line, sample) == pytest.approx((3209.5, 3209.5))
+
+
+def test_longitud_cero_va_hacia_arriba_y_90_este_hacia_la_derecha():
+    # Convención PDS del polo sur (verificada contra las alturas de Moon Trek en IM-2 y Odysseus):
+    # lon 0° hacia arriba (fila menor), lon 90°E hacia la derecha (columna mayor).
+    pytest.importorskip("pyproj")
+    m = ic.LOLA_MAPS["65S_240M"]
+    rho_px = 2 * 1_737_400 * math.tan(math.radians(45 - 80 / 2)) / 240  # lat -80°, en píxeles
+    line, sample = ic.map_pixel(m, -80.0, 0.0)
+    assert line == pytest.approx(3209.5 - rho_px) and sample == pytest.approx(3209.5)
+    line, sample = ic.map_pixel(m, -80.0, 90.0)
+    assert line == pytest.approx(3209.5) and sample == pytest.approx(3209.5 + rho_px)
+
+
+def test_nuestros_porcentajes_coinciden_con_la_iluminacion_media_de_lola():
+    """Validación a grandes rasgos (C5-07): mismo orden de magnitud que Mazarico et al. 2011.
+
+    No es el mismo número: nuestro período es de 120 días y el de LOLA, 2009-2013; nuestro horizonte
+    llega a 20 km. Tolerancia: 10 puntos porcentuales contra cualquiera de los mapas que cubren el sitio.
+    """
+    ref = json.loads((ic.REFERENCE_PATH).read_text(encoding="utf-8"))
+    sites = json.loads((PUBLIC / "sites.json").read_text(encoding="utf-8"))["sites"]
+    rows = {r["site_id"]: r for r in ic.summary(sites, PUBLIC / "sites")}
+    assert set(ref["sites"]) <= set(rows)
+    for site_id, maps in ref["sites"].items():
+        for name, vals in maps.items():
+            assert rows[site_id]["sun_pct"] == pytest.approx(vals["sun_pct"], abs=10), (site_id, name)
+            assert rows[site_id]["earth_pct"] == pytest.approx(vals["earth_pct"], abs=10), (site_id, name)
 
 
 def test_tabla_de_los_sitios_publicados_del_polo_sur():
