@@ -137,5 +137,17 @@
   "compare.add": "Add scenario",
   "compare.remove": "Remove",
   "compare.removeAria": "Remove scenario {n}",
-  "compare.limits": "You can compare at least 2 and at most 3 scenarios."
+  "compare.limits": "You can compare at least 2 and at most 3 scenarios.",
+  "live.title": "Free position on the Moon (live query)",
+  "live.intro": "Enter a latitude and a longitude to ask JPL Horizons, live, where the Sun and the Earth are from that point. It uses the date chosen above.",
+  "live.lat": "Latitude (°)",
+  "live.lon": "Longitude (°)",
+  "live.hint": "Decimal degrees: planetocentric latitude from -90 to 90 and east-positive longitude from -180 to 180. Ideal horizon, no relief.",
+  "live.query": "Query",
+  "live.loading": "Asking JPL Horizons… it can take a few seconds.",
+  "live.errLat": "Latitude must be a number between -90 and 90.",
+  "live.errLon": "Longitude must be a number between -180 and 180.",
+  "live.apiError": "Could not query the live position: {error}",
+  "live.siteName": "Free position ({lat}°, {lon}°)",
+  "live.active": "Showing a free position. Pick a site from the list to go back to the saved sites."
 }
