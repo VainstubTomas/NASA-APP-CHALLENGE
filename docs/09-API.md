@@ -1,8 +1,8 @@
 > 🇬🇧 [Read in English](en/09-API.md)
 
-# 09. API de efemérides en vivo
+# 09. API de efemérides y horizonte en vivo
 
-Última actualización: 2026-11-15 · Decisión: [ADR-015](adr/ADR-015-api-horizons-en-vivo.md) · Código: [`data/api/`](../data/api/) · Issue: #104
+Última actualización: 2026-11-15 · Decisiones: [ADR-015](adr/ADR-015-api-horizons-en-vivo.md) y [ADR-018](adr/ADR-018-relieve-en-vivo.md) · Código: [`data/api/`](../data/api/) · Issue: #104
 
 ## Para qué sirve
 Los sitios de `data/public/sites.json` tienen sus efemérides precalculadas. Para un punto **cualquiera** de la Luna (latitud y longitud que elige la persona) no hay datos guardados, así que la web se los pide a esta API. La API consulta **JPL Horizons** y responde con el mismo formato que `ephemeris.json` ([contrato](03-DATA-CONTRACT.md)).
@@ -19,6 +19,7 @@ python -m uvicorn data.api.main:app --reload --port 8000
 - **curl**:
   ```bash
   curl "http://localhost:8000/ephemeris?lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1"
+  curl "http://localhost:8000/horizon?lat=0&lon=30"
   ```
 - Esquema OpenAPI: <http://localhost:8000/openapi.json>.
 
@@ -29,8 +30,8 @@ python -m uvicorn data.api.main:app --reload --port 8000
 |---|---|---|
 | `lat` | Latitud planetocéntrica, grados | -90 a 90 |
 | `lon` | Longitud este-positiva, grados | -180 a 180 |
-| `start` | Inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-02-28 |
-| `days` | Días de la ventana, una muestra por hora. Por defecto 7 | 1 a 14. Si pasa del 2027-02-28 se recorta |
+| `start` | Inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-12-31 |
+| `days` | Días de la ventana, una muestra por hora. Por defecto 7 | 1 a 14. Si pasa del 2027-12-31 se recorta |
 
 Convenciones: azimut en grados con 0° = norte y sentido horario; elevación en grados sobre el horizonte; tiempo en UTC; marco topocéntrico (desde el punto elegido). Son las mismas del resto del proyecto.
 
@@ -59,10 +60,27 @@ Para `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (se muestran solo las prim
 
 **La API nunca devuelve datos inventados**: si Horizons falla, responde el error y no hay datos.
 
+## El relieve: `GET /horizon` (ADR-018)
+`GET /horizon?lat=<°>&lon=<°>` responde el horizonte con relieve alrededor del punto, con el formato de `horizon.json` y el mismo `site_id` que `/ephemeris`. Usa el mismo cálculo que los sitios guardados (`precompute/terrain/lola_horizon.py`): 360 elevaciones, una por grado de azimut, con el relieve hasta 20 km.
+
+| Latitud | Mapa (NASA Moon Trek, LOLA) | Primera consulta (medida) |
+|---|---|---|
+| al sur de -75,7° | polar de 30 m (~9 MB) | ~30 s |
+| -75,7° a 85° | global de 128 ppd, ~237 m (~260 KB) | ~2–3 s |
+| al norte de 85° | sin mapa: Luna lisa, sin `dem` | inmediata |
+
+El recorte queda en `data/raw/` (no versionado): repetir el mismo punto tarda ~0,1 s.
+
+| Código | Cuándo |
+|---|---|
+| 422 | Latitud o longitud fuera de rango o con formato inválido. No se baja nada. |
+| 502 | Moon Trek falló o el recorte no se pudo leer (se borra para reintentar). |
+| 504 | Moon Trek no respondió a tiempo. |
+
 ## Cómo la usa la web
 - Si hay una URL de API configurada (`VITE_API_URL`), la web muestra la sección "Posición libre en la Luna": dos inputs (latitud y longitud) que usan la fecha del selector.
 - La web valida los rangos antes de llamar a la API y muestra el error si falla. Cada consulta pide los 7 días desde el inicio del día UTC elegido y se guarda mientras se siga en ese día.
-- El horizonte de una posición libre es **ideal** (Luna lisa, 360 ceros, ADR-011): la web avisa "horizonte ideal, sin relieve". Las horas de Sol y de Tierra son las de una Luna sin montañas, no las reales.
+- **Relieve** (ADR-018): la web pide el relieve (`/horizon`) en paralelo con las efemérides y el loader del centro sigue hasta que llegan los dos, así el cielo se dibuja una sola vez y ya con el relieve. El relieve se guarda por punto. Si falla, el cielo se muestra con el horizonte ideal y el estado de la consulta lo avisa.
 - Sin `VITE_API_URL` la sección no aparece y la web funciona solo con los sitios precalculados.
 - Código: `web/src/live-core.js` (lógica, probada con `npm test`) y `web/src/live.js` (formulario).
 
@@ -74,7 +92,7 @@ Para `lat=0&lon=30&start=2026-11-30T06:00:00Z&days=1` (se muestran solo las prim
 
 ## Tests
 ```bash
-python -m pytest tests/test_api_ephemeris.py     # API
+python -m pytest tests/test_api_ephemeris.py tests/test_api_horizon.py     # API
 cd web && npm test                               # lógica de la web (live-core.test.js)
 ```
 Los tests de la API corren sin red con un Horizons falso (valores sintéticos que solo prueban formato, validaciones, errores y caché). El caso conocido (lat 0, lon 30 E, 2026-11-30T06:00:00Z) se compara contra la respuesta guardada de Horizons (`docs/adr/evidencia/ADR-006-horizons-web/`) y lleva el marcador `network`.

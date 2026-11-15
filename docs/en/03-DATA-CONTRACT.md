@@ -63,6 +63,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 - `elevation_deg[i]` is the horizon elevation at azimuth `azimuth_start_deg + i * azimuth_step_deg`.
 - The web interpolates linearly between samples and closes the circle (azimuth 359 connects to 0).
 - **Flat Moon (ADR-011)**: until there is relief, `elevation_deg` is 360 zeros and `dem` is omitted (it is optional). It is the same format; the web does not distinguish, and when `dem` is missing it shows the warning "ideal horizon, no relief".
+- **Live query (ADR-018)**: the API in `data/api/` (`GET /horizon?lat&lon`) answers with this same format for a free point, with the `live-<lat>-<lon>` `site_id` of its ephemerides. Without a map for that latitude (north of 85°) it answers the flat Moon, without `dem`. The contract and its schema do not change.
 - `dem.name` and `dem.pixel_m` describe the map actually used (the source is fixed in ADR-006; the example shows the backup plan).
 
 ## `ephemeris.json`
@@ -70,7 +71,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 {
   "schema_version": "1.0",
   "site_id": "demo-sintetico",
-  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 3600, "count": 2880 },
+  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 3600, "count": 10224 },
   "sun":   { "azimuth_deg": [], "elevation_deg": [] },
   "earth": { "azimuth_deg": [], "elevation_deg": [] },
   "angular_radius_deg": { "sun": 0.25, "earth": 1.0 },
@@ -86,7 +87,7 @@ Optional fields: `mission`, `country`, `notes`. Every real site carries a verifi
 {
   "schema_version": "1.0",
   "site_id": "demo-sintetico",
-  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 86400, "count": 120 },
+  "time": { "start_utc": "2026-11-01T00:00:00Z", "step_s": 86400, "count": 426 },
   "daily": {
     "sun_hours": [],
     "earth_hours": [],

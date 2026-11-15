@@ -1,11 +1,11 @@
 > 🇬🇧 [Read in English](README.en.md)
 
-# API de efemérides en vivo (issue #104, ADR-015)
+# API de efemérides y horizonte en vivo (issue #104, ADR-015 y ADR-018)
 
 Servicio FastAPI que consulta **JPL Horizons** para una posición libre de la Luna (latitud, longitud) y devuelve el azimut y la elevación del Sol y la Tierra con **el mismo formato que `ephemeris.json`** (`docs/03-DATA-CONTRACT.md`). La web no llama a Horizons: Horizons no permite CORS, así que pasa por esta API. Los sitios de `sites.json` siguen usando los JSON precalculados. La guía de uso completa está en [`docs/09-API.md`](../../docs/09-API.md).
 
 - `main.py`: la app (endpoint, validación de parámetros, errores, CORS y documentación Swagger).
-- `service.py`: arma la respuesta reusando `precompute/ephemeris/horizons_client.py` (consulta validada en el ADR-006).
+- `service.py`: arma las respuestas reusando `precompute/ephemeris/horizons_client.py` (consulta validada en el ADR-006) y `precompute/terrain/lola_horizon.py` (el relieve de los sitios guardados).
 
 ## Levantarla en local
 Desde la **raíz del repo**:
@@ -24,8 +24,8 @@ Desde la **raíz del repo**:
 |---|---|---|
 | `lat` | latitud planetocéntrica, grados | -90 a 90 |
 | `lon` | longitud este-positiva, grados | -180 a 180 |
-| `start` | inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-02-28 |
-| `days` | días de la ventana, paso de 1 h (por defecto 7) | 1 a 14; si pasa del 2027-02-28 se recorta |
+| `start` | inicio, UTC ISO 8601 (`2026-11-30T06:00:00Z`) | 2026-11-01 a 2027-12-31 |
+| `days` | días de la ventana, paso de 1 h (por defecto 7) | 1 a 14; si pasa del 2027-12-31 se recorta |
 
 | Código | Cuándo |
 |---|---|
@@ -35,6 +35,8 @@ Desde la **raíz del repo**:
 | 504 | Horizons no respondió a tiempo. |
 
 La API **nunca devuelve datos inventados**: si Horizons falla, responde el error. Cada consulta se guarda en `data/raw/horizons/` (no versionado); repetirla no vuelve a llamar a Horizons.
+
+`GET /horizon?lat=<°>&lon=<°>` (ADR-018): horizonte con relieve en formato `horizon.json`, con el mapa LOLA de NASA Moon Trek (polar de 30 m al sur de -75,7°, global de 128 ppd hasta 85° N; más al norte, Luna lisa sin `dem`). La primera consulta de un punto baja el recorte a `data/raw/` (~2–3 s, ~30 s en el polo sur); las siguientes tardan ~0,1 s. Errores: 422 (entrada inválida), 502 (Moon Trek falló o el recorte no se pudo leer), 504 (Moon Trek no respondió a tiempo).
 
 ## Conectar la web
 La caja de latitud y longitud de la web aparece **solo si hay una URL de API**. En local, crear `web/.env.local` (no se commitea):
@@ -54,6 +56,6 @@ CORS permite `localhost:5173`, `localhost:4173`, `https://vainstubtomas.github.i
 
 ## Tests
 ```bash
-.venv/bin/python -m pytest tests/test_api_ephemeris.py
+.venv/bin/python -m pytest tests/test_api_ephemeris.py tests/test_api_horizon.py
 ```
 Corren sin red con un Horizons falso (valores sintéticos, solo prueban formato, validaciones, errores y caché). El caso conocido (lat 0, lon 30 E, 2026-11-30T06:00:00Z) contra la respuesta guardada de Horizons lleva el marcador `network`: consulta Horizons la primera vez y después lee del caché.

@@ -19,7 +19,7 @@ Lunar Landing Site Navigator answers one question in a single screen: if I land 
 
 ## Detailed Project Description
 **What it does**
-- Site and date selection: [14] landing sites (Apollo missions, CLPS and other commercial landers, and other countries' programs), any hour from today to February 2027, in UTC.
+- Site and date selection: [14] landing sites (Apollo missions, CLPS and other commercial landers, and other countries' programs), any hour from today to the end of December 2027, in UTC.
 - Sun and Earth position: azimuth and elevation of both bodies, drawn over the horizon in a 3D sky view (with a 2D compass and elevation ruler as fallback). The Sun's elevation is the most visible number on the screen, because it drives solar power.
 - Time: a time player, a 7-day timeline of when the Sun and Earth are above the horizon, and a live countdown to the next sunset/sunrise and Earthset/Earthrise.
 - Scenario comparison: 2 or 3 site-date scenarios side by side with hours of Sun and of Earth in view over 7 days. The tool does not pick a winner: for each metric it marks which scenario has more Sun hours and which has more Earth hours, and the user decides according to their mission requirements (ADR-017).

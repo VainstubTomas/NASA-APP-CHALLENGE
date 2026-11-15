@@ -20,9 +20,9 @@ import { skylinePoints, chartProfile, skylineLight, skylineEdge, lightColor } fr
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
-  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter,
+  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -610,12 +610,15 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const maxT = tiltMax(v.horizonY, k);
     const minT = nadirTilt(v, k);
     const visibleDeg = (v.horizonY - 60) / k;
+    const centered = tiltToCenter(pos.elevation_deg, v.horizonY, v.height, k);
     let tiltTo = tilt;
     if (pos.elevation_deg < 0) {
       // Bajo el horizonte: baja la mirada para verlo sobre el piso, a media pantalla.
-      tiltTo = clampTilt(pos.elevation_deg + (v.height / 2 - v.horizonY) / k, maxT, minT);
+      tiltTo = clampTilt(centered, maxT, minT);
     } else if (zoom || pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
-      tiltTo = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxT, minT);
+      // Sobre el horizonte: lo deja a media pantalla (sin redondear a pasos de TILT_STEP_DEG: con
+      // zoom fuerte, redondear hacia arriba lo mandaba debajo del borde inferior y no se veía).
+      tiltTo = clampTilt(centered, maxT, 0);
     }
     animateTo(normAz(pos.azimuth_deg), { fovTo, tiltTo });
   }

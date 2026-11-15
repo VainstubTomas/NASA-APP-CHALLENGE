@@ -261,6 +261,9 @@
   pointer-events: auto;
   transition: opacity 0.2s ease; /* sin transición en el giro: al cruzar 0° daría la vuelta larga */
 }
+/* display: grid pisa el atributo hidden: sin esto la flecha quedaba visible (y con el ángulo
+   viejo) cuando el cuerpo está en el centro de la pantalla. */
+.sky-pointer[hidden] { display: none; }
 .sky-pointer svg { filter: drop-shadow(0 0 4px currentColor); }
 .sky-pointer--sun { color: var(--sky-sun-hover); }
 .sky-pointer--earth { color: var(--sky-earth); }

@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseCoord, validateCoords, dayStartMs, buildLiveUrl, flatHorizon, apiErrorMessage, createLiveLoader,
+  parseCoord, validateCoords, dayStartMs, buildLiveUrl, buildHorizonUrl, flatHorizon, apiErrorMessage, createLiveLoader,
 } from './live-core.js';
 import { checkHorizon } from './contract.js';
 
@@ -97,4 +97,49 @@ test('loader: sin conexión o formato inesperado rechaza, no inventa datos', asy
   await assert.rejects(down.load(0, 30, T), /no se pudo conectar con la API/);
   const bad = createLiveLoader({ apiBase: 'http://api', fetchImpl: okFetch({ ...ephemeris(), schema_version: '9' }, []) });
   await assert.rejects(bad.load(0, 30, T), /formato inesperado/);
+});
+
+// ------------------------------------------------------------------ relieve en vivo (ADR-018)
+
+function relief(siteId = 'live-n0p0-e30p0') {
+  return { ...flatHorizon(siteId), elevation_deg: Array(360).fill(2), dem: { name: 'LRO_LOLA_DEM_Global_128ppd_v04', pixel_m: 237 } };
+}
+
+test('buildHorizonUrl: arma /horizon con lat y lon', () => {
+  assert.equal(buildHorizonUrl('http://localhost:8000/', -89.5, 0), 'http://localhost:8000/horizon?lat=-89.5&lon=0');
+});
+
+test('loader: el relieve se pide una vez por punto (no depende de la fecha)', async () => {
+  const calls = [];
+  const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl: okFetch(relief(), calls) });
+  const h = await loader.loadHorizon(0, 30);
+  assert.equal(h.dem.pixel_m, 237);
+  await loader.loadHorizon(0, 30);
+  assert.equal(calls.length, 1);
+  await loader.loadHorizon(0, 31);
+  assert.equal(calls.length, 2);
+});
+
+test('loader: la Luna lisa de la API (sin mapa para esa latitud) también es un relieve válido', async () => {
+  const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl: okFetch(flatHorizon('live-n89p0-e0p0'), []) });
+  const h = await loader.loadHorizon(89, 0);
+  assert.equal(h.dem, undefined);
+});
+
+test('loader: si el relieve falla rechaza con el mensaje de la API y el próximo pedido reintenta', async () => {
+  const calls = [];
+  const fetchImpl = async (url) => {
+    calls.push(url);
+    return { ok: false, status: 504, json: async () => ({ detail: 'NASA Moon Trek no respondió a tiempo.' }) };
+  };
+  const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl });
+  await assert.rejects(loader.loadHorizon(0, 30), /Moon Trek/);
+  await assert.rejects(loader.loadHorizon(0, 30), /Moon Trek/);
+  assert.equal(calls.length, 2);
+});
+
+test('loader: un relieve con formato inesperado se rechaza (no se dibuja nada inventado)', async () => {
+  const bad = { ...relief(), elevation_deg: Array(10).fill(0) };
+  const loader = createLiveLoader({ apiBase: 'http://api', fetchImpl: okFetch(bad, []) });
+  await assert.rejects(loader.loadHorizon(0, 30), /formato inesperado/);
 });
