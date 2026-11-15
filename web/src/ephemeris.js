@@ -76,22 +76,30 @@ export function nextVisibilityChange(ephemeris, utcMs, body, horizonDeg = 0) {
   const radius = ephemeris.angular_radius_deg[body];
   const { azimuth_deg, elevation_deg } = ephemeris[body];
   const horizonAt = typeof horizonDeg === 'function' ? horizonDeg : () => horizonDeg;
-  const visibleAt = (i) => isAboveHorizon(elevation_deg[i], radius, horizonAt(azimuth_deg[i]));
   // Margen sobre el horizonte del borde superior del disco; cambia de signo en la puesta/salida.
   const marginAt = (i) => elevation_deg[i] + radius - horizonAt(azimuth_deg[i]);
 
-  const visible = visibleAt(start.index);
-  for (let i = start.index + 1; i < count; i += 1) {
-    if (visibleAt(i) !== visible) {
-      const atMs = start.utcMs + (i - start.index) * step_s * 1000;
-      // crossMs: cruce estimado por interpolación lineal entre la muestra anterior y esta.
-      // atMs es la primera muestra ya cambiada (cota superior); crossMs es la mejor estimación.
-      const m0 = marginAt(i - 1);
-      const m1 = marginAt(i);
-      const frac = m0 === m1 ? 1 : Math.min(1, Math.max(0, m0 / (m0 - m1)));
-      const crossMs = atMs - (1 - frac) * step_s * 1000;
-      return { visible, event: visible ? 'sets' : 'rises', atMs, inHours: (atMs - utcMs) / 3600000, crossMs };
-    }
+  // El estado se evalúa en el instante pedido (interpolando entre las dos muestras que lo rodean) y
+  // no en la muestra más cercana: con datos horarios esa muestra puede estar hasta 30 min antes o
+  // después, y el cruce podía quedar del lado equivocado (por ejemplo, "se pone en 0 m" con el cuerpo ya oculto).
+  const stepMs = step_s * 1000;
+  const t0 = Date.parse(ephemeris.time.start_utc);
+  const pos = (utcMs - t0) / stepMs;
+  const i0 = Math.min(count - 1, Math.max(0, Math.floor(pos)));
+  const frac0 = i0 + 1 < count ? pos - i0 : 0;
+  const marginNow = i0 + 1 < count ? marginAt(i0) + (marginAt(i0 + 1) - marginAt(i0)) * frac0 : marginAt(i0);
+  const visible = marginNow > 0;
+  for (let i = i0; i + 1 < count; i += 1) {
+    const m0 = marginAt(i);
+    const m1 = marginAt(i + 1);
+    if (m0 > 0 === m1 > 0) continue;
+    // crossMs: cruce estimado por interpolación lineal entre las dos muestras. atMs es la primera
+    // muestra ya cambiada (cota superior); crossMs es la mejor estimación.
+    const frac = Math.min(1, Math.max(0, m0 / (m0 - m1)));
+    const crossMs = t0 + (i + frac) * stepMs;
+    if (crossMs <= utcMs) continue; // ese cruce ya pasó: el estado de ahora ya lo incluye
+    const atMs = t0 + (i + 1) * stepMs;
+    return { visible, event: visible ? 'sets' : 'rises', atMs, inHours: (atMs - utcMs) / 3600000, crossMs };
   }
   return { visible, event: null, atMs: null, inHours: null, crossMs: null };
 }

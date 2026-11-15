@@ -34,9 +34,11 @@ export const rotate = (heading, delta) => normAz(heading + delta);
  */
 export const tiltMax = (horizonY, k) => Math.max(0, 90 - horizonY / k);
 export const tiltUp = (tilt, max) => Math.min(max, tilt + TILT_STEP_DEG);
-export const tiltDown = (tilt) => Math.max(0, tilt - TILT_STEP_DEG);
-/** Inclinación al arrastrar el cielo: entre el horizonte (0°) y el máximo. */
-export const clampTilt = (tilt, max) => Math.min(max, Math.max(0, tilt));
+/** Inclinación mínima (negativa = mirar hacia abajo): deja el horizonte a `margin` px del borde de arriba. */
+export const tiltMin = (horizonY, k, margin = 150) => Math.min(0, -(horizonY - margin) / k) || 0;
+export const tiltDown = (tilt, min = 0) => Math.max(min, tilt - TILT_STEP_DEG);
+/** Inclinación al arrastrar el cielo: entre `min` (por defecto el horizonte, 0°) y el máximo. */
+export const clampTilt = (tilt, max, min = 0) => Math.min(max, Math.max(min, tilt));
 
 export const pxPerDeg = (width, fov = FOV_DEG) => width / fov;
 
@@ -98,7 +100,7 @@ export function initialHeading(sun, earth, sunRadius, earthRadius) {
 
 /**
  * Qué hacer al tocar "Aplicar" en el panel de búsqueda (nada se aplica antes).
- * mode: 'historical' (sitio de sites.json), 'location' (latitud y longitud, API en vivo) o 'map'.
+ * mode: 'historical' (sitio de sites.json), 'location' (latitud y longitud, API en vivo) o 'map' (clic en el mapa).
  * current / chosen: { site, time } con time en el formato de <input type="datetime-local"> (UTC).
  * Devuelve los pasos en orden: { type: 'site' | 'time', value } y { type: 'live' } (consultar la API).
  */
@@ -108,7 +110,8 @@ export function applyPlan({ mode, current, chosen }) {
   if (mode === 'historical') {
     if (chosen.site && chosen.site !== current.site) steps.push({ type: 'site', value: chosen.site });
     if (timeChanged) steps.push({ type: 'time', value: chosen.time });
-  } else if (mode === 'location') {
+  } else if (mode === 'location' || mode === 'map') {
+    // El mapa completa latitud y longitud y, de ahí en adelante, es igual que la ubicación específica.
     if (timeChanged) steps.push({ type: 'time', value: chosen.time });
     steps.push({ type: 'live' });
   }

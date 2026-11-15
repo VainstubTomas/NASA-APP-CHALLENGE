@@ -5,7 +5,7 @@ import { checkEphemeris } from './contract.js';
 
 export const LAT_MAX = 90;
 export const LON_MAX = 180;
-export const LIVE_DAYS = 7; // la misma ventana que la línea de tiempo (C3-03)
+export const LIVE_DAYS = 14; // máximo de la API: la cuenta regresiva busca cruces dentro de estos datos (la línea de tiempo usa 7)
 const DAY_MS = 24 * 3600 * 1000;
 
 /** Número desde el texto de un input (acepta coma decimal), o NaN si está vacío o no es un número. */

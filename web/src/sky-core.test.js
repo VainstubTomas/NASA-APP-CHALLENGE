@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
-  normAz, relAz, rotate, tiltMax, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
+  normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
   FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, pointerAngle, nearCenter,
 } from './sky-core.js';
@@ -130,7 +130,7 @@ test('applyPlan: ubicación específica fija la fecha y después consulta la API
     { type: 'live' },
   ]);
   assert.deepEqual(applyPlan({ mode: 'location', current, chosen: { ...current } }), [{ type: 'live' }]);
-  assert.deepEqual(applyPlan({ mode: 'map', current, chosen: { ...current } }), []);
+  assert.deepEqual(applyPlan({ mode: 'map', current, chosen: { ...current } }), [{ type: 'live' }]);
   assert.deepEqual(applyPlan({ mode: null, current, chosen: { ...current } }), []);
 });
 
@@ -183,4 +183,13 @@ test('nearCenter: el cuerpo está en la zona central de la pantalla (la flecha y
   assert.equal(nearCenter(1100, 450, 1440, 900), false); // muy a la derecha
   assert.equal(nearCenter(720, 100, 1440, 900), false); // muy arriba
   assert.equal(nearCenter(-300, 450, 1440, 900), false); // fuera de la vista
+});
+
+test('tiltMin y clampTilt: se puede bajar la mirada para ver el piso, con un límite', () => {
+  assert.equal(tiltMin(800, 20, 200), -30);
+  assert.equal(tiltMin(100, 20), 0);
+  assert.equal(clampTilt(-50, 60, -30), -30);
+  assert.equal(clampTilt(-4, 60), 0);
+  assert.equal(tiltDown(0, -30), -10);
+  assert.equal(tiltDown(-25, -30), -30);
 });

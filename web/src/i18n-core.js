@@ -4,8 +4,8 @@
 export const LANGS = ['es', 'en', 'hi', 'zh'];
 // Idioma fuente de los textos (los JSON se escriben primero en español).
 export const DEFAULT_LANG = 'es';
-// Idioma para quien no usa ninguno de los 4: inglés, porque Space Apps pide inglés en todo lo
-// que se enlaza en la entrega (#110).
+// Idioma por defecto de la web: inglés, porque Space Apps pide inglés en todo lo que se enlaza en
+// la entrega (#110). No depende del idioma del navegador.
 export const FALLBACK_LANG = 'en';
 
 // Locale para fechas y números (Intl) de cada idioma.
@@ -18,16 +18,12 @@ export function langFromSearch(search) {
 }
 
 /**
- * Idioma a usar: el de la URL (`?lang=`) si es válido; si no, el guardado por el usuario; si no,
- * el primero del navegador que soportemos ('zh-CN' -> 'zh'); si ninguno, inglés.
+ * Idioma a usar: el de la URL (`?lang=`) si es válido; si no, el que eligió el usuario antes; si no,
+ * inglés. El idioma del navegador no cuenta: la web siempre arranca en inglés hasta que se elige otro.
  */
-export function detectLang(browserLangs = [], storedLang = null, urlLang = null) {
+export function detectLang(storedLang = null, urlLang = null) {
   if (LANGS.includes(urlLang)) return urlLang;
   if (LANGS.includes(storedLang)) return storedLang;
-  for (const tag of browserLangs) {
-    const base = String(tag).toLowerCase().split('-')[0];
-    if (LANGS.includes(base)) return base;
-  }
   return FALLBACK_LANG;
 }
 

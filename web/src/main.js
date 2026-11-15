@@ -11,8 +11,10 @@ import { initLive } from './live.js';
 import { createLiveLoader } from './live-core.js';
 import { initSky } from './sky.js';
 import { getRange } from './state.js';
+import { initWelcome } from './welcome.js';
 
 applyStaticTexts();
+initWelcome(); // modal de bienvenida (una vez por sesión)
 initLangSelect(document.getElementById('lang'));
 
 const panel = document.getElementById('panel');
@@ -53,6 +55,7 @@ const sky = initSky(document.getElementById('sky'), {
   onUserInput: () => player?.pause(),
   drawer: document.getElementById('details'),
   liveEnabled: Boolean(liveLoader),
+  isLive: () => Boolean(liveSite),
 });
 
 async function showLive(utcMs) {
@@ -60,6 +63,7 @@ async function showLive(utcMs) {
   const seq = ++liveSeq;
   notice.hidden = true;
   live.setBusy(true);
+  sky.setLoading(true);
   live.setStatus(i18nT('live.loading'));
   try {
     const { ephemeris, horizon } = await liveLoader.load(lat, lon, utcMs);
@@ -79,7 +83,10 @@ async function showLive(utcMs) {
     sky.clear({ utcMs });
     live.setStatus(i18nT('live.apiError', { error: err.message }), true);
   } finally {
-    if (seq === liveSeq) live.setBusy(false);
+    if (seq === liveSeq) {
+      live.setBusy(false);
+      sky.setLoading(false);
+    }
   }
 }
 
@@ -89,6 +96,7 @@ document.getElementById('site').addEventListener('change', () => {
   liveSeq += 1;
   live?.setStatus('');
   live?.setBusy(false);
+  sky.setLoading(false);
 });
 
 initSelector({

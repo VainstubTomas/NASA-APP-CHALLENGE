@@ -81,3 +81,49 @@
 .sky-drawer .compare-btn--add { border-color: var(--color-border); font-weight: 600; }
 .sky-drawer .compare__flat { padding: 0; background: none; color: var(--color-muted); font-size: var(--fs-xs); }
 .compare__partial { margin: var(--space-2) 0 0; font-size: var(--fs-xs); color: var(--color-muted); }
+
+/* Ayuda con tooltip: "?" dentro de un círculo */
+.info-table__key--help { position: relative; }
+.info-table__keyrow { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.info-table__label { min-width: 0; }
+.info-help { flex: none; }
+.info-help__btn {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--color-muted);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: help;
+}
+.info-help__btn:hover,
+.info-help__btn:focus-visible { color: var(--color-text, #fff); border-color: currentColor; }
+.info-help__tip {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  z-index: 10;
+  width: 260px;
+  max-width: 70vw;
+  padding: 8px 10px;
+  border: 1px solid var(--color-muted);
+  border-radius: 6px;
+  background: var(--color-surface, #1c1f25);
+  color: var(--color-text, #fff);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+.info-help:hover .info-help__tip,
+.info-help:focus-within .info-help__tip { visibility: visible; opacity: 1; }

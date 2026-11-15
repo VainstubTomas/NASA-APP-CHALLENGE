@@ -40,30 +40,25 @@ test('los marcadores {variable} son los mismos en todos los idiomas', () => {
   }
 });
 
-test('detecta el idioma del navegador y usa inglés si no lo soporta (#110)', () => {
-  // Space Apps pide inglés en todo lo que se enlaza en la entrega: un jurado con el navegador
-  // en un idioma que no tenemos (francés, portugués...) tiene que ver la web en inglés.
+test('el idioma por defecto es inglés, sin importar el idioma del navegador (#110)', () => {
+  // Space Apps pide inglés en todo lo que se enlaza en la entrega: se abre en inglés hasta que
+  // alguien elige otro idioma (un navegador en español, hindi o chino no cambia nada).
   assert.equal(FALLBACK_LANG, 'en');
-  assert.equal(detectLang(['zh-CN', 'en']), 'zh');
-  assert.equal(detectLang(['hi-IN']), 'hi');
-  assert.equal(detectLang(['en-US', 'es']), 'en');
-  assert.equal(detectLang(['es-AR']), 'es');
-  assert.equal(detectLang(['fr-FR', 'es-AR']), 'es');
-  assert.equal(detectLang(['fr-FR']), 'en');
-  assert.equal(detectLang([]), 'en');
-  // La elección guardada por el usuario gana sobre el navegador.
-  assert.equal(detectLang(['en-US'], 'hi'), 'hi');
-  assert.equal(detectLang(['en-US'], 'xx'), 'en'); // guardado inválido: se ignora
+  assert.equal(detectLang(), 'en');
+  assert.equal(detectLang(null, null), 'en');
+  // La elección guardada por el usuario gana sobre el defecto.
+  assert.equal(detectLang('hi'), 'hi');
+  assert.equal(detectLang('xx'), 'en'); // guardado inválido: se ignora
 });
 
-test('?lang= en la URL gana sobre lo guardado y el navegador (#110)', () => {
+test('?lang= en la URL gana sobre lo guardado (#110)', () => {
   assert.equal(langFromSearch('?site=apollo-11&lang=en'), 'en');
   assert.equal(langFromSearch('?lang=ZH'), 'zh');
   assert.equal(langFromSearch('?lang=fr'), null);
   assert.equal(langFromSearch(''), null);
-  assert.equal(detectLang(['es-AR'], 'hi', 'en'), 'en');
-  assert.equal(detectLang(['es-AR'], 'hi', null), 'hi');
-  assert.equal(detectLang(['es-AR'], null, 'xx'), 'es'); // inválido: se ignora
+  assert.equal(detectLang('hi', 'en'), 'en');
+  assert.equal(detectLang('hi', null), 'hi');
+  assert.equal(detectLang(null, 'xx'), 'en'); // inválido: se ignora
 });
 
 test('t() reemplaza variables y, si falta una traducción, usa español y después la clave', () => {
