@@ -535,22 +535,11 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   }
 
   // --- Gráfico de 360° (como "Cómo leer los números" del artifact) ---
-  function drawChart() {
+  // La parte fija del gráfico (grilla, silueta, etiquetas) se arma solo cuando cambian el horizonte,
+  // el rango o el idioma. En cada cuadro solo se mueven el recuadro de la vista y los dos cuerpos.
+  let chartCache = null;
+  function buildChartStatic(ax, ay, { X0, X1, Y0, Y1, min, max, relief, profile }) {
     chart.replaceChildren();
-    const X0 = CHART_X0;
-    const X1 = CHART_X1;
-    const Y0 = 14;
-    const Y1 = 160;
-    const sample = pose;
-    const relief = hasRelief(data?.horizon);
-    const profile = relief ? chartProfile(data.horizon) : null;
-    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
-    const { min, max } = chartRange([
-      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
-      ...(profile ? profile.map((p) => p.elevation) : []),
-    ]);
-    const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
-    const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
     const step = max <= 15 ? 5 : max <= 45 ? 10 : 15;
     // Marcas en múltiplos del paso (con escala grande, −5° no lleva etiqueta: se pisaba con 0°)
     for (let v = Math.ceil(min / step) * step; v <= max; v += step) {
@@ -578,27 +567,78 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     }
     if (!relief) svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
 
-    // Recuadro de lo que muestra la vista (puede cruzar el norte: dos rectángulos)
+    // Recuadro de la vista (puede cruzar el norte: dos rectángulos; el segundo queda en ancho 0 si no hace falta)
+    const views = [
+      svg('rect', { y: Y0, height: Y1 - Y0, class: 'sky-chart__view' }, chart),
+      svg('rect', { y: Y0, height: Y1 - Y0, class: 'sky-chart__view' }, chart),
+    ];
+    // Cuerpos: van al final para quedar encima; la posición se pone en cada cuadro
+    const bodies = {};
+    for (const key of ['earth', 'sun']) {
+      const c = svg('circle', { r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}` }, chart);
+      const tx = svg('text', { 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart);
+      tx.textContent = bodyName(key);
+      bodies[key] = { c, tx };
+    }
+    return { views, bodies };
+  }
+
+  function drawChart() {
+    const X0 = CHART_X0;
+    const X1 = CHART_X1;
+    const Y0 = 14;
+    const Y1 = 160;
+    const sample = pose;
+    if (!chartCache || chartCache.horizon !== data?.horizon) {
+      const relief = hasRelief(data?.horizon);
+      chartCache = { horizon: data?.horizon, relief, profile: relief ? chartProfile(data.horizon) : null, key: null, nodes: null };
+    }
+    const { relief, profile } = chartCache;
+    // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
+    const { min, max } = chartRange([
+      ...(sample ? [sample.sun.elevation_deg, sample.earth.elevation_deg] : [0]),
+      ...(profile ? profile.map((p) => p.elevation) : []),
+    ]);
+    const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
+    const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
+
+    const labels = [0, 45, 90, 135, 180, 225, 270, 315, 360].map((a) => t(`compass.${compassLabel(a)}`));
+    const key = [min, max, relief, labels.join('|'), bodyName('sun'), bodyName('earth'), t('sky.chart.ground')].join('|');
+    if (chartCache.key !== key) {
+      chartCache.key = key;
+      chartCache.nodes = buildChartStatic(ax, ay, { X0, X1, Y0, Y1, min, max, relief, profile });
+    }
+    const { views, bodies } = chartCache.nodes;
+
     const from = normAz(heading - fov / 2);
     const to = from + fov;
-    const win = (a0, a1) => svg('rect', {
-      x: X0 + (a0 / 360) * (X1 - X0), y: Y0, width: ((a1 - a0) / 360) * (X1 - X0), height: Y1 - Y0,
-      class: 'sky-chart__view',
-    }, chart);
-    if (to <= 360) win(from, to);
-    else { win(from, 360); win(0, to - 360); }
+    const setView = (node, a0, a1) => {
+      node.setAttribute('x', X0 + (a0 / 360) * (X1 - X0));
+      node.setAttribute('width', ((a1 - a0) / 360) * (X1 - X0));
+    };
+    if (to <= 360) {
+      setView(views[0], from, to);
+      setView(views[1], 0, 0);
+    } else {
+      setView(views[0], from, 360);
+      setView(views[1], 0, to - 360);
+    }
 
-    if (!sample) return;
     for (const key of ['earth', 'sun']) {
+      const { c, tx } = bodies[key];
+      c.style.display = sample ? '' : 'none';
+      tx.style.display = sample ? '' : 'none';
+      if (!sample) continue;
       const pos = sample[key];
       const x = ax(pos.azimuth_deg);
       const y = ay(pos.elevation_deg);
       // Si el relieve lo tapa o está bajo el horizonte, el punto se dibuja hueco (no se ve desde el sitio).
       const state = visibilityState(pos, data.ephemeris.angular_radius_deg[key], data.horizon);
-      const hidden = state === 'blocked' || state === 'down' ? ' is-hidden' : '';
-      svg('circle', { cx: x, cy: y, r: key === 'earth' ? 6 : 5, class: `sky-chart__body sky-chart__body--${key}${hidden}` }, chart);
-      svg('text', { x, y: y - 11, 'text-anchor': 'middle', class: `sky-chart__name--${key}` }, chart)
-        .textContent = bodyName(key);
+      c.classList.toggle('is-hidden', state === 'blocked' || state === 'down');
+      c.setAttribute('cx', x);
+      c.setAttribute('cy', y);
+      tx.setAttribute('x', x);
+      tx.setAttribute('y', y - 11);
     }
   }
 
