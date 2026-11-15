@@ -15,7 +15,7 @@ import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
 import { sampleAt, nextVisibilityChange, elevationDisplay, compassLabel } from './ephemeris.js';
-import { horizonAt } from './horizon.js';
+import { horizonAt, hasRelief } from './horizon.js';
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
@@ -641,6 +641,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     update({ ephemeris, horizon: hz, utcMs, siteName, key }) {
       const sample = sampleAt(ephemeris, utcMs);
       data = { ephemeris, horizon: hz, utcMs, siteName, sample };
+      smooth.style.display = hasRelief(hz) ? 'none' : '';
       if (key !== siteKey && sample) {
         siteKey = key;
         const radii = ephemeris.angular_radius_deg;

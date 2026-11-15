@@ -59,7 +59,9 @@ No se entregaron archivos de datos: ni kernels ni mapas.
 2. **Terreno: el mapa de elevación sale de Moon Trek o de Quickmap, si permiten exportarlo** (C5-05, antes C0-03; ADR-011, timebox de 1 h). El cálculo del horizonte (pieza 2) no cambia.
    - Plan B: `LDEM_80S_80MPP_ADJ.TIF` del archivo PDS de LOLA (dato público de NASA, fuera de la lista de recursos), solo con el OK de los organizadores (C0-11).
    - Plan C: si no hay mapa a tiempo, se recorta a la capa 1 (sin horizonte real), según la regla "recortar, no estirar".
-   - Fuente elegida (completar en C5-05): producto, resolución y proyección.
+   - Fuente elegida (C5-05, #13): `LRO_LOLA_DEM_Global_128ppd_v04` (LRO LOLA DEM, Moon Trek). Elevación cruda en metros, Float32, 128 ppd (~237 m/px en el ecuador), proyección `urn:ogc:def:crs:EPSG::104903` (GCS_Moon_2000, ESRI 104903). Se consulta por recorte con `ImageServer/exportImage` (`precompute/terrain/lola_dem.py`), no se baja el global (2.2 GB). Descartados: `LRO_LOLAKaguya_DEM_60N60S_512ppd` (solo `Mosaic`, 453 GB) y los polares `LRO_LOLA_DEM_SPole*` (no cubren Apollo 11 ni Apollo 14).
+   - Chequeo cruzado: la altura de Apollo 11 (23.4730°E, 0.6741°N) da -1928 m en el recorte y en `identify`, pero es la misma fuente.
+   - Referencias externas: Apollo 11, LROC "Spacecraft Related Coordinates, 2016 update" (https://lroc.im-ldi.com/images/938): descent stage -1928 m (modelo GLD100, no LOLA). Coincide con el recorte. Chang'e 4, Nature s41467-019-12278-3 (https://www.nature.com/articles/s41467-019-12278-3): aterrizaje 177.5991°E, 45.4446°S, ~-5935 m. Recorte: -5930 m (diferencia 5 m, dentro de 237 m/px).
 3. **Validación** (reemplaza en parte al ADR-005): como Horizons es la fuente, se verifica que **lo leemos bien**.
    - Tests contra respuestas de Horizons guardadas en `tests/reference/`, con la consulta exacta que las generó.
    - Comparación manual con la interfaz web de Horizons en 3 sitios y 3 fechas.

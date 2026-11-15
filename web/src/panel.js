@@ -5,7 +5,7 @@
 // contra horizon.json (#32) con la regla del contrato; las horas, con visibilitySeries.
 import './panel.css';
 import { sampleAt, compassLabel, nextVisibilityChange } from './ephemeris.js';
-import { horizonAt, statusAgainstHorizon } from './horizon.js';
+import { horizonAt, statusAgainstHorizon, hasRelief } from './horizon.js';
 import { visibilitySeries } from './visibility.js';
 import { windowHours, periodSummary } from './info-core.js';
 import { t, locale } from './i18n.js';
@@ -155,7 +155,7 @@ export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, co
     ],
   );
 
-  const note = el('p', 'info-note', t('info.note'));
+  const note = el('p', 'info-note', t(hasRelief(horizon) ? 'info.noteRelief' : 'info.note'));
   container.append(header, position, windowsTable, summary, note);
 
   // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza

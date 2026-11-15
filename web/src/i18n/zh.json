@@ -234,6 +234,7 @@
   "info.dh": "{d} 天 {h} 小时",
   "info.h": "{h} 小时",
   "info.note": "理想地平线，无地形起伏（ADR-011）。可见：圆盘上缘高于地平线。JPL Horizons 逐小时数据；穿越时刻由插值估算（± 几分钟）。",
+  "info.noteRelief": "月球真实地形（LOLA）。可见：天体圆盘上缘高于地平线。数据为 JPL Horizons 逐小时数据；穿越时刻为插值估计（误差约几分钟）。",
   "live.latPlaceholder": "−90 至 90（南为负）",
   "live.lonPlaceholder": "−180 至 180（东为正）",
   "compare.row.site": "着陆点",

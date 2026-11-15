@@ -234,6 +234,7 @@
   "info.dh": "{d} d {h} h",
   "info.h": "{h} h",
   "info.note": "Horizonte ideal, sin relieve (ADR-011). Visible: el borde superior del disco está sobre el horizonte. Datos horarios de JPL Horizons; los cruces se estiman por interpolación (± unos minutos).",
+  "info.noteRelief": "Relieve real de LOLA. Visible: el borde superior del disco está sobre el horizonte. Datos horarios de JPL Horizons; los cruces se estiman por interpolación (± unos minutos).",
   "live.latPlaceholder": "Entre −90 y 90 (sur negativo)",
   "live.lonPlaceholder": "Entre −180 y 180 (este positivo)",
   "compare.row.site": "Sitio",

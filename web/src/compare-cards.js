@@ -6,6 +6,7 @@
 import { summarizeScenario, groupScenarios } from './compare-core.js';
 import { explainBest } from './compare-summary-core.js';
 import { loadSite, loadSites } from './data.js';
+import { hasRelief } from './horizon.js';
 import { t, locale, siteName } from './i18n.js';
 
 const WINDOW_DAYS = 7; // misma ventana que la línea de tiempo (C3-03) y que ADR-014
@@ -39,7 +40,7 @@ export async function summarizeAll(scenarios) {
     const base = { ...scenario, n: i + 1, name: site ? siteName(site) : scenario.site };
     try {
       const { ephemeris, horizon } = await loadSite(scenario.site);
-      return { ...base, summary: summarizeScenario(ephemeris, horizon, scenario.t, WINDOW_DAYS) };
+      return { ...base, relief: hasRelief(horizon), summary: summarizeScenario(ephemeris, horizon, scenario.t, WINDOW_DAYS) };
     } catch (err) {
       console.warn(`Comparación: sin datos para ${scenario.site}`, err);
       return { ...base, summary: null };
@@ -160,6 +161,6 @@ export function renderCompareCards(container, items) {
     scenarioTable(groups, bestId),
     ...tableNotes(groups),
     el('p', 'compare__window', t('compare.window', { days: WINDOW_DAYS })),
-    el('p', 'compare__flat', t('compare.flatNote')),
+    ...(items.some((i) => i.summary && !i.relief) ? [el('p', 'compare__flat', t('compare.flatNote'))] : []),
   );
 }
