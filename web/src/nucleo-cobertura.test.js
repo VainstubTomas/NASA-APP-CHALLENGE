@@ -1,4 +1,11 @@
 // Pruebas de ramas que faltaban en el núcleo web (#106). Correr con: npm test (dentro de web/).
+//
+// Decisión (#106): la cobertura se mide solo sobre el núcleo sin DOM (contract.js, dials-core.js,
+// validation.js, visibility.js, i18n-core.js, live-core.js, compare-core.js…). Los módulos que dibujan
+// (main.js, compare.js, compare-cards.js, live.js, selector.js…) quedan fuera de la medición: dependen
+// del navegador, su lógica ya vive en los *-core.js probados, y se verifican a mano en el navegador.
+// No se agregan tests de humo con DOM falso: costarían más de lo que protegen para el plazo del hackatón.
+// Medir con: node --test --experimental-test-coverage (dentro de web/).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
