@@ -5,9 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1020" />
     <title>Lunar Landing Site Navigator</title>
+    <!-- Favicon: logo del equipo (Vizcachas fuera de órbita) en un círculo blanco -->
+    <link rel="icon" type="image/svg+xml" href="./src/assets/sky/favicon.svg" />
   </head>
   <body>
-    <div class="page">
+    <!-- Vista del cielo (rediseño #99): la arma src/sky.js. -->
+    <section id="sky" class="sky">
+      <!-- Panel de búsqueda (Figma frames 3 y 4): nada se aplica hasta tocar "Aplicar" (src/sky-panel.js). -->
+      <div id="sky-panel" class="sky-panel" role="dialog" aria-labelledby="sky-panel-intro" hidden>
+        <button type="button" class="sky-panel__close" data-sky-close data-i18n-label="sky.panel.close">×</button>
+        <p id="sky-panel-intro" class="sky-panel__intro" data-i18n="sky.panel.intro"></p>
+        <div class="sky-panel__modes" role="group" aria-labelledby="sky-panel-intro">
+          <button type="button" class="sky-mode" data-mode="historical" aria-pressed="false" data-i18n="sky.panel.mode.historical"></button>
+          <button type="button" class="sky-mode" data-mode="location" aria-pressed="false" data-i18n="sky.panel.mode.location"></button>
+          <button type="button" class="sky-mode" data-mode="map" aria-pressed="false" data-i18n="sky.panel.mode.map"></button>
+        </div>
+        <div class="sky-pane field" data-pane="historical" hidden>
+          <label for="sky-site" data-i18n="sky.panel.historical"></label>
+          <select id="sky-site"></select>
+        </div>
+        <div class="sky-pane" data-pane="location" hidden>
+          <section id="live" class="live" hidden></section>
+          <p class="sky-panel__note" data-no-api data-i18n="sky.panel.noApi" hidden></p>
+        </div>
+        <div class="sky-pane sky-map" data-pane="map" data-pole="south" hidden>
+          <!-- Mapas de los polos (originales: psur.png y pnorte.png, achicados a 720 px). -->
+          <img class="sky-map__image" data-pole-image="south" src="./src/assets/sky/pole-south.png" data-i18n-label="sky.panel.poleSouthImage" alt="" />
+          <img class="sky-map__image" data-pole-image="north" src="./src/assets/sky/pole-north.png" data-i18n-label="sky.panel.poleNorthImage" alt="" hidden />
+          <div class="sky-map__row">
+            <p class="sky-map__label" data-pole-label aria-live="polite" data-i18n="sky.panel.poleSouth"></p>
+            <button type="button" class="sky-map__rotate" data-pole-rotate data-i18n="sky.panel.rotate"></button>
+          </div>
+          <p class="sky-panel__note" data-i18n="sky.panel.soon"></p>
+        </div>
+        <div class="sky-pane field" data-pane="date" hidden>
+          <label for="sky-time" data-i18n="sky.panel.date"></label>
+          <input id="sky-time" type="datetime-local" />
+          <p class="field-hint" data-i18n="selector.timeHint"></p>
+        </div>
+        <button type="button" class="sky-panel__apply" data-sky-apply data-i18n="sky.panel.apply" hidden></button>
+      </div>
+      <!-- Controles reales del selector (src/selector.js); el panel los cambia al aplicar. -->
+      <div hidden>
+        <select id="site" tabindex="-1" aria-hidden="true"></select>
+        <input id="time" type="datetime-local" tabindex="-1" aria-hidden="true" />
+      </div>
+    </section>
+
+    <!-- Más información (Figma frame 2): cajón lateral con el detalle. -->
+    <div class="page sky-drawer" id="details" aria-hidden="true" inert>
       <header>
         <div class="topbar">
           <label for="lang" data-i18n="lang.label">Idioma</label>
@@ -19,22 +65,6 @@
       </header>
 
       <main>
-        <section class="controls">
-          <div class="field">
-            <label for="site" data-i18n="selector.site">Sitio de aterrizaje</label>
-            <select id="site"></select>
-          </div>
-          <div class="field">
-            <label for="time" data-i18n="selector.time">Fecha y hora (UTC)</label>
-            <input id="time" type="datetime-local" />
-            <p class="field-hint" data-i18n="selector.timeHint"></p>
-          </div>
-        </section>
-
-        <section id="live" class="live" hidden></section>
-
-        <section id="player" class="player"></section>
-
         <p id="notice" hidden></p>
         <section id="panel" aria-live="polite"></section>
         <section id="timeline"></section>

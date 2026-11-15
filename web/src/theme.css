@@ -57,6 +57,32 @@
   --radius: 0.75rem;
   --radius-pill: 999px;
   --page-width: 46rem;
+
+  /* Vista del cielo (rediseño #99). Interfaz neutra (blanco, grises, negro); los únicos colores
+     son los de los cuerpos: Sol amarillo (--color-sun) y Tierra celeste (--sky-earth). */
+  --sky-bg: #000000;
+  --sky-text: #ffffff;
+  --sky-text-dim: #b9bfcc;
+  --sky-white: #ffffff;
+  --sky-primary: #12131a;       /* Figma "Primary": botones oscuros */
+  --sky-horizon: #e9edf3;       /* horizonte y brújula: blanco suave */
+  --sky-horizon-glow: rgba(255, 255, 255, 0.35);
+  --sky-edge: rgba(255, 255, 255, 0.32);       /* bordes blancos difuminados de los recuadros */
+  --sky-edge-glow: rgba(255, 255, 255, 0.16);
+  --sky-earth: #00ffe5;         /* Tierra: nombre, línea, grados, flecha y brillo */
+  --sky-earth-glow: rgba(0, 255, 229, 0.55);
+  --sky-sun-glow: rgba(255, 197, 77, 0.55);    /* Sol: mismo amarillo que --color-sun */
+  --sky-sun-hover: rgba(255, 197, 77, 0.85);
+  --sky-card: #111316;
+  --sky-tab: #1c1f25;
+  --sky-grid: #2a2d33;
+  --sky-chart-ground: #24262b;
+  --sky-view-fill: rgba(255, 255, 255, 0.08);
+  --sky-chip-bg: rgba(0, 0, 0, 0.62);
+  --sky-field: #d9d9d9;
+  --sky-shadow: 0 1.5px 3px rgba(18, 19, 26, 0.25); /* Figma "Shadow" */
+  --font-sky: 'Inter', var(--font-sans);
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 *,

@@ -1,6 +1,6 @@
 # Lunar Landing Site Navigator: contexto para Claude
 
-> Léelo completo antes de tocar código. Última actualización: 2026-11-14. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
+> Léelo completo antes de tocar código. Última actualización: 2026-11-15. Si algo de acá cambia, se cambia con un ADR (ver `docs/adr/`).
 
 ## Qué estamos construyendo
 Una web que responde una pregunta: **si aterrizo en este lugar de la Luna en esta fecha, ¿voy a tener Sol y voy a poder comunicarme con la Tierra?**
@@ -12,6 +12,7 @@ Proyecto del NASA Space Apps Challenge 2026 (evento presencial, 14 y 15 de novie
 2. **Terreno** (Python, offline): perfil de horizonte de 360 valores por sitio. **Primero Luna lisa** (360 ceros, sin relieve, capas 1 a 4); el relieve desde un mapa de elevación LOLA (fuente según ADR-006: Moon Trek/Quickmap o, como plan B, PDS) va **al final, en la capa 5** (ADR-011). Carpeta `precompute/terrain/`.
 3. **Web** (JS): lee los JSON precalculados y compara elevación del cuerpo contra horizonte. Carpeta `web/`.
 Python y la web **solo se hablan por los JSON** de `data/public/`. El contrato está en `docs/03-DATA-CONTRACT.md` y los esquemas en `data/schema/`.
+**Única excepción (ADR-015)**: la consulta en vivo. Si hay `VITE_API_URL`, la web pide a la API de `data/api/` (FastAPI) las efemérides de una latitud y longitud libres; la API consulta Horizons y responde con el formato de `ephemeris.json`. Los sitios de `sites.json` siguen con los JSON precalculados. Guía en `docs/09-API.md`.
 
 ## Recursos oficiales del desafío (liberados el 13/11; ver ADR-006)
 - **JPL Horizons**: posiciones del Sol y la Tierra vistas desde cualquier punto de la Luna. Es nuestra fuente de efemérides.
@@ -37,6 +38,7 @@ tests/               pytest: contrato y validación contra Horizons
 web/                 web (Vite)
 data/raw/            datos pesados (mapa de elevación, caché de Horizons). NO se commitea
 data/public/         JSON que consume la web. Se commitea
+data/api/            API en vivo (FastAPI, ADR-015): efemérides de una posición libre
 data/schema/         JSON Schema del contrato
 scripts/             utilidades (labels, issues, datos sintéticos)
 ```
@@ -69,4 +71,4 @@ Objetivo: capas 1 a 4 (la 4 es obligatoria desde el ADR-009). **Recortar, no est
 Equipo multirubro: no hay roles fijos. Todos trabajan en cualquier área (Python, web, producto y demo) y toman los issues que sigan en el tablero.
 
 ## Más contexto
-`docs/00-CONTEXT.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-DATA-CONTRACT.md` · `docs/04-GIT-WORKFLOW.md` · `docs/05-ROADMAP.md` · `docs/06-PITCH-DEMO.md` · `docs/07-DESAFIO-OFICIAL.md` (texto oficial) · `docs/adr/`
+`docs/00-CONTEXT.md` · `docs/01-PRD.md` · `docs/02-ARCHITECTURE.md` · `docs/03-DATA-CONTRACT.md` · `docs/04-GIT-WORKFLOW.md` · `docs/05-ROADMAP.md` · `docs/06-PITCH-DEMO.md` · `docs/07-DESAFIO-OFICIAL.md` (texto oficial) · `docs/09-API.md` (API en vivo) · `docs/adr/`

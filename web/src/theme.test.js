@@ -35,6 +35,18 @@ const PAIRS = [
   ['color-partial', 'color-partial-bg'],
   ['color-down', 'color-down-bg'],
   ['color-notice', 'color-notice-bg'],
+  // Vista del cielo (#99)
+  ['sky-text', 'sky-bg'],
+  ['sky-text-dim', 'sky-bg'],
+  ['sky-text-dim', 'sky-card'],
+  ['sky-horizon', 'sky-bg'],
+  ['sky-earth', 'sky-bg'],
+  ['color-sun', 'sky-bg'],
+  ['sky-earth', 'sky-card'],
+  ['color-sun', 'sky-card'],
+  ['sky-horizon', 'sky-card'],
+  ['sky-white', 'sky-tab'],
+  ['sky-white', 'sky-primary'],
 ];
 
 test('todos los pares de texto y fondo tienen contraste AA (4,5:1 o más)', () => {
