@@ -6,6 +6,7 @@
 // Qué pasos se ejecutan lo decide applyPlan (sky-core.js, con tests).
 import { applyPlan } from './sky-core.js';
 import { validateCoords } from './live-core.js';
+import { t } from './i18n.js';
 
 /**
  * @param {HTMLElement} panel  #sky-panel
@@ -26,6 +27,24 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   let mode = null;
   let applying = false;
 
+  // Mapa lunar: polo sur (el del proyecto) y, con "Rotar", polo norte.
+  const map = panel.querySelector('[data-pane="map"]');
+  const poleLabel = map?.querySelector('[data-pole-label]');
+  function setPole(pole) {
+    if (!map) return;
+    map.dataset.pole = pole;
+    for (const img of map.querySelectorAll('[data-pole-image]')) img.hidden = img.dataset.poleImage !== pole;
+    poleLabel.textContent = t(pole === 'south' ? 'sky.panel.poleSouth' : 'sky.panel.poleNorth');
+  }
+  map?.querySelector('[data-pole-rotate]')?.addEventListener('click', () => {
+    setPole(map.dataset.pole === 'south' ? 'north' : 'south');
+  });
+  // Textos accesibles: alt en las imágenes, aria-label en el resto.
+  panel.querySelectorAll('[data-i18n-label]').forEach((n) => {
+    if (n.tagName === 'IMG') n.alt = t(n.dataset.i18nLabel);
+    else n.setAttribute('aria-label', t(n.dataset.i18nLabel));
+  });
+
   const liveForm = () => panel.querySelector('#live form');
 
   function setMode(next) {
@@ -33,11 +52,26 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     for (const b of modes) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
     for (const p of panes) {
       const name = p.dataset.pane;
+      // La fecha acompaña a histórico y a ubicación específica; el mapa todavía no aplica nada.
       p.hidden = !mode || (name === 'date' ? mode === 'map' : name !== mode);
     }
     if (noApi) noApi.hidden = liveEnabled;
-    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled);
-    apply.hidden = !mode || mode === 'map';
+    // "Aplicar" está en los tres modos. El mapa todavía no permite elegir un lugar y la
+    // ubicación específica necesita la API en vivo: en esos casos queda deshabilitado.
+    apply.hidden = !mode;
+    updateApply();
+  }
+
+  // Coordenadas cargadas y dentro de rango (mismas reglas que la API: live-core.js).
+  function coordsValid() {
+    const inputs = liveForm()?.querySelectorAll('input');
+    return inputs?.length >= 2 && validateCoords(inputs[0].value, inputs[1].value).ok;
+  }
+
+  // "Aplicar": histórico siempre; ubicación específica cuando hay API y las coordenadas son válidas;
+  // el mapa todavía no permite elegir un lugar.
+  function updateApply() {
+    const canApply = mode === 'historical' || (mode === 'location' && liveEnabled && coordsValid());
     apply.disabled = !canApply;
   }
 
@@ -50,6 +84,7 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     time.step = realTime.step;
     time.value = realTime.value;
     setMode(null);
+    setPole('south');
     panel.hidden = false;
     trigger.setAttribute('aria-expanded', 'true');
     modes[0]?.focus();
@@ -69,17 +104,15 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
 
   function runApply() {
     const form = liveForm();
-    if (mode === 'location') {
-      // Coordenadas inválidas: se envía igual para que el formulario muestre los errores, y no se cierra.
-      const inputs = form?.querySelectorAll('input');
-      const check = inputs?.length >= 2 ? validateCoords(inputs[0].value, inputs[1].value) : { ok: false };
-      if (!check.ok) {
-        applying = true;
-        form?.requestSubmit();
-        applying = false;
-        return;
-      }
+    if (mode === 'location' && !coordsValid()) {
+      // Coordenadas inválidas (por ejemplo, Enter con un campo vacío): el formulario muestra
+      // los errores de cada campo y el panel no se cierra. live.js no consulta si no son válidas.
+      applying = true;
+      form?.requestSubmit();
+      applying = false;
+      return;
     }
+    if (apply.disabled || apply.hidden) return;
     const steps = applyPlan({
       mode,
       current: { site: realSite.value, time: realTime.value },
@@ -98,6 +131,7 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   }
 
   for (const b of modes) b.addEventListener('click', () => setMode(b.dataset.mode));
+  panel.querySelector('[data-pane="location"]')?.addEventListener('input', updateApply);
   apply.addEventListener('click', runApply);
   panel.querySelectorAll('[data-sky-close]').forEach((b) => b.addEventListener('click', () => close()));
 

@@ -2,9 +2,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG, TILT_MAX_DEG,
-  normAz, relAz, rotate, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
+  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  normAz, relAz, rotate, tiltMax, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, applyPlan,
+  FOV_MIN_DEG, FOV_MAX_DEG, zoomFov, makeStars, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 test('normAz lleva cualquier ángulo a [0, 360)', () => {
@@ -28,20 +29,26 @@ test('rotate gira el rumbo y lo normaliza (las flechas giran 45°: de un rumbo a
   assert.equal(rotate(90, 45), 135);
 });
 
-test('la flecha de arriba sube la mirada de a 10° hasta 30°, la de abajo vuelve', () => {
+test('tiltMax: se puede subir la mirada hasta que el borde de arriba muestre el cenit (90°)', () => {
+  // Horizonte a 720 px del borde superior y 24 px por grado: sin inclinar se ven 30° de cielo.
+  assert.equal(tiltMax(720, 24), 60);
+  // Muy alejado (zoom), ya se ve el cenit sin inclinar.
+  assert.equal(tiltMax(720, 6), 0);
+});
+
+test('la flecha de arriba sube la mirada de a 10° hasta el máximo; la de abajo vuelve', () => {
   assert.equal(TILT_STEP_DEG, 10);
-  assert.equal(TILT_MAX_DEG, 30);
-  assert.equal(tiltUp(0), 10);
-  assert.equal(tiltUp(30), 30);
-  assert.equal(tiltUp(25), 30);
+  assert.equal(tiltUp(0, 60), 10);
+  assert.equal(tiltUp(55, 60), 60);
+  assert.equal(tiltUp(60, 60), 60);
   assert.equal(tiltDown(10), 0);
   assert.equal(tiltDown(0), 0);
 });
 
-test('clampTilt: al arrastrar, la mirada queda entre el horizonte y 30°', () => {
-  assert.equal(clampTilt(-4), 0);
-  assert.equal(clampTilt(12.5), 12.5);
-  assert.equal(clampTilt(80), 30);
+test('clampTilt: al arrastrar, la mirada queda entre el horizonte y el máximo', () => {
+  assert.equal(clampTilt(-4, 60), 0);
+  assert.equal(clampTilt(12.5, 60), 12.5);
+  assert.equal(clampTilt(80, 60), 60);
 });
 
 test('escala: el campo de visión horizontal (60°) ocupa todo el ancho', () => {
@@ -125,4 +132,55 @@ test('applyPlan: ubicación específica fija la fecha y después consulta la API
   assert.deepEqual(applyPlan({ mode: 'location', current, chosen: { ...current } }), [{ type: 'live' }]);
   assert.deepEqual(applyPlan({ mode: 'map', current, chosen: { ...current } }), []);
   assert.deepEqual(applyPlan({ mode: null, current, chosen: { ...current } }), []);
+});
+
+test('zoomFov: la rueda acerca (campo más chico) y aleja, entre 20° y 100°', () => {
+  assert.equal(FOV_MIN_DEG, 20);
+  assert.equal(FOV_MAX_DEG, 100);
+  assert.ok(zoomFov(60, -100) < 60); // rueda hacia arriba: acerca
+  assert.ok(zoomFov(60, 100) > 60); // rueda hacia abajo: aleja
+  assert.equal(zoomFov(60, 0), 60);
+  assert.equal(zoomFov(21, -100000), 20);
+  assert.equal(zoomFov(99, 100000), 100);
+  // Ida y vuelta: el mismo giro de rueda en los dos sentidos vuelve al campo inicial.
+  assert.ok(Math.abs(zoomFov(zoomFov(60, -120), 120) - 60) < 1e-9);
+});
+
+test('makeStars: siempre las mismas para la misma semilla, sobre el horizonte y casi todas débiles', () => {
+  const a = makeStars(500, 42);
+  const b = makeStars(500, 42);
+  assert.equal(a.length, 500);
+  assert.deepEqual(a, b);
+  assert.notDeepEqual(makeStars(500, 7), a);
+  for (const s of a) {
+    assert.ok(s.az >= 0 && s.az < 360);
+    assert.ok(s.el >= 0 && s.el <= 90);
+    assert.ok(s.alpha > 0 && s.alpha <= 1);
+    assert.ok(s.size > 0 && s.size <= 2);
+    assert.match(s.color, /^#[0-9a-f]{6}$/);
+  }
+  const faint = a.filter((s) => s.alpha < 0.5).length;
+  assert.ok(faint > a.length * 0.6, `débiles: ${faint}`);
+});
+
+test('pointerAngle: hacia dónde apunta la flecha del centro (0° = arriba, sentido horario)', () => {
+  assert.equal(pointerAngle(500, 400, 500, 100), 0); // arriba
+  assert.equal(pointerAngle(500, 400, 900, 400), 90); // derecha
+  assert.equal(pointerAngle(500, 400, 500, 700), 180); // abajo
+  assert.equal(pointerAngle(500, 400, 100, 400), 270); // izquierda
+  assert.equal(pointerAngle(500, 400, 600, 300), 45);
+  // Cuerpo fuera de la vista: la proyección lo deja lejos a un costado y la flecha apunta hacia ese lado.
+  const view = { heading: 0, tilt: 0, width: 1440, horizonY: 700 };
+  const earth = project({ azimuth_deg: 120, elevation_deg: 2 }, view);
+  const a = pointerAngle(720, 450, earth.x, earth.y);
+  assert.ok(a > 90 && a < 135, `ángulo ${a}`);
+});
+
+test('nearCenter: el cuerpo está en la zona central de la pantalla (la flecha ya no hace falta)', () => {
+  // Pantalla 1440 × 900: zona central de 720 × 450 alrededor de (720, 450).
+  assert.equal(nearCenter(720, 450, 1440, 900), true);
+  assert.equal(nearCenter(1000, 600, 1440, 900), true);
+  assert.equal(nearCenter(1100, 450, 1440, 900), false); // muy a la derecha
+  assert.equal(nearCenter(720, 100, 1440, 900), false); // muy arriba
+  assert.equal(nearCenter(-300, 450, 1440, 900), false); // fuera de la vista
 });

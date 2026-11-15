@@ -1,11 +1,11 @@
-// Tarjetas de la comparación de escenarios (C4-01c, #93): una por escenario, lado a lado y con la misma
-// estructura para compararlas a simple vista. Los números salen de summarizeScenario (compare-core.js, #91).
-// C4-01d (#94): arriba de las tarjetas, un resumen dice cuál conviene (criterio de ADR-014) y se destaca su tarjeta.
+// Resultado de la comparación de escenarios (C4-01c, #93): una tabla con un escenario por columna,
+// con las mismas filas para compararlos a simple vista (rediseño #99: antes eran tarjetas con íconos).
+// Los números salen de summarizeScenario (compare-core.js, #91).
+// C4-01d (#94): arriba, un resumen dice cuál conviene (criterio de ADR-014) y se destaca su columna.
 import { summarizeScenario } from './compare-core.js';
 import { explainBest } from './compare-summary-core.js';
 import { loadSite, loadSites } from './data.js';
 import { t, locale, siteName } from './i18n.js';
-import { sunIcon, earthIcon } from './icons.js';
 
 const WINDOW_DAYS = 7; // misma ventana que la línea de tiempo (C3-03) y que ADR-014
 
@@ -43,43 +43,58 @@ function nextChange(change) {
   return t(`compare.next.${change.event}`, { time: fmtUtc(change.crossMs) });
 }
 
-function bodyBlock(body, icon, hours, change) {
-  const box = el('div', `compare-card__body compare-card__body--${body}`);
-  const title = el('p', 'compare-card__label');
-  title.append(icon, t(`panel.${body}`));
-  box.append(
-    title,
-    el('p', 'compare-card__hours', t('compare.hours', { hours: fmtNum(hours) })),
-    el('p', 'panel-card__caption', t(`compare.${body}Hours`)),
-    el('p', 'compare-card__next', nextChange(change)),
-  );
-  return box;
+/** Tabla de escenarios: filas = datos, columnas = escenarios; la columna del mejor, resaltada. */
+function scenarioTable(items, bestId) {
+  const tbl = el('table', 'info-table compare-table');
+  const head = el('tr');
+  const corner = el('th', 'info-table__key');
+  corner.scope = 'col';
+  head.append(corner);
+  items.forEach((item) => {
+    const th = el('th', item.id === bestId ? 'compare-table__best' : '');
+    th.scope = 'col';
+    th.append(el('span', '', t('compare.scenario', { n: item.n })));
+    if (item.id === bestId) th.append(el('span', 'compare-table__badge', t('compare.best.badge')));
+    head.append(th);
+  });
+  const thead = el('thead');
+  thead.append(head);
+
+  const value = (item, fn) => (item.summary ? fn(item.summary) : '—');
+  const rows = [
+    ['compare.row.site', (item) => item.name, false],
+    ['compare.row.date', (item) => fmtUtc(item.t), false],
+    ['compare.row.sunHours', (item) => value(item, (s) => t('compare.hours', { hours: fmtNum(s.sunHours) })), true],
+    ['compare.row.earthHours', (item) => value(item, (s) => t('compare.hours', { hours: fmtNum(s.earthHours) })), true],
+    ['compare.row.sunNext', (item) => value(item, (s) => nextChange(s.next.sun)), false],
+    ['compare.row.earthNext', (item) => value(item, (s) => nextChange(s.next.earth)), false],
+  ];
+  const tbody = el('tbody');
+  for (const [key, fn, numeric] of rows) {
+    const tr = el('tr');
+    const th = el('th', 'info-table__key', t(key, { days: WINDOW_DAYS }));
+    th.scope = 'row';
+    tr.append(th);
+    for (const item of items) {
+      const cls = [numeric ? 'info-num' : '', item.id === bestId ? 'compare-table__best' : ''].join(' ').trim();
+      tr.append(el('td', cls, fn(item)));
+    }
+    tbody.append(tr);
+  }
+  tbl.append(thead, tbody);
+  return tbl;
 }
 
-function card(item, bestId) {
-  const node = el('article', 'panel-card compare-card');
-  if (item.id === bestId) {
-    node.classList.add('compare-card--best');
-    node.append(el('p', 'compare-card__badge', t('compare.best.badge')));
+/** Avisos debajo de la tabla: escenarios sin datos o con menos días que el resto. */
+function tableNotes(items) {
+  const notes = [];
+  for (const item of items) {
+    if (!item.summary) notes.push(`${t('compare.scenario', { n: item.n })}: ${t('compare.noData')}`);
+    else if (item.summary.windowDays < WINDOW_DAYS) {
+      notes.push(`${t('compare.scenario', { n: item.n })}: ${t('compare.partial', { days: fmtNum(item.summary.windowDays) })}`);
+    }
   }
-  node.append(
-    el('p', 'compare-card__name', t('compare.scenario', { n: item.n })),
-    el('h3', 'panel-card__title', item.name),
-    el('p', 'panel-card__caption', fmtUtc(item.t)),
-  );
-  const s = item.summary;
-  if (!s) {
-    node.append(el('p', 'compare-card__empty', t('compare.noData')));
-    return node;
-  }
-  node.append(
-    bodyBlock('sun', sunIcon(), s.sunHours, s.next.sun),
-    bodyBlock('earth', earthIcon(), s.earthHours, s.next.earth),
-  );
-  if (s.windowDays < WINDOW_DAYS) {
-    node.append(el('p', 'compare-card__partial', t('compare.partial', { days: fmtNum(s.windowDays) })));
-  }
-  return node;
+  return notes.map((n) => el('p', 'compare__partial', n));
 }
 
 /** Frase del resumen en lenguaje simple (claves compare.best.*). */
@@ -115,19 +130,17 @@ function summaryBox(result, items) {
 }
 
 /**
- * Dibuja el resumen y las tarjetas en `container`.
+ * Dibuja el resumen y la tabla de escenarios en `container`.
  * @param {HTMLElement} container
  * @param {object[]} items resultado de summarizeAll
  */
 export function renderCompareCards(container, items) {
   const result = explainBest(items);
   const bestId = result.kind === 'sun' || result.kind === 'earth' ? result.id : null;
-  const grid = el('div', 'compare-cards');
-  grid.style.setProperty('--compare-cols', String(items.length));
-  grid.append(...items.map((item) => card(item, bestId)));
   container.append(
     summaryBox(result, items),
-    grid,
+    scenarioTable(items, bestId),
+    ...tableNotes(items),
     el('p', 'compare__window', t('compare.window', { days: WINDOW_DAYS })),
     el('p', 'compare__flat', t('compare.flatNote')),
   );

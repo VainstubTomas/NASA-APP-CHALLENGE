@@ -42,7 +42,9 @@ const PAIRS = [
   ['sky-horizon', 'sky-bg'],
   ['sky-earth', 'sky-bg'],
   ['color-sun', 'sky-bg'],
-  ['sky-earth-chart', 'sky-card'],
+  ['sky-earth', 'sky-card'],
+  ['color-sun', 'sky-card'],
+  ['sky-horizon', 'sky-card'],
   ['sky-white', 'sky-tab'],
   ['sky-white', 'sky-primary'],
 ];

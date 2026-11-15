@@ -1,7 +1,6 @@
 import './theme.css';
 import { initSelector } from './selector.js';
 import { renderPanel, clearPanel } from './panel.js';
-import { initPlayer } from './player.js';
 import { t as i18nT, siteName, applyStaticTexts, initLangSelect } from './i18n.js';
 import { loadSite, loadSites, loadValidation, loadMetrics } from './data.js';
 import { renderTimeline } from './timeline.js';
@@ -26,7 +25,14 @@ async function getSiteName(siteId) {
   return site ? siteName(site) : siteId;
 }
 
-let player; // se crea después del primer render del selector
+// Coordenadas del sitio (sites.json) para el encabezado de la hoja de datos.
+async function getSiteCoords(siteId) {
+  const site = (await loadSites()).find((s) => s.id === siteId);
+  return site ? { lat: site.lat_deg, lon: site.lon_deg } : null;
+}
+
+// El reproductor de tiempo se quitó del cajón (#99): la fecha se mueve con el deslizador del cielo.
+let player = null;
 let selectorApi; // lo que devuelve initSelector (para que el deslizador del cielo mueva la fecha)
 
 
@@ -40,8 +46,6 @@ let liveSeq = 0; // descarta respuestas viejas si el usuario cambia algo mientra
 
 // Vista del cielo (rediseño #99): pantalla principal. Se crea antes del selector porque el
 // primer render del selector ya le manda datos.
-const closeLabel = document.querySelector('[data-i18n-label]');
-if (closeLabel) closeLabel.setAttribute('aria-label', i18nT(closeLabel.dataset.i18nLabel));
 const sky = initSky(document.getElementById('sky'), {
   range: getRange(Date.now()),
   onTime: (ms) => selectorApi?.setTime(ms),
@@ -61,7 +65,7 @@ async function showLive(utcMs) {
     if (seq !== liveSeq || !liveSite) return;
     console.log('[live] consulta OK', { lat, lon, utc: new Date(utcMs).toISOString(), site_id: ephemeris.site_id, muestras: ephemeris.time.count });
     const liveName = i18nT('live.siteName', { lat, lon });
-    renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName });
+    renderPanel(panel, { ephemeris, horizon, utcMs, siteName: liveName, coords: { lat, lon } });
     sky.update({ ephemeris, horizon, utcMs, siteName: liveName, key: `live:${lat},${lon}` });
     renderTimeline(timeline, ephemeris, horizon, utcMs, 7);
     validationBody.replaceChildren(); // no hay valores de referencia de Horizons para un punto libre
@@ -107,7 +111,7 @@ initSelector({
       const { ephemeris, horizon } = await loadSite(site);
       const name = await getSiteName(site);
       sky.update({ ephemeris, horizon, utcMs: t, siteName: name, key: site });
-      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name });
+      renderPanel(panel, { ephemeris, horizon, utcMs: t, siteName: name, coords: await getSiteCoords(site) });
       // C3-03: barras de Sol y Tierra para 7 días desde la fecha elegida.
       renderTimeline(timeline, ephemeris, horizon, t, 7);
     } catch (err) {
@@ -133,18 +137,18 @@ initSelector({
   },
 }).then(async (selector) => {
   selectorApi = selector;
-  player = initPlayer(document.getElementById('player'), selector);
-  if (liveLoader) {
-    const liveSection = document.getElementById('live');
-    liveSection.hidden = false;
-    live = initLive(liveSection, {
-      onQuery: ({ lat, lon }) => {
-        player?.pause();
-        liveSite = { lat, lon };
-        showLive(selector.getState().t);
-      },
-    });
-  }
+  // El formulario de latitud y longitud vive en el panel de búsqueda ("Ubicación específica").
+  // Se dibuja siempre; sin API configurada el panel no deja aplicar y lo explica.
+  const liveSection = document.getElementById('live');
+  liveSection.hidden = false;
+  live = initLive(liveSection, {
+    onQuery: ({ lat, lon }) => {
+      if (!liveLoader) return;
+      player?.pause();
+      liveSite = { lat, lon };
+      showLive(selector.getState().t);
+    },
+  });
   // Capa 4 (#92): comparación de escenarios. Arranca con la selección actual como primer escenario.
   initCompare(document.getElementById('compare'), {
     sites: await loadSites(),

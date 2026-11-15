@@ -37,8 +37,9 @@ export function initLive(container, { onQuery }) {
   container.replaceChildren();
   const form = el('form', 'live-form');
   form.noValidate = true; // los rangos se validan acá y se muestran en español, no con el aviso del navegador
-  const lat = field('live-lat', 'live.lat', '0');
-  const lon = field('live-lon', 'live.lon', '30');
+  // Rangos del contrato: latitud planetocéntrica [-90, 90] y longitud este-positiva [-180, 180].
+  const lat = field('live-lat', 'live.lat', t('live.latPlaceholder'));
+  const lon = field('live-lon', 'live.lon', t('live.lonPlaceholder'));
   const button = el('button', 'live-submit');
   button.type = 'submit';
   button.innerHTML = '<svg class="live-submit__icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">'

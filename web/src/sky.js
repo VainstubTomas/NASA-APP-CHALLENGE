@@ -1,27 +1,27 @@
 // Vista del cielo (rediseño #99, Figma "frame1"): la pantalla principal de la web.
 // Una cámara parada en el sitio mira hacia un rumbo; el Sol y la Tierra se dibujan en su azimut
-// y elevación reales (JPL Horizons) y con su tamaño angular real. La línea magenta es el horizonte
-// y funciona como brújula: al girar se mueve. Arriba a la izquierda, el deslizador de fecha;
-// arriba a la derecha, la cuenta regresiva y los botones "Ver Sol" / "Ver Tierra"; abajo a la
-// izquierda, el horizonte completo de 360°. Al pasar el mouse por un cuerpo aparece su brillo,
-// la línea punteada al horizonte y los grados sobre el horizonte.
+// y elevación reales (JPL Horizons) y con su tamaño angular real. La línea blanca es el horizonte
+// y funciona como brújula: al girar se mueve. Todo se maneja con el mouse: arrastrar gira y sube
+// la mirada, la rueda hace zoom y las flechas del centro apuntan al Sol y a la Tierra.
+// Arriba a la izquierda, el deslizador de fecha; arriba a la derecha, la cuenta regresiva;
+// abajo a la izquierda, el horizonte completo de 360°. Al pasar el mouse por un cuerpo aparece
+// su brillo, la línea punteada al horizonte y los grados sobre el horizonte.
 // La lógica (proyección, brújula, rangos) está en sky-core.js, probada con `npm test`.
 import './sky.css';
 import sunImg from './assets/sky/sun.png';
 import earthImg from './assets/sky/earth.png';
 import groundImg from './assets/sky/ground.png';
-import logoImg from './assets/sky/logo.svg';
+import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
-import chevronIcon from './assets/sky/chevron-left.svg';
 import { t, locale } from './i18n.js';
 import { sampleAt, nextVisibilityChange, elevationDisplay, compassLabel } from './ephemeris.js';
 import { horizonAt } from './horizon.js';
 import { timeToSlider, sliderToTime } from './player-core.js';
 import { initSkyPanel } from './sky-panel.js';
 import {
-  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG, TILT_MAX_DEG,
-  normAz, relAz, rotate, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading,
+  FOV_DEG, ROTATE_STEP_DEG, TILT_STEP_DEG,
+  normAz, relAz, rotate, tiltMax, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
+  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -32,6 +32,11 @@ const SUN_DISC_FRACTION = 0.75;
 const EARTH_DISC_FRACTION = 0.89;
 // Un arrastre menor a esto es un clic (fija o suelta el detalle del cuerpo).
 const CLICK_SLOP_PX = 4;
+// Estrellas decorativas (sky-core.js): fijas en el cielo del sitio, giran con la vista.
+const STARS = makeStars(1400, 2026);
+// Flechas del centro: a qué distancia del centro se dibuja cada una. Radios distintos para que
+// no se pisen cuando el Sol y la Tierra quedan para el mismo lado.
+const POINTER_RADIUS_PX = { sun: 58, earth: 96 };
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -45,18 +50,6 @@ function svg(tag, attrs = {}, parent) {
   for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
   parent?.appendChild(node);
   return node;
-}
-
-function iconButton(className, icon, label) {
-  const b = el('button', `sky-btn ${className}`);
-  b.type = 'button';
-  b.setAttribute('aria-label', label);
-  b.title = label;
-  const img = el('img');
-  img.src = icon;
-  img.alt = '';
-  b.append(img);
-  return b;
 }
 
 const fmt1 = (x) => x.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -106,25 +99,38 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const headingDeg = el('span', 'sky-heading__deg');
   headingLabel.append(headingName, headingDeg);
   const smooth = el('p', 'sky-smooth', `⚠ ${t('sky.smooth')}`);
-  const scaleNote = el('p', 'sky-scale', t('sky.scale', { fov: FOV_DEG }));
+  const scaleNote = el('p', 'sky-scale');
   const sun = createBody('sun');
   const earth = createBody('earth');
   const bodies = [earth, sun];
-  air.append(earth.disc, sun.disc);
+  const stars = el('canvas', 'sky-stars');
+  stars.setAttribute('aria-hidden', 'true');
+  air.append(stars, earth.disc, sun.disc);
   overlay.append(earth.ghost, sun.ghost, earth.stem, sun.stem, earth.name, sun.name, earth.label, sun.label);
 
-  const left = iconButton('sky-btn--left', chevronIcon, t('sky.left'));
-  const right = iconButton('sky-btn--right', chevronIcon, t('sky.right'));
-  const up = iconButton('sky-btn--up', chevronIcon, t('sky.up', { step: TILT_STEP_DEG }));
-  const down = iconButton('sky-btn--down', chevronIcon, t('sky.down', { step: TILT_STEP_DEG }));
 
-  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, left, right, up, down);
+  // Flechas en el centro de la pantalla que apuntan hacia el Sol y la Tierra (clic: girar hacia él).
+  const pointers = el('div', 'sky-pointers');
+  const pointerFor = {};
+  for (const key of ['sun', 'earth']) {
+    const b = el('button', `sky-pointer sky-pointer--${key}`);
+    b.type = 'button';
+    b.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">'
+      + '<path d="M12 3 L20 15 L12 11.5 L4 15 Z" fill="currentColor"/></svg>';
+    pointerFor[key] = b;
+    pointers.append(b);
+  }
+
+  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
 
   // --- Arriba a la izquierda: logo, búsqueda y fecha ---
   const topLeft = el('div', 'sky-topleft');
-  const logo = el('img', 'sky-logo');
-  logo.src = logoImg;
-  logo.alt = t('sky.logo');
+  // Logo del equipo: el SVG es negro sobre transparente, va dentro de un círculo blanco.
+  const logo = el('div', 'sky-logo');
+  const logoPic = el('img', 'sky-logo__img');
+  logoPic.src = logoImg;
+  logoPic.alt = t('sky.logo');
+  logo.append(logoPic);
   const search = el('button', 'sky-search');
   search.type = 'button';
   search.setAttribute('aria-expanded', 'false');
@@ -133,8 +139,11 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   searchImg.src = searchIcon;
   searchImg.alt = '';
   search.append(searchImg, el('span', 'sky-search__text', t('sky.search')));
+  // Pantalla completa (Fullscreen API). Si el navegador no la permite, el botón no aparece.
+  const full = el('button', 'sky-full');
+  full.type = 'button';
   const brandRow = el('div', 'sky-brand');
-  brandRow.append(logo, search);
+  brandRow.append(logo, search, full);
 
   const time = el('div', 'sky-time');
   const timeLabel = el('label', 'sky-time__label');
@@ -149,20 +158,11 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   time.append(timeLabel, slider, when);
   topLeft.append(brandRow, time);
 
-  // --- Arriba a la derecha: cuenta regresiva y botones fijos para mirar al Sol o a la Tierra ---
+  // --- Arriba a la derecha: cuenta regresiva ---
   const topRight = el('div', 'sky-topright');
   const countdown = el('div', 'sky-countdown');
   countdown.setAttribute('role', 'status');
-  const seeRow = el('div', 'sky-see');
-  const seeButtons = {};
-  for (const key of ['sun', 'earth']) {
-    const b = el('button', `sky-see__btn sky-see__btn--${key}`);
-    b.type = 'button';
-    b.append(el('span', 'sky-see__dot'), el('span', 'sky-see__text', t('sky.see', { body: bodyName(key) })));
-    seeButtons[key] = b;
-    seeRow.append(b);
-  }
-  topRight.append(countdown, seeRow);
+  topRight.append(countdown);
 
   // --- Abajo a la izquierda: horizonte de 360° ---
   const chartBox = el('figure', 'sky-chart');
@@ -182,6 +182,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   // --- Estado ---
   let heading = 0;
   let tilt = 0;
+  let fov = FOV_DEG; // cambia con la rueda del mouse (zoom)
   let data = null; // { ephemeris, horizon, utcMs, siteName, sample }
   let siteKey = null;
   let anim = null;
@@ -194,43 +195,152 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   function view() {
     const width = stage.clientWidth || window.innerWidth;
     const height = stage.clientHeight || window.innerHeight;
-    return { heading, tilt, width, height, horizonY: height * HORIZON_FRACTION };
+    return { heading, tilt, fov, width, height, horizonY: height * HORIZON_FRACTION };
+  }
+
+  // Hasta dónde se puede subir la mirada: hasta ver el cenit en el borde de arriba.
+  function maxTilt() {
+    const v = view();
+    return tiltMax(v.horizonY, pxPerDeg(v.width, fov));
   }
 
   // --- Dibujo de la vista ---
   function drawStage() {
     const v = view();
-    const k = pxPerDeg(v.width);
+    const k = pxPerDeg(v.width, fov);
     const hy = v.horizonY + tilt * k; // horizonte en pantalla (baja al mirar hacia arriba)
     air.style.height = `${Math.max(0, hy)}px`;
+    drawStars(v, k, hy);
+    scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
     for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
     const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
     ground.style.backgroundSize = `${tileW}px auto`;
     ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    drawGround(v, k, hy);
     root.classList.toggle('is-tilted', tilt > 0);
     root.classList.toggle('is-ground-hidden', hy > v.height - 8);
 
     // Brújula sobre la línea
     ticks.replaceChildren();
-    for (const tk of compassTicks(heading)) {
+    for (const tk of compassTicks(heading, fov)) {
       const mark = el('span', `sky-tick${tk.point ? ' sky-tick--major' : ''}`);
       mark.style.left = `${v.width / 2 + tk.rel * k}px`;
-      if (tk.point && Math.abs(tk.rel) > 5) mark.dataset.label = t(`compass.${tk.point}`);
+      // Sin etiqueta cerca del centro: ahí ya está el rumbo actual en grande.
+      // y tampoco si es el mismo punto cardinal que el rumbo central (dos "E" juntas confunden).
+      if (tk.point && Math.abs(tk.rel) * k > 70 && tk.point !== compassLabel(heading)) {
+        mark.dataset.label = t(`compass.${tk.point}`);
+      }
       ticks.append(mark);
     }
-    headingName.textContent = t(`sky.heading.${compassLabel(heading)}`);
+    headingName.textContent = t(`compass.${compassLabel(heading)}`);
     headingDeg.textContent = `${Math.round(normAz(heading))}°`;
 
-    up.disabled = tilt >= TILT_MAX_DEG;
-    down.hidden = tilt === 0;
 
     if (!data?.sample) {
       for (const b of bodies) for (const n of [b.disc, b.ghost, b.name, b.stem, b.label]) n.hidden = true;
-      for (const b of Object.values(seeButtons)) b.disabled = true;
+      for (const b of Object.values(pointerFor)) b.hidden = true;
       return;
     }
     const radii = data.ephemeris.angular_radius_deg;
+    discs = [];
     for (const b of bodies) drawBody(b, data.sample[b.key], radii[b.key], v, k, hy);
+    hidePointersOverDiscs(v);
+  }
+
+  // Suelo 3D ilustrativo (sky-ground.js, three.js): se carga después del primer dibujo. Hasta
+  // entonces, o si el navegador no tiene WebGL2, queda la textura plana del Figma.
+  let ground3d = null;
+  function drawGround(v, k, hy) {
+    if (!ground3d) return;
+    const sample = data?.sample;
+    ground3d.render({
+      width: Math.round(v.width),
+      groundHeight: Math.max(0, Math.round(v.height - hy)),
+      pxPerDeg: k,
+      heading,
+      sun: sample?.sun ?? null,
+      earth: sample?.earth ?? null,
+      radii: data?.ephemeris?.angular_radius_deg,
+    });
+  }
+  setTimeout(() => {
+    import('./sky-ground.js')
+      .then(({ createGround }) => {
+        ground3d = createGround(ground);
+        root.classList.add('has-ground-3d');
+        draw();
+      })
+      .catch((err) => console.warn('[sky] suelo 3D no disponible, se usa la textura plana:', err.message));
+  }, 0);
+
+  // Estrellas: un canvas del tamaño del cielo; solo se dibujan las que caen en la vista.
+  function drawStars(v, k, hy) {
+    const dpr = window.devicePixelRatio || 1;
+    const h = Math.max(0, Math.round(hy));
+    const w = Math.round(v.width);
+    if (stars.width !== w * dpr || stars.height !== h * dpr) {
+      stars.width = w * dpr;
+      stars.height = h * dpr;
+      stars.style.width = `${w}px`;
+      stars.style.height = `${h}px`;
+    }
+    const ctx = stars.getContext('2d');
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    const half = fov / 2 + 1;
+    // Al acercar, las estrellas crecen un poco (como en una foto con más aumento).
+    const grow = Math.min(1.6, Math.max(0.8, Math.sqrt(FOV_DEG / fov)));
+    for (const st of STARS) {
+      const rel = relAz(st.az, heading);
+      if (Math.abs(rel) > half) continue;
+      const x = w / 2 + rel * k;
+      const y = hy - st.el * k;
+      if (y < -2 || y > h) continue;
+      ctx.globalAlpha = st.alpha;
+      ctx.fillStyle = st.color;
+      ctx.beginPath();
+      ctx.arc(x, y, st.size * grow * 0.5 + 0.25, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Flecha del centro hacia un cuerpo. Se atenúa si el cuerpo ya se ve en pantalla y se
+  // desvanece si además está bastante centrado (ya no hace falta), o pegado al centro.
+  // Discos en pantalla de este dibujo, para que una flecha no quede encima de un cuerpo.
+  let discs = [];
+  function hidePointersOverDiscs(v) {
+    for (const [key, b] of Object.entries(pointerFor)) {
+      if (b.hidden || !b.dataset.angle) continue;
+      const a = (Number(b.dataset.angle) * Math.PI) / 180;
+      const radius = POINTER_RADIUS_PX[key];
+      const px = v.width / 2 + Math.sin(a) * radius;
+      const py = v.height / 2 - Math.cos(a) * radius;
+      const over = discs.some((d) => Math.hypot(px - d.x, py - d.y) < d.r + 18);
+      b.classList.toggle('is-over-body', over);
+    }
+  }
+
+  function drawPointer(key, p, r, v, hy) {
+    if (p.onScreen) discs.push({ x: p.x, y: p.y, r });
+    const b = pointerFor[key];
+    const cx = v.width / 2;
+    const cy = v.height / 2;
+    const dist = Math.hypot(p.x - cx, p.y - cy);
+    const radius = POINTER_RADIUS_PX[key];
+    b.hidden = dist < radius + r + 14;
+    if (b.hidden) return;
+    const angle = pointerAngle(cx, cy, p.x, p.y);
+    b.style.transform = `rotate(${angle}deg) translateY(-${radius}px)`;
+    b.dataset.angle = String(angle);
+    const inView = p.onScreen && p.y > 0 && p.y < Math.min(hy, v.height);
+    b.classList.toggle('is-in-view', inView);
+    b.classList.toggle('is-centered', inView && nearCenter(p.x, p.y, v.width, v.height));
+    const name = bodyName(key);
+    const az = Math.round(data.sample[key].azimuth_deg);
+    b.setAttribute('aria-label', t('sky.goTo', { body: name, az }));
+    b.title = name;
   }
 
   function drawBody(b, pos, radiusDeg, v, k, hy) {
@@ -239,6 +349,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const box = (2 * r) / (b.key === 'sun' ? SUN_DISC_FRACTION : EARTH_DISC_FRACTION);
     const fullyBelow = pos.elevation_deg + radiusDeg <= horizonDegAt(pos.azimuth_deg);
     const above = p.y + r < hy;
+    drawPointer(b.key, p, r, v, hy);
 
     b.disc.hidden = !p.onScreen;
     b.ghost.hidden = !p.onScreen || !fullyBelow;
@@ -246,10 +357,6 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     b.stem.hidden = !p.onScreen;
     b.label.hidden = !p.onScreen;
 
-    const see = seeButtons[b.key];
-    see.disabled = false;
-    see.dataset.az = String(pos.azimuth_deg);
-    see.title = t('sky.goTo', { body: bodyName(b.key), az: Math.round(pos.azimuth_deg) });
     if (!p.onScreen) return;
 
     Object.assign(b.disc.style, { left: `${p.x}px`, top: `${p.y}px`, width: `${box}px`, height: `${box}px` });
@@ -277,7 +384,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     const ax = (a) => X0 + (normAz(a) / 360) * (X1 - X0);
     const ay = (e) => Y0 + ((max - Math.max(min, Math.min(max, e))) / (max - min)) * (Y1 - Y0);
     const step = max <= 15 ? 5 : max <= 45 ? 10 : 15;
-    for (let v = min; v <= max; v += step) {
+    // Marcas en múltiplos del paso (con escala grande, −5° no lleva etiqueta: se pisaba con 0°)
+    for (let v = Math.ceil(min / step) * step; v <= max; v += step) {
       if (v === 0) continue;
       svg('line', { x1: X0, x2: X1, y1: ay(v), y2: ay(v), class: 'sky-chart__grid' }, chart);
       svg('text', { x: X0 - 6, y: ay(v) + 4, 'text-anchor': 'end' }, chart).textContent = `${v}°`;
@@ -295,8 +403,8 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     svg('text', { x: X1 - 6, y: ay(0) + 16, 'text-anchor': 'end' }, chart).textContent = t('sky.chart.ground');
 
     // Recuadro de lo que muestra la vista (puede cruzar el norte: dos rectángulos)
-    const from = normAz(heading - FOV_DEG / 2);
-    const to = from + FOV_DEG;
+    const from = normAz(heading - fov / 2);
+    const to = from + fov;
     const win = (a0, a1) => svg('rect', {
       x: X0 + (a0 / 360) * (X1 - X0), y: Y0, width: ((a1 - a0) / 360) * (X1 - X0), height: Y1 - Y0,
       class: 'sky-chart__view',
@@ -379,22 +487,24 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const turn = (delta) => animateTo(rotate(heading, delta));
   const setTilt = (value) => { tilt = value; draw(); };
 
-  left.addEventListener('click', () => turn(-ROTATE_STEP_DEG));
-  right.addEventListener('click', () => turn(ROTATE_STEP_DEG));
-  up.addEventListener('click', () => setTilt(tiltUp(tilt)));
-  down.addEventListener('click', () => setTilt(tiltDown(tilt)));
-  for (const [key, b] of Object.entries(seeButtons)) {
-    b.addEventListener('click', () => {
-      if (!data?.sample) return;
-      const pos = data.sample[key];
-      // Si el cuerpo está alto (sitios del ecuador), también sube la mirada para que entre.
-      const v = view();
-      const visibleDeg = (v.horizonY - 60) / pxPerDeg(v.width);
-      if (pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
-        tilt = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG);
-      }
-      animateTo(normAz(pos.azimuth_deg));
-    });
+  // Girar la vista hacia un cuerpo (clic en su flecha del centro). Si está alto (sitios del
+  // ecuador), también sube la mirada para que entre.
+  function lookAt(key) {
+    if (!data?.sample) return;
+    const pos = data.sample[key];
+    const v = view();
+    const visibleDeg = (v.horizonY - 60) / pxPerDeg(v.width, fov);
+    if (pos.elevation_deg > visibleDeg + tilt || pos.elevation_deg < tilt) {
+      tilt = clampTilt(Math.ceil((pos.elevation_deg - visibleDeg / 2) / TILT_STEP_DEG) * TILT_STEP_DEG, maxTilt());
+    }
+    animateTo(normAz(pos.azimuth_deg));
+  }
+
+  for (const [key, b] of Object.entries(pointerFor)) {
+    b.addEventListener('click', () => lookAt(key));
+    // El hover de la flecha también enciende el detalle del cuerpo (mismo color)
+    b.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
+    b.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
   }
 
   // Detalle de un cuerpo (brillo, línea al horizonte y grados): al pasar el mouse o fijado con un clic.
@@ -423,9 +533,9 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     drag.moved = true;
     stage.classList.add('is-dragging');
     if (anim) cancelAnimationFrame(anim);
-    const k = pxPerDeg(stage.clientWidth);
+    const k = pxPerDeg(stage.clientWidth, fov);
     heading = normAz(drag.heading - dx / k);
-    tilt = clampTilt(drag.tilt + dy / k);
+    tilt = clampTilt(drag.tilt + dy / k, maxTilt());
     draw();
   });
   const endDrag = () => {
@@ -441,13 +551,36 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   stage.addEventListener('pointerup', endDrag);
   stage.addEventListener('pointercancel', endDrag);
 
+  // Zoom con la rueda del mouse (o el gesto de pellizcar del touchpad)
+  stage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const lines = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
+    const next = zoomFov(fov, e.deltaY * lines * (e.ctrlKey ? 4 : 1));
+    if (next === fov) return;
+    // Zoom hacia el cursor: el azimut y la elevación que están bajo el mouse no se mueven.
+    const v = view();
+    const rect = stage.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const k0 = pxPerDeg(v.width, fov);
+    const azCursor = heading + (mx - v.width / 2) / k0;
+    const elCursor = tilt + (v.horizonY - my) / k0;
+    fov = next;
+    const k1 = pxPerDeg(v.width, fov);
+    if (anim) cancelAnimationFrame(anim);
+    heading = normAz(azCursor - (mx - v.width / 2) / k1);
+    tilt = clampTilt(elCursor - (v.horizonY - my) / k1, maxTilt());
+    draw();
+  }, { passive: false });
+
   // Teclado: flechas giran y suben la mirada (salvo dentro de un control o del cajón)
   root.addEventListener('keydown', (e) => {
     if (e.target.closest('input, select, textarea, .sky-panel')) return;
     if (e.key === 'ArrowLeft') turn(-ROTATE_STEP_DEG);
     else if (e.key === 'ArrowRight') turn(ROTATE_STEP_DEG);
-    else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt));
+    else if (e.key === 'ArrowUp') setTilt(tiltUp(tilt, maxTilt()));
     else if (e.key === 'ArrowDown') setTilt(tiltDown(tilt));
+    else if ((e.key === 'f' || e.key === 'F') && canFullscreen && !e.metaKey && !e.ctrlKey) toggleFullscreen();
     else return;
     e.preventDefault();
   });
@@ -460,6 +593,29 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   });
 
   search.addEventListener('click', () => panel?.toggle());
+
+  const ICON_ENTER = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const ICON_EXIT = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const docEl = document.documentElement;
+  const fsElement = () => document.fullscreenElement ?? document.webkitFullscreenElement ?? null;
+  const canFullscreen = Boolean(docEl.requestFullscreen || docEl.webkitRequestFullscreen);
+  function renderFull() {
+    const on = Boolean(fsElement());
+    full.innerHTML = on ? ICON_EXIT : ICON_ENTER;
+    const label = t(on ? 'sky.fullscreen.exit' : 'sky.fullscreen.enter');
+    full.setAttribute('aria-label', label);
+    full.setAttribute('aria-pressed', String(on));
+    full.title = `${label} (F)`;
+  }
+  function toggleFullscreen() {
+    if (fsElement()) (document.exitFullscreen ?? document.webkitExitFullscreen)?.call(document);
+    else (docEl.requestFullscreen ?? docEl.webkitRequestFullscreen)?.call(docEl)?.catch?.(() => {});
+  }
+  full.hidden = !canFullscreen;
+  full.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', renderFull);
+  document.addEventListener('webkitfullscreenchange', renderFull);
+  renderFull();
 
   // Cajón "Más información": se abre al costado (la pestaña se mueve con él)
   function setDrawer(open) {
@@ -490,6 +646,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
         const radii = ephemeris.angular_radius_deg;
         heading = normAz(initialHeading(sample.sun, sample.earth, radii.sun, radii.earth));
         tilt = 0;
+        fov = FOV_DEG;
       }
       drawTime();
       drawCountdown();

@@ -12,7 +12,7 @@
   color: var(--sky-text);
   font-family: var(--font-sky);
   user-select: none;
-  --sky-btn-size: clamp(44px, 3.4vw, 64px);
+  --color-focus: var(--sky-white); /* contorno de foco neutro sobre el cielo */
 }
 
 .sky-stage {
@@ -32,6 +32,9 @@
   overflow: hidden;
 }
 
+/* Estrellas (decorativas): canvas del tamaño del cielo, debajo del Sol y la Tierra */
+.sky-stars { position: absolute; top: 0; left: 0; pointer-events: none; }
+
 /* Suelo lunar: textura del Figma ("image 1"), se desplaza al girar */
 .sky-ground {
   position: absolute;
@@ -43,8 +46,11 @@
   background-color: #6f7176;
 }
 .sky.is-ground-hidden .sky-ground { display: none; }
+/* Suelo 3D (sky-ground.js): reemplaza a la textura plana cuando carga */
+.sky.has-ground-3d .sky-ground { background-image: none !important; background-color: #000; }
+.sky-ground__canvas { position: absolute; top: 0; left: 0; display: block; }
 
-/* Horizonte: línea magenta que funciona como brújula */
+/* Horizonte: línea blanca que funciona como brújula */
 .sky-horizon {
   position: absolute;
   left: 0;
@@ -52,7 +58,8 @@
   height: 0;
   border-top: 4px solid var(--sky-horizon);
   transform: translateY(-2px);
-  box-shadow: 0 0 12px var(--sky-horizon-glow);
+  /* brillo hacia el cielo y un borde oscuro fino para que se lea sobre el suelo iluminado */
+  box-shadow: 0 0 12px var(--sky-horizon-glow), 0 2px 3px rgba(0, 0, 0, 0.75);
 }
 .sky-ticks { position: absolute; left: 0; right: 0; height: 0; pointer-events: none; }
 .sky-tick {
@@ -71,19 +78,20 @@
   left: 50%;
   transform: translateX(-50%);
   color: var(--sky-horizon);
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
 }
 
-/* Rumbo actual: "Norte" en el centro, sobre la línea (Figma: Inter 48 px, magenta) */
+/* Rumbo actual abreviado ("N", "SO"...) en el centro, sobre la línea */
 .sky-heading {
   position: absolute;
   left: 50%;
   margin: 0;
   transform: translate(-50%, calc(-100% - 6px));
   color: var(--sky-horizon);
-  font-size: clamp(24px, 2.4vw, 40px);
+  font-size: clamp(18px, 1.5vw, 26px);
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
   pointer-events: none;
@@ -98,13 +106,13 @@
 /* Aviso obligatorio: Luna lisa (ADR-011) */
 .sky-smooth {
   position: absolute;
-  right: 92px;
+  right: 16px;
   margin: 0;
   transform: translateY(calc(-100% - 10px));
   padding: 3px 10px;
   border-radius: 999px;
   background: var(--sky-chip-bg);
-  color: var(--color-notice);
+  color: var(--sky-text-dim);
   font-size: 13px;
   white-space: nowrap;
   pointer-events: none;
@@ -130,7 +138,24 @@
   cursor: pointer;
 }
 .sky-stage.is-dragging .sky-body { cursor: grabbing; }
-.sky-body__crop { position: absolute; inset: 0; overflow: hidden; }
+.sky-body__crop { position: absolute; inset: 0; overflow: hidden; isolation: isolate; }
+/* Color: las imágenes del Figma son grises; una capa con mezcla "color" les da el tono
+   y conserva el detalle (nubes de la Tierra, granulado del Sol). Recortada al disco. */
+.sky-body__crop::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: color;
+  pointer-events: none;
+}
+.sky-body--earth .sky-body__crop::after {
+  inset: 5.5%; /* el disco ocupa el 89 % del recorte */
+  background: radial-gradient(circle at 38% 34%, #6fb8ff 0%, #1f6fd1 45%, #0b3a8a 100%);
+}
+.sky-body--sun .sky-body__crop::after {
+  inset: 12.5%; /* el disco ocupa el 75 % del recorte */
+  background: radial-gradient(circle, #fff6d6 0%, #ffd24a 45%, #ff9a1f 100%);
+}
 .sky-body__img { position: absolute; max-width: none; }
 /* Recortes del Figma: "Element" (Sol) e "Im happy you here!" (Tierra) */
 .sky-body--sun .sky-body__img { width: 544.15%; height: 405%; left: -410%; top: -128%; }
@@ -209,32 +234,46 @@
 .sky-label--earth { color: var(--sky-earth); }
 
 
-/* Botones redondos blancos con chevron (Figma "Arrows": 84 px, padding 16,7 px) */
-.sky-btn {
+/* Flechas del centro hacia el Sol y la Tierra: discretas, del color del hover de cada cuerpo */
+.sky-pointers {
   position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.sky-pointer {
+  position: absolute;
+  left: -19px;
+  top: -19px;
   display: grid;
   place-items: center;
-  width: var(--sky-btn-size);
-  height: var(--sky-btn-size);
+  width: 38px;
+  height: 38px;
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: var(--sky-white);
-  box-shadow: var(--sky-shadow);
+  background: transparent;
+  opacity: 0.55;
   cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.2s ease; /* sin transición en el giro: al cruzar 0° daría la vuelta larga */
 }
-.sky-btn img { width: 60%; height: 60%; }
-.sky-btn:disabled { opacity: 0.4; cursor: default; }
-.sky-btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-.sky-btn--left { left: 8px; top: calc(80% - var(--sky-btn-size) / 2); }
-.sky-btn--right { right: 16px; top: calc(80% - var(--sky-btn-size) / 2); }
-.sky-btn--right img { transform: scaleX(-1); }
-.sky-btn--up { left: 50%; top: 24px; transform: translateX(-50%); }
-.sky-btn--up img { transform: rotate(90deg); }
-.sky-btn--down { left: calc(50% + clamp(30px, 2.4vw, 44px)); top: 24px; }
-.sky-btn--down img { transform: rotate(-90deg); }
-.sky.is-tilted .sky-btn--up { transform: translateX(calc(-100% - 8px)); }
-.sky.is-tilted .sky-btn--down { left: 50%; }
+.sky-pointer svg { filter: drop-shadow(0 0 4px currentColor); }
+.sky-pointer--sun { color: var(--sky-sun-hover); }
+.sky-pointer--earth { color: var(--sky-earth); }
+.sky-pointer.is-in-view { opacity: 0.25; }
+.sky-pointer.is-centered,
+.sky-pointer.is-centered:hover,
+.sky-pointer.is-over-body,
+.sky-pointer.is-over-body:hover { opacity: 0; pointer-events: none; }
+.sky-pointer:hover,
+.sky-pointer:focus-visible { opacity: 1; }
+.sky-pointer:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.sky.is-pointing-sun .sky-body--sun .sky-body__glow,
+.sky.is-pointing-earth .sky-body--earth .sky-body__glow { opacity: 1; }
+
 
 /* Arriba a la izquierda */
 .sky-topleft {
@@ -243,10 +282,22 @@
   left: 20px;
   display: grid;
   gap: 18px;
-  width: min(300px, calc(100vw - 40px));
+  width: min(352px, calc(100vw - 40px));
 }
+.sky-brand { gap: 10px; }
 .sky-brand { display: flex; align-items: center; gap: 16px; }
-.sky-logo { width: clamp(44px, 3.7vw, 64px); height: clamp(44px, 3.7vw, 64px); flex: none; }
+.sky-logo {
+  display: grid;
+  place-items: center;
+  width: clamp(44px, 3.7vw, 64px);
+  height: clamp(44px, 3.7vw, 64px);
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--sky-white);
+  box-shadow: var(--sky-shadow);
+}
+.sky-logo__img { width: 100%; height: 100%; object-fit: contain; }
 .sky-search {
   display: flex;
   align-items: center;
@@ -266,14 +317,32 @@
 }
 .sky-search img { width: 22px; height: 22px; flex: none; }
 .sky-search__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Pantalla completa: mismo estilo que la búsqueda, cuadrado */
+.sky-full {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: var(--sky-white);
+  color: var(--sky-primary);
+  cursor: pointer;
+}
+.sky-full[hidden] { display: none; }
+.sky-full:hover { box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25); }
+.sky-full:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .sky-search:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 
-/* Deslizador de fecha (Figma: recuadro con borde magenta) */
+/* Deslizador de fecha: recuadro con borde blanco difuminado */
 .sky-time {
   display: grid;
   gap: 6px;
   padding: 8px 12px;
-  border: 1px solid var(--sky-border);
+  border: 1px solid var(--sky-edge);
+  box-shadow: 0 0 14px var(--sky-edge-glow);
   border-radius: 5px;
   background: var(--sky-card);
 }
@@ -287,17 +356,52 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sky-time__slider { width: 100%; margin: 0; padding: 0; border: none; background: transparent; accent-color: var(--color-sun); }
+.sky-time__slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  margin: 6px 0;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+  accent-color: var(--sky-white);
+  cursor: pointer;
+}
+.sky-time__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: var(--sky-white);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+.sky-time__slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: none;
+  border-radius: 50%;
+  background: var(--sky-white);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+.sky-time__slider::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.28); }
+.sky-time__slider::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--sky-white); }
 .sky-time__when { margin: 0; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
 
-/* Arriba a la derecha: cuenta regresiva (sutil) y, fijos debajo, "Ver Sol" / "Ver Tierra" */
+/* Arriba a la derecha, pegado al borde: cuenta regresiva (sutil) */
 .sky-topright {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 20px;
+  right: 0;
   display: grid;
   gap: 10px;
   justify-items: end;
+  padding: 10px 16px 12px 18px;
+  border-radius: 12px 0 0 12px;
+  background: var(--sky-chip-bg);
 }
 .sky-countdown {
   display: grid;
@@ -311,24 +415,6 @@
 .sky-cd.is-visible .sky-cd__dot { opacity: 1; }
 .sky-cd--sun .sky-cd__dot { background: var(--color-sun); }
 .sky-cd--earth .sky-cd__dot { background: var(--sky-earth); }
-.sky-see { display: flex; gap: 8px; }
-.sky-see__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  background: var(--sky-chip-bg);
-  font: inherit;
-  font-size: 13px;
-  cursor: pointer;
-}
-.sky-see__btn--sun { color: var(--color-sun); }
-.sky-see__btn--earth { color: var(--sky-earth); }
-.sky-see__btn:disabled { opacity: 0.4; cursor: default; }
-.sky-see__btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
-.sky-see__dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .sky-cd__value {
   min-width: 9.5em;
   text-align: right;
@@ -337,7 +423,7 @@
   color: var(--sky-text);
 }
 
-/* Horizonte de 360° abajo a la izquierda (Figma: recuadro 810 × 205, borde magenta) */
+/* Horizonte de 360° abajo a la izquierda: recuadro con borde blanco difuminado */
 .sky-chart {
   position: absolute;
   left: clamp(64px, 5vw, 121px);
@@ -346,7 +432,8 @@
   max-width: calc(100% - 140px);
   margin: 0;
   padding: 4px 6px 2px;
-  border: 1px solid var(--sky-border);
+  border: 1px solid var(--sky-edge);
+  box-shadow: 0 0 14px var(--sky-edge-glow);
   border-radius: 5px;
   background: var(--sky-card);
 }
@@ -356,7 +443,7 @@
 .sky-chart__ground { fill: var(--sky-chart-ground); }
 .sky-chart__horizon { stroke: var(--sky-text); stroke-width: 1.5; }
 .sky-chart__tick { stroke: var(--sky-text-dim); }
-.sky-chart__view { fill: var(--sky-view-fill); stroke: var(--sky-horizon); stroke-width: 1; }
+.sky-chart__view { fill: var(--sky-view-fill); stroke: var(--sky-edge); stroke-width: 1; }
 .sky-chart__body--sun { fill: var(--color-sun); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart__body--earth { fill: var(--sky-earth); stroke: var(--sky-card); stroke-width: 1.5; }
 .sky-chart text.sky-chart__name--sun { fill: var(--color-sun); }
@@ -403,6 +490,10 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
   user-select: text;
 }
 .sky-panel[hidden] { display: none; }
+/* Dentro del panel, `hidden` siempre gana: cada modo muestra solo lo suyo
+   (sin esto, reglas como .field { display: grid } dejaban todo visible). */
+.sky-panel [hidden] { display: none !important; }
+.sky-panel { --color-focus: var(--sky-primary); }
 .sky-panel__intro { margin: 0 32px 0 0; font-size: 17px; line-height: 1.3; }
 .sky-panel__close {
   position: absolute;
@@ -436,8 +527,36 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 .sky-panel__note { margin: 0; font-size: 13px; color: #444; }
 .sky-panel .live-fields { grid-template-columns: 1fr 1fr; }
 .sky-panel .live-submit,
+.sky-panel .live-title,
 .sky-panel .live-intro,
-.sky-panel .live + .field-hint { display: none; }
+.sky-panel .live .field-hint { display: none; }
+.sky-panel .live-fields { display: grid; gap: 10px; }
+.sky-panel .live-error { margin: 4px 0 0; font-size: 12px; color: #b00020; }
+
+/* Mapa lunar: imagen del polo, debajo el nombre del polo y a su derecha "Rotar" */
+.sky-map { display: grid; gap: 10px; }
+.sky-map__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.sky-map__image[hidden] { display: none; }
+.sky-map__row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sky-map__label { margin: 0; font-size: 15px; }
+.sky-map__rotate {
+  min-width: 120px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: var(--sky-primary);
+  color: var(--sky-white);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+.sky-map__rotate:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
 .sky-panel label { font-size: 13px; color: #000; }
 .sky-panel select,
 .sky-panel input {
@@ -460,7 +579,10 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 .sky-panel .live { margin: 0; padding: 0; background: none; border: none; color: #000; }
 .sky-panel .live-title { font-size: 13px; font-weight: 400; margin: 0 0 4px; color: #000; }
 .sky-panel__apply {
+  position: sticky; /* siempre a la vista, aunque el panel tenga scroll */
+  bottom: 0;
   justify-self: end;
+  box-shadow: 0 0 0 8px var(--sky-white);
   min-width: 140px;
   height: 40px;
   border: none;
@@ -478,7 +600,7 @@ body.is-drawer-open .sky-more { left: var(--drawer-w); }
 /* Pantallas angostas: el gráfico y la cuenta regresiva se acomodan */
 @media (max-width: 760px) {
   .sky-chart { left: 8px; max-width: calc(100% - 16px); }
-  .sky-topright { top: auto; bottom: calc(20% + 56px); right: 12px; }
+  .sky-topright { top: auto; bottom: calc(20% + 56px); }
   .sky-countdown { font-size: 12px; }
   .sky-more { top: 30%; }
   .sky-smooth { right: 64px; }
@@ -505,11 +627,46 @@ body { --drawer-w: min(46rem, calc(100vw - 56px)); }
   visibility: hidden;
   transition: transform 0.3s ease, visibility 0s linear 0.3s;
 }
+/* Paleta del cajón: la misma interfaz neutra de la vista del cielo. Redefinir los tokens acá
+   unifica la línea de tiempo, la comparación y la validación sin tocar esos módulos. */
+.sky-drawer {
+  --color-bg: #0b0c0e;
+  --color-surface: #131417;
+  --color-surface-2: #1b1c20;
+  --color-border: #2a2c31;
+  --color-text: #eceef2;
+  --color-muted: #a2a7b1;
+  --color-sun: #ffc54d;
+  --color-earth: #00ffe5;
+  --color-notice: #d6d9df;
+  --color-notice-bg: #1b1c20;
+  --color-focus: #ffffff;
+  --radius: 6px;
+  font-family: var(--font-sky);
+  padding: 28px 32px 40px;
+  color: var(--color-text);
+}
+.sky-drawer main { display: grid; gap: 32px; }
+.sky-drawer main > section:not(:empty),
+.sky-drawer main > details {
+  margin: 0;
+  padding: 0 0 28px;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: none;
+}
+.sky-drawer h2 { font-size: var(--fs-base); font-weight: 600; letter-spacing: 0.02em; }
+.sky-drawer .app-title { font-size: var(--fs-lg); margin-top: 0; }
+.sky-drawer .app-question { font-size: var(--fs-sm); color: var(--color-muted); }
+.sky-drawer .app-intro { display: none; }
+.sky-drawer summary { font-size: var(--fs-sm); }
+.sky-drawer .footer { border-top: none; color: var(--color-muted); }
 body.is-drawer-open .sky-drawer {
   transform: none;
   visibility: visible;
   transition: transform 0.3s ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .sky-drawer, .sky-more, .sky-body__glow, .sky-stem, .sky-label { transition: none; }
+  .sky-drawer, .sky-more, .sky-body__glow, .sky-stem, .sky-label, .sky-pointer { transition: none; }
 }
