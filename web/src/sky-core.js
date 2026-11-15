@@ -193,6 +193,15 @@ export function nearCenter(x, y, width, height, fraction = 0.5) {
 }
 
 /**
+ * Azimut (0° a 360°) que corresponde a una posición horizontal del gráfico de 360°.
+ * x0 y x1 son los bordes del gráfico en las mismas unidades que x; fuera de ellos se recorta al borde.
+ */
+export function chartXToAz(x, x0, x1) {
+  const f = Math.max(0, Math.min(1, (x - x0) / (x1 - x0)));
+  return normAz(f * 360);
+}
+
+/**
  * Qué hace el clic en un indicador de la cuenta regresiva (Sol o Tierra).
  * Oculto y con salida en los datos: salta a la primera hora con el cuerpo visible (`atMs`).
  * Visible, o sin cruce en los datos: solo gira la vista hacia el cuerpo.

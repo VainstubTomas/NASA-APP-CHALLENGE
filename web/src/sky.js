@@ -22,10 +22,13 @@ import { initSkyPanel } from './sky-panel.js';
 import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
-  compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
+  compassTicks, shortDuration, chartRange, chartXToAz, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
   countdownAction,
 } from './sky-core.js';
 
+// Márgenes horizontales del gráfico de 360° (en unidades del viewBox).
+const CHART_X0 = 44;
+const CHART_X1 = 704;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 // Altura del horizonte en la pantalla (fracción del alto), como en el Figma: 1082 / 1346.
 const HORIZON_FRACTION = 0.8;
@@ -459,8 +462,8 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   // --- Gráfico de 360° (como "Cómo leer los números" del artifact) ---
   function drawChart() {
     chart.replaceChildren();
-    const X0 = 44;
-    const X1 = 704;
+    const X0 = CHART_X0;
+    const X1 = CHART_X1;
     const Y0 = 14;
     const Y1 = 160;
     const sample = data?.sample;
@@ -745,6 +748,32 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   };
   stage.addEventListener('pointerup', endDrag);
   stage.addEventListener('pointercancel', endDrag);
+
+  // Gráfico de 360°: clic o arrastre centra la cámara en ese azimut (mismo efecto que arrastrar el cielo).
+  let chartDrag = false;
+  const chartPointToAz = (e) => {
+    const m = chart.getScreenCTM();
+    if (!m) return null;
+    const x = (e.clientX - m.e) / m.a; // px de pantalla → unidades del viewBox
+    return chartXToAz(x, CHART_X0, CHART_X1);
+  };
+  const aimFromChart = (e) => {
+    const az = chartPointToAz(e);
+    if (az == null) return;
+    if (anim) cancelAnimationFrame(anim);
+    heading = az;
+    draw();
+  };
+  chart.addEventListener('pointerdown', (e) => {
+    chartDrag = true;
+    chart.setPointerCapture(e.pointerId);
+    chartBox.classList.add('is-dragging');
+    aimFromChart(e);
+  });
+  chart.addEventListener('pointermove', (e) => { if (chartDrag) aimFromChart(e); });
+  const endChartDrag = () => { chartDrag = false; chartBox.classList.remove('is-dragging'); };
+  chart.addEventListener('pointerup', endChartDrag);
+  chart.addEventListener('pointercancel', endChartDrag);
 
   // Zoom con la rueda del mouse (o el gesto de pellizcar del touchpad)
   stage.addEventListener('wheel', (e) => {
