@@ -15,6 +15,8 @@ Near the lunar south pole the Sun and the Earth barely peek above the horizon, a
 
 In addition, a **live API** (FastAPI, [`data/api/`](data/api/)) lets the user pick any latitude and longitude on the Moon: it queries Horizons and answers in the same format. It is optional; without it the web app uses only the precomputed sites. Guide: [`docs/en/09-API.md`](docs/en/09-API.md).
 
+**The scenario comparison does not pick a winner.** It puts 2 or 3 site-date scenarios side by side and, for each metric separately, marks which one has more hours of Sun (power) and which has more hours of Earth in view (communication). Which one is better depends on the requirements of the mission, so that decision is left to the user (ADR-017).
+
 The positions of the Sun and the Earth come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); the sites and the terrain are explored with Quickmap and Moon Trek, the official resources of the challenge.
 
 ## Project map

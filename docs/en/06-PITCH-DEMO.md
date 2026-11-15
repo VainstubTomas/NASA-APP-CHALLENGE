@@ -64,7 +64,7 @@ Test done on 14/11/2026 by someone on the team using the tools for the first tim
 1. Choose a site from the list and the original date: the horizon, the Sun and the Earth, and the numbers are shown. While there is no relief (layer 5), say the horizon is ideal and the mountain is the next step; do not claim the tool shows mountains hiding the Sun (ADR-011).
 2. Advance the time player: the Sun approaches the horizon (a mountain, once there is relief). The countdown appears: "the Sun sets in N hours".
 3. Change the date (delay): look at the timeline of light and of contact with the Earth.
-4. Compare the two scenarios side by side and conclude which is better (layer 4).
+4. Compare the two scenarios side by side (layer 4): show which has more Sun hours and which has more Earth hours. The tool does not pick a "better" one: say it depends on what the mission needs (more power or more communication) and that the user decides (ADR-017).
 5. Show the validation panel against Horizons (C3-06): for known cases, our numbers next to Horizons', with the difference.
 
 Choose a site and dates where the difference is visible and dramatic; test them on Saturday.

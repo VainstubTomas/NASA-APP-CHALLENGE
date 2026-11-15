@@ -8,7 +8,7 @@ Fill in the `[brackets]` before pasting. Source: [Project Submission Guide](http
 Lunar Landing Site Navigator
 
 ## High-Level Project Summary
-Lunar Landing Site Navigator answers one question in a single screen: if I land at this place on the Moon on this date, will I have Sun (power) and will I see Earth (direct communication)? Pick a landing site and a date, and the app shows the Sun and Earth over the local horizon, the Sun's elevation, how many hours of sunlight and Earth visibility the next days bring, and a countdown to the next sunset or Earthset. Two or three site-date scenarios can be compared side by side, and the app says which one is better and why. Every number comes from NASA/JPL Horizons and is checked against saved Horizons answers. The data already exists in NASA tools, but they are built for specialists; we made it quick to compare for mission planners, educators and the public.
+Lunar Landing Site Navigator answers one question in a single screen: if I land at this place on the Moon on this date, will I have Sun (power) and will I see Earth (direct communication)? Pick a landing site and a date, and the app shows the Sun and Earth over the local horizon, the Sun's elevation, how many hours of sunlight and Earth visibility the next days bring, and a countdown to the next sunset or Earthset. Two or three site-date scenarios can be compared side by side, and the app marks which has more Sun hours and which has more Earth hours, leaving the choice to the user. Every number comes from NASA/JPL Horizons and is checked against saved Horizons answers. The data already exists in NASA tools, but they are built for specialists; we made it quick to compare for mission planners, educators and the public.
 
 ## Link to Project Demo
 [Public link to the 7-slide deck or the 30-second video, tested in a private window]
@@ -22,7 +22,7 @@ Lunar Landing Site Navigator answers one question in a single screen: if I land 
 - Site and date selection: [14] landing sites (Apollo missions, CLPS and other commercial landers, and other countries' programs), any hour from today to February 2027, in UTC.
 - Sun and Earth position: azimuth and elevation of both bodies, drawn over the horizon in a 3D sky view (with a 2D compass and elevation ruler as fallback). The Sun's elevation is the most visible number on the screen, because it drives solar power.
 - Time: a time player, a 7-day timeline of when the Sun and Earth are above the horizon, and a live countdown to the next sunset/sunrise and Earthset/Earthrise.
-- Scenario comparison: 2 or 3 site-date scenarios side by side with hours of Sun and of Earth in view over 7 days. A one-sentence summary names the better one (more Sun hours; if tied, more Earth hours; full ties are reported as ties).
+- Scenario comparison: 2 or 3 site-date scenarios side by side with hours of Sun and of Earth in view over 7 days. The tool does not pick a winner: for each metric it marks which scenario has more Sun hours and which has more Earth hours, and the user decides according to their mission requirements (ADR-017).
 - Validation panel: our values next to JPL Horizons reference values, with the difference.
 - [Only if the live API is deployed (ADR-015): custom coordinates. Any latitude and longitude on the Moon are sent to our own API, which queries JPL Horizons live.]
 - Plain-language texts, mobile layout, and four languages (English, Spanish, Hindi, Simplified Chinese).

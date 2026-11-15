@@ -15,6 +15,8 @@ Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y 
 
 Además, una **API en vivo** (FastAPI, [`data/api/`](data/api/)) permite elegir cualquier latitud y longitud de la Luna: consulta a Horizons y responde en el mismo formato. Es opcional; sin ella la web usa solo los sitios precalculados. Guía: [`docs/09-API.md`](docs/09-API.md).
 
+**La comparación de escenarios no elige un ganador.** Pone 2 o 3 escenarios de sitio y fecha lado a lado y, por cada métrica por separado, marca cuál tiene más horas de Sol (energía) y cuál más horas con la Tierra visible (comunicación). Cuál conviene depende de los requisitos de la misión, así que esa decisión la toma la persona que usa la herramienta (ADR-017).
+
 Las posiciones del Sol y la Tierra salen de [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); los sitios y el terreno se exploran con Quickmap y Moon Trek, los recursos oficiales del desafío.
 
 ## Mapa del proyecto
