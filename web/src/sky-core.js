@@ -203,15 +203,13 @@ export function chartXToAz(x, x0, x1) {
 
 /**
  * Qué hace el clic en un indicador de la cuenta regresiva (Sol o Tierra).
- * Con un cruce del horizonte en los datos salta a ese momento: la salida (`atMs`, primera hora con el
- * cuerpo visible) si está oculto, o la puesta (`crossMs`, cruce estimado) si está visible.
+ * Con un cruce del horizonte en los datos salta a ese momento (`atMs`): la primera hora con el cuerpo
+ * visible si está oculto (sale), o la primera hora con el cuerpo ya oculto si está visible (se pone).
  * Sin cruce en los datos: solo gira la vista hacia el cuerpo.
  * @param {{visible:boolean, event:string|null, atMs:number|null}|null} change resultado de nextVisibilityChange
  * @returns {{type:'jump', ms:number} | {type:'look'}}
  */
 export function countdownAction(change) {
-  // Se pone: salta al cruce estimado, el mismo instante que muestra la cuenta regresiva.
-  if (change?.event === 'sets' && change.crossMs != null) return { type: 'jump', ms: change.crossMs };
   if (change?.event && change.atMs != null) return { type: 'jump', ms: change.atMs };
   return { type: 'look' };
 }
