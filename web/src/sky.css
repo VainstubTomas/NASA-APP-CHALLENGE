@@ -437,7 +437,7 @@
   font-size: 13px;
   color: var(--sky-text-dim);
 }
-/* Cada fila es un botón: clic salta a la salida del cuerpo o gira la vista hacia él */
+/* Cada fila es un botón: clic salta a la salida o a la puesta del cuerpo (o gira la vista si no hay cruce) */
 .sky-cd {
   margin: 0;
   display: flex;
