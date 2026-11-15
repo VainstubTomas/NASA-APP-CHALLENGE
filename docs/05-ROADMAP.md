@@ -83,8 +83,8 @@ Estado al 14/11 a la noche: **todas las sub-issues cerradas**. La épica #40 se 
 | C4-01a | Núcleo de comparación: horas de Sol y Tierra por escenario (#91) | Web | S | Hecha |
 | C4-01b | Selector de 2 o 3 escenarios (#92) | Web | S | Hecha |
 | C4-01c | Tarjetas de escenarios lado a lado (#93) | Web | S | Hecha |
-| C4-01d | Resumen de cuál escenario conviene (#94) | Web | S | Hecha |
-| C4-02 | ADR-014: criterio de "cuál conviene" (#95) | Producto | S | Hecha |
+| C4-01d | Resumen por métrica: en qué escenario hay más Sol y en cuál más Tierra, sin elegir un mejor (#94, ADR-017) | Web | S | Hecha |
+| C4-02 | ADR-014: criterio de "cuál conviene" (#95) | Producto | S | Hecha; en la web lo reemplazó el ADR-017 (sin veredicto), sigue siendo el orden del buscador de ventanas |
 | C4-04 | Escenarios guardados en la URL (#97, opcional) | Web | S | Hecha |
 | - | API propia para consultar Horizons en vivo con coordenadas elegidas (#104, ADR-015) | Efemérides | L | Hecha (resuelve C5-04) |
 

@@ -83,8 +83,8 @@ Status on the night of 11/14: **all sub-issues closed**. Epic #40 closes once th
 | C4-01a | Comparison core: Sun and Earth hours per scenario (#91) | Web | S | Done |
 | C4-01b | Selector for 2 or 3 scenarios (#92) | Web | S | Done |
 | C4-01c | Side-by-side scenario cards (#93) | Web | S | Done |
-| C4-01d | Summary of which scenario is better (#94) | Web | S | Done |
-| C4-02 | ADR-014: "which one is better" rule (#95) | Product | S | Done |
+| C4-01d | Summary by metric: which scenario has more Sun and which has more Earth, without picking a better one (#94, ADR-017) | Web | S | Done |
+| C4-02 | ADR-014: "which one is better" rule (#95) | Product | S | Done; in the web app it was replaced by ADR-017 (no verdict), and it is still the order of the window finder |
 | C4-04 | Scenarios saved in the URL (#97, optional) | Web | S | Done |
 | - | Own API to query Horizons live with user-chosen coordinates (#104, ADR-015) | Ephemeris | L | Done (solves C5-04) |
 
