@@ -1,3 +1,5 @@
+> 🇬🇧 [Read in English](../en/adr/ADR-013-validation-json-for-the-panel.md)
+
 # ADR-013: validation.json en data/public/ para el panel de validación
 
 - **Estado**: Propuesto
