@@ -23,7 +23,10 @@
           "synthetic": { "type": "boolean" },
           "mission": { "type": "string" },
           "country": { "type": "string" },
-          "notes": { "type": "string" }
+          "notes": { "type": "string" },
+          "landing_utc": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$" },
+          "landing_source": { "type": "string", "minLength": 1 },
+          "landing_source_url": { "type": "string" }
         }
       }
     }

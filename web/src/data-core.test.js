@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createFetchJson, createSiteLoader } from './data-core.js';
+import { missionWindow } from './state.js';
 
 const real = (siteId, file) =>
   JSON.parse(readFileSync(new URL(`../../data/public/sites/${siteId}/${file}`, import.meta.url), 'utf8'));
@@ -85,4 +86,49 @@ test('fetchJson: error claro si el archivo no existe o no es JSON', async () => 
   assert.deepEqual(await fetchJson('bien.json'), { ok: 1 });
   await assert.rejects(fetchJson('no-existe.json'), /no-existe\.json: no existe o no es JSON/);
   await assert.rejects(fetchJson('caido.json'), /caido\.json: HTTP 500/);
+});
+
+// --- Modo misión (ADR-019): mission.json tiene el mismo formato que ephemeris.json ---
+const MISSION_FILES = { ...APOLLO, 'sites/apollo-11/mission.json': real('apollo-11', 'mission.json') };
+
+test('loadSite con { mission: true } lee mission.json y el mismo horizon.json', async () => {
+  const fake = fakeFetchJson(MISSION_FILES);
+  const { loadSite } = createSiteLoader(fake.fetchJson);
+  const { ephemeris, horizon } = await loadSite('apollo-11', { mission: true });
+  assert.equal(ephemeris.time.start_utc, '1969-07-17T20:00:00Z');
+  assert.equal(ephemeris.time.count, 145);
+  assert.equal(horizon.site_id, 'apollo-11');
+  assert.equal(fake.calls['sites/apollo-11/mission.json'], 1);
+  assert.equal(fake.calls['sites/apollo-11/ephemeris.json'], undefined);
+});
+
+test('la misión y las fechas actuales del mismo sitio se guardan por separado', async () => {
+  const fake = fakeFetchJson(MISSION_FILES);
+  const { loadSite } = createSiteLoader(fake.fetchJson);
+  const normal = await loadSite('apollo-11');
+  const mission = await loadSite('apollo-11', { mission: true });
+  assert.notEqual(normal.ephemeris.time.start_utc, mission.ephemeris.time.start_utc);
+  assert.equal(await loadSite('apollo-11', { mission: true }), mission); // caché
+  assert.equal(await loadSite('apollo-11'), normal);
+});
+
+test('un mission.json con formato inesperado se rechaza nombrando el archivo', async () => {
+  const bad = real('apollo-11', 'mission.json');
+  bad.time.count = 10; // no coincide con las series
+  const { loadSite } = createSiteLoader(fakeFetchJson({ ...MISSION_FILES, 'sites/apollo-11/mission.json': bad }).fetchJson);
+  await assert.rejects(() => loadSite('apollo-11', { mission: true }), /mission\.json: .*time\.count/);
+});
+
+test('cada sitio con landing_utc tiene su mission.json con las 145 muestras de la ventana', () => {
+  const sites = real('..', 'sites.json').sites.filter((s) => s.landing_utc);
+  assert.equal(sites.length, 14);
+  for (const site of sites) {
+    const doc = real(site.id, 'mission.json');
+    assert.equal(doc.time.count, 145, site.id);
+    assert.equal(doc.site_id, site.id);
+    // La web (state.js) y Python (build_mission.py) calculan la misma ventana.
+    const w = missionWindow(site);
+    assert.equal(Date.parse(doc.time.start_utc), w.minMs, site.id);
+    assert.equal(Date.parse(doc.time.start_utc) + (doc.time.count - 1) * doc.time.step_s * 1000, w.maxMs, site.id);
+  }
 });

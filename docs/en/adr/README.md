@@ -24,5 +24,6 @@ Template: copy `ADR-000-template.md`, number the next one (`ADR-011-...`) and fi
 | [015](ADR-015-live-horizons-api.md) | Own API in `data/api/` to query Horizons live for a user-chosen site | Proposed |
 | [016](ADR-016-3d-sky-view.md) | 3D sky view with the flat horizon (terrain rendering stays out of scope) | Proposed |
 | [018](ADR-018-live-relief.md) | Real relief for a free position: `GET /horizon` in the API and the loader waits for the relief | Proposed |
+| [019](ADR-019-mission-day-window.md) | Go to the day of a historic mission with a precomputed ephemeris window (`mission.json`, ±3 days) | Proposed |
 
 Statuses: Proposed, Accepted, Replaced.

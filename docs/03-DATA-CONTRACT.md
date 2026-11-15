@@ -43,7 +43,10 @@ data/public/sites/<site_id>/metrics.json        (capa 3)
   ]
 }
 ```
-Campos opcionales: `mission`, `country`, `notes`. Todo sitio real lleva `source` y `source_url` verificados. `synthetic: true` marca datos de prueba y **debe eliminarse antes de la entrega**.
+Campos opcionales: `mission`, `country`, `notes`, `landing_utc` (alunizaje, UTC), `landing_source` y `landing_source_url` (ADR-019). Todo sitio real lleva `source` y `source_url` verificados. `synthetic: true` marca datos de prueba y **debe eliminarse antes de la entrega**.
+
+### `mission.json` (ADR-019)
+Para cada sitio con `landing_utc`, `data/public/sites/<id>/mission.json` tiene **exactamente el formato de `ephemeris.json`** (mismo esquema): una muestra por hora desde 3 días antes hasta 3 días después de la hora del alunizaje (hora redondeada hacia abajo, 145 muestras). La web lo usa cuando la fecha cae dentro de esa ventana. Se genera con `python -m precompute.ephemeris.build_mission`.
 
 ## `horizon.json`
 ```json

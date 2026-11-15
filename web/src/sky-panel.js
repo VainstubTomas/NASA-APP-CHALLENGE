@@ -8,6 +8,7 @@ import { applyPlan } from './sky-core.js';
 import { validateCoords } from './live-core.js';
 import { pixelToLatLon, latLonToPixel, roundCoord, POLES } from './map-core.js';
 import { t } from './i18n.js';
+import { missionWindow, missionStartMs, toInputValue } from './state.js';
 
 /**
  * @param {HTMLElement} panel  #sky-panel
@@ -24,6 +25,9 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
   const modes = [...panel.querySelectorAll('[data-mode]')];
   const panes = [...panel.querySelectorAll('[data-pane]')];
   const apply = panel.querySelector('[data-sky-apply]');
+  const missionBox = panel.querySelector('[data-mission]');
+  const missionGo = panel.querySelector('[data-mission-go]');
+  const missionHint = panel.querySelector('[data-mission-hint]');
   const noApis = [...panel.querySelectorAll('[data-no-api]')];
   let mode = null;
   let applying = false;
@@ -127,14 +131,37 @@ export function initSkyPanel(panel, { trigger, liveEnabled }) {
     apply.disabled = !canApply;
   }
 
+  // Misión del sitio elegido en el panel (ADR-019): ventana de ±3 días alrededor del alunizaje.
+  function selectedMission() {
+    return missionWindow({ landing_utc: site.selectedOptions[0]?.dataset.landing });
+  }
+  function showMission() {
+    const w = selectedMission();
+    missionBox.hidden = !w;
+    if (w) missionHint.textContent = t('sky.panel.missionHint', { landing: `${new Date(w.landingMs).toISOString().slice(0, 16).replace('T', ' ')} UTC` });
+  }
+  site.addEventListener('change', showMission);
+  // "Ir al día de la misión": pone la fecha en la hora del alunizaje y aplica en el acto (sin "Aplicar").
+  missionGo?.addEventListener('click', () => {
+    const w = selectedMission();
+    if (!w) return;
+    time.value = toInputValue(missionStartMs({ landing_utc: site.selectedOptions[0].dataset.landing }));
+    runApply();
+  });
+
   function open() {
     // Copia las opciones y los valores actuales del selector real; empieza eligiendo el modo.
-    site.replaceChildren(...[...realSite.options].map((o) => new Option(o.textContent, o.value)));
+    site.replaceChildren(...[...realSite.options].map((o) => {
+      const option = new Option(o.textContent, o.value);
+      if (o.dataset.landing) option.dataset.landing = o.dataset.landing;
+      return option;
+    }));
     site.value = realSite.value;
     time.min = realTime.min;
     time.max = realTime.max;
     time.step = realTime.step;
     time.value = realTime.value;
+    showMission();
     setMode(null);
     setPole('south');
     panel.hidden = false;
