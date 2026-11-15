@@ -41,3 +41,20 @@ def test_tiff_descargado_es_float32_en_metros():
     assert info["count"] == 1
     # rango razonable de altura lunar: el relieve del mapa LOLA va de unos -10 km a +10 km
     assert -10_000 < info["min"] < info["max"] < 10_000
+
+
+def test_url_polar_pide_un_cuadrado_de_30_m_en_la_proyeccion_del_servicio():
+    from urllib.parse import parse_qs, urlparse
+
+    url = ld.polar_export_url(1000.0, -2000.0, 22_000.0, 'PROJCS["Moon2000_spole"]')
+    assert url.startswith(ld.POLAR_SERVICE + "/exportImage?")
+    q = {k: v[0] for k, v in parse_qs(urlparse(url).query).items()}
+    assert q["bbox"] == "-21000.0,-24000.0,23000.0,20000.0"
+    assert q["size"] == "1467,1467"  # 44 km / 30 m
+    assert '"wkt"' in q["bboxSR"] and q["bboxSR"] == q["imageSR"]
+    assert q["format"] == "tiff" and q["pixelType"] == "F32"
+
+
+def test_descarga_polar_rechaza_sitios_fuera_del_mapa(tmp_path):
+    with pytest.raises(ValueError, match="fuera del mapa polar"):
+        ld.download_polar(-69.37, 32.32, tmp_path / "x.tif")

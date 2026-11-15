@@ -18,11 +18,11 @@ Proyección: la posición del sitio en el mapa se calcula con pyproj usando el C
 archivo; nunca se convierte a mano (CLAUDE.md). Para moverse desde el sitio se usa la fórmula del
 destino sobre la esfera (geodésica exacta en una esfera), y luego pyproj pasa cada punto al mapa.
 
-Este módulo calcula el perfil y dibuja la silueta. Escribir horizon.json es C5-07 (#51).
+Este módulo calcula el perfil y dibuja la silueta; `lola_horizon.py` lo usa para escribir horizon.json.
 
-Uso (cuando esté el mapa en data/raw/lola/, que no se sube a git):
-    python -m precompute.terrain.horizon_profile --dem data/raw/lola/LDEM_80S_80MPP_ADJ.TIF \\
-        --site intuitive-machines-2 --plot horizonte-im2.png
+Uso con un recorte ya descargado en data/raw/ (no se sube a git):
+    python -m precompute.terrain.horizon_profile --dem data/raw/dem30_intuitive-machines-2.tif \\
+        --site intuitive-machines-2 --max-km 20 --plot horizonte-im2.png
 """
 from __future__ import annotations
 
@@ -172,8 +172,11 @@ class DemTerrain:
                 data[data == src.nodata] = np.nan
             self.transform = src.transform
             self.inverse = ~src.transform
-            self.pixel_m = float(abs(src.res[0]))
             crs = CRS.from_wkt(src.crs.to_wkt())
+            # En un mapa lon/lat (como el LOLA 128 ppd) el píxel viene en grados: se pasa a metros
+            # con el paso en latitud, que no depende de la latitud.
+            res = float(abs(src.res[1]))
+            self.pixel_m = res * math.pi * MOON_RADIUS_M / 180.0 if crs.is_geographic else res
             units = tuple(u.lower() for u in (src.units or ()) if u)
         self.height_unit_m = height_unit_m if height_unit_m is not None else self._guess_unit(data, units)
         self.data = data * self.height_unit_m

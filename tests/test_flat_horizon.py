@@ -75,4 +75,5 @@ def test_cada_sitio_real_tiene_horizonte_valido(site_id):
     _assert_valid("horizon.schema.json", path)
     doc = json.loads(path.read_text(encoding="utf-8"))
     assert len(doc["elevation_deg"]) == 360
-    assert doc["dem"]["name"] == "LRO_LOLA_DEM_Global_128ppd_v04"
+    # Polo sur (#16): mapa polar de 30 m; el resto, el global de 128 ppd.
+    assert doc["dem"]["name"] in ("LRO_LOLA_DEM_Global_128ppd_v04", "LRO_LOLA_DEM_SPole75_30mp_v04")
