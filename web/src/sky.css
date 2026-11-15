@@ -437,9 +437,49 @@
   font-size: 13px;
   color: var(--sky-text-dim);
 }
-.sky-cd { margin: 0; display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; }
-.sky-cd__dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; opacity: 0.45; }
+/* Cada fila es un botón: clic salta a la salida del cuerpo o gira la vista hacia él */
+.sky-cd {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.sky-cd:hover { background: rgba(255, 255, 255, 0.08); }
+.sky-cd:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.sky-cd::after {
+  content: '›';
+  margin-left: 2px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.sky-cd:hover::after,
+.sky-cd:focus-visible::after { opacity: 0.7; transform: none; }
+.sky-cd__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  align-self: center;
+  opacity: 0.45;
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
 .sky-cd.is-visible .sky-cd__dot { opacity: 1; }
+.sky-cd:hover .sky-cd__dot { transform: scale(1.4); opacity: 1; }
+.sky-cd--sun:hover .sky-cd__dot { box-shadow: 0 0 8px var(--color-sun); }
+.sky-cd--earth:hover .sky-cd__dot { box-shadow: 0 0 8px var(--sky-earth); }
+@media (prefers-reduced-motion: reduce) {
+  .sky-cd, .sky-cd::after, .sky-cd__dot { transition: none; }
+}
 .sky-cd--sun .sky-cd__dot { background: var(--color-sun); }
 .sky-cd--earth .sky-cd__dot { background: var(--sky-earth); }
 /* Filas sin cuenta (siempre visible / no sale): sin hueco vacío a la derecha, el texto queda en el margen */

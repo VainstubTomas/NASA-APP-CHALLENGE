@@ -252,6 +252,7 @@
   "info.next30d": "Próximos 30 días",
   "info.next30dHelp": "Horas, de los próximos 30 días, en que el cuerpo está sobre el horizonte. «Ambos» cuenta las horas con Sol y Tierra a la vez.",
   "info.period": "Resumen del período {from} a {to} ({hours} h)",
+  "info.periodSource": "Sale de todas las horas de JPL Horizons que tiene la app para este sitio ({hours} datos horarios, del {from} al {to}). No depende de la fecha que elegiste.",
   "info.value": "Valor",
   "info.sunVisible": "Sol visible",
   "info.sunVisibleHelp": "Horas del período en que el Sol asoma sobre el horizonte: hay luz para los paneles solares. Entre paréntesis, el porcentaje del período.",

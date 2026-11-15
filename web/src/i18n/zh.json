@@ -252,6 +252,7 @@
   "info.next30d": "未来 30 天",
   "info.next30dHelp": "未来 30 天中天体在地平线以上的小时数。“两者”指太阳和地球同时可见的小时数。",
   "info.period": "汇总 {from} 至 {to}（{hours} 小时）",
+  "info.periodSource": "取自应用中此地点在 JPL Horizons 的全部逐小时数据（{hours} 个样本，{from} 至 {to}）。与你选择的日期无关。",
   "info.value": "数值",
   "info.sunVisible": "太阳可见",
   "info.sunVisibleHelp": "该时段内太阳在地平线以上的小时数：太阳能板有光照。括号内为占该时段的百分比。",

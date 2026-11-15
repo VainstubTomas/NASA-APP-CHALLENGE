@@ -23,6 +23,7 @@ import {
   FOV_DEG, FOV_MIN_DEG, ROTATE_STEP_DEG,
   normAz, relAz, rotate, tiltMax, tiltMin, tiltUp, tiltDown, clampTilt, pxPerDeg, project, discRadiusPx,
   compassTicks, shortDuration, chartRange, initialHeading, zoomFov, makeStars, pointerAngle, nearCenter, tiltToCenter,
+  countdownAction,
 } from './sky-core.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -186,7 +187,6 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   // --- Arriba a la derecha: cuenta regresiva ---
   const topRight = el('div', 'sky-topright');
   const countdown = el('div', 'sky-countdown');
-  countdown.setAttribute('role', 'status');
   topRight.append(countdown);
 
   // --- Abajo a la izquierda: horizonte de 360° ---
@@ -532,10 +532,15 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     if (!data?.sample) return;
     const rows = ['sun', 'earth'].map((key) => {
       const change = nextVisibilityChange(data.ephemeris, data.utcMs, key, horizonFn());
-      const row = el('p', `sky-cd sky-cd--${key}`);
+      // Cada fila es un botón: salta a la salida del cuerpo (si está oculto) o gira la vista hacia él.
+      const row = el('button', `sky-cd sky-cd--${key}`);
+      row.type = 'button';
       const text = el('span', 'sky-cd__text');
       const value = el('span', 'sky-cd__value');
       row.append(el('span', 'sky-cd__dot'), text, value);
+      row.addEventListener('click', () => activateCountdown(key, change));
+      row.addEventListener('pointerenter', () => root.classList.add(`is-pointing-${key}`));
+      row.addEventListener('pointerleave', () => root.classList.remove(`is-pointing-${key}`));
       countdown.append(row);
       if (!change?.event) {
         // Sin cruce del horizonte en los datos: queda siempre visible o nunca, según el estado de ahora.
@@ -567,6 +572,47 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     onUserInput?.();
     onMissionExit?.();
   });
+
+  // Clic en la cuenta regresiva: salto animado a la salida del cuerpo, o solo girar si ya está visible.
+  let timeAnim = null;
+  const cancelTimeAnim = () => {
+    if (timeAnim) cancelAnimationFrame(timeAnim);
+    timeAnim = null;
+  };
+  // Mueve la fecha en pantalla sin pedirla todavía: cada cuadro recalcula la posición de los cuerpos.
+  function previewTime(ms) {
+    data = { ...data, utcMs: ms, sample: sampleAt(data.ephemeris, ms) };
+    drawTime();
+    draw();
+  }
+  function animateTime(targetMs, key) {
+    cancelTimeAnim();
+    const startMs = data.utcMs;
+    const delta = targetMs - startMs;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    const dur = reduce ? 0 : 900;
+    const t0 = performance.now();
+    const step = (now) => {
+      const f = dur ? Math.min(1, (now - t0) / dur) : 1;
+      if (f < 1) {
+        const e = 1 - (1 - f) ** 3;
+        previewTime(Math.round(startMs + delta * e));
+        timeAnim = requestAnimationFrame(step);
+        return;
+      }
+      timeAnim = null;
+      previewTime(targetMs);
+      onTime(targetMs);
+      lookAt(key, true);
+    };
+    timeAnim = requestAnimationFrame(step);
+  }
+  function activateCountdown(key, change) {
+    if (!data?.sample) return;
+    const action = countdownAction(change);
+    if (action.type === 'jump') animateTime(action.ms, key);
+    else lookAt(key, true);
+  }
 
   function drawTime() {
     timeLabel.textContent = t('sky.slider', { site: data?.siteName ?? '' });
@@ -739,6 +785,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   // Con una posición libre (API en vivo) cada instante nuevo es una consulta: mientras se arrastra
   // solo se actualiza la fecha en pantalla y se pide una vez, al soltar.
   slider.addEventListener('input', () => {
+    cancelTimeAnim();
     onUserInput?.();
     const ms = sliderToTime(slider.value, range.minMs, range.maxMs);
     if (isLive()) {
