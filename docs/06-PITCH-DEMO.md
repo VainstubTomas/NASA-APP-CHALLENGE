@@ -11,6 +11,8 @@ Apuntamos a **Best Use of Data** ("el proyecto que mejor hace accesibles los dat
 > Los datos de NASA para saber si un sitio lunar tiene Sol y línea de vista con la Tierra ya existen, pero están en herramientas complejas. Nosotros los hicimos accesibles: una pantalla, una pregunta, y números verificados contra JPL Horizons.
 
 ## Estructura de la presentación (3 a 5 minutos, ajustar al tiempo que den)
+> Es la **defensa presencial** ante el jurado local. La demo que se sube a Space Apps es otra cosa y tiene límites estrictos: hasta 7 diapositivas o 30 s de video, en inglés (ver "Entrega oficial y rúbrica" en `docs/00-CONTEXT.md`).
+
 Entre corchetes, el premio al que le habla cada bloque.
 1. **El problema** (30 s) [Mission Concept]: polo sur lunar, Sol y Tierra pegados al horizonte, cualquier montaña los tapa; Artemis exige iluminación y comunicación directa. Analogía del campamento: sol para el panel y señal para el celular.
 2. **Por qué es difícil hoy** (30 s) [Data]: los datos existen en Quickmap, Moon Trek y Horizons, pero son potentes y confusos. Mostrar 2 o 3 capturas y lo que resulta confuso (lista completa abajo, en "Por qué es difícil hoy: lo que encontramos").
@@ -75,12 +77,24 @@ Elegir un sitio y fechas donde la diferencia sea visible y dramática; probarlas
 - Correr la demo completa al menos dos veces antes de la defensa (dom 15, entre 14:30 y 16:30).
 - Probar con alguien de afuera (un mentor o compañero de otro equipo) y anotar dónde se confunde.
 
-## Checklist de entrega (confirmar qué pide la organización)
-- [ ] Repo en GitHub público y actualizado, con README claro
+## Checklist de entrega (guías oficiales: ver "Entrega oficial y rúbrica" en `docs/00-CONTEXT.md`)
+**Repo y web**
+- [x] README en inglés como portada, con uso de IA, créditos y licencia (#110)
+- [x] La web abre en inglés con `?lang=en` y usa inglés si el navegador no está en un idioma soportado (#110)
 - [ ] `main` contiene la versión final y arranca siguiendo el README
-- [ ] Datos sintéticos de desarrollo eliminados (`synthetic: true` fuera de `sites.json`)
-- [ ] Web desplegada con link en el README
-- [ ] Créditos y fuentes de datos citados (JPL Horizons, Quickmap de ASU, NASA Moon Trek, datos LRO/LOLA; CSA si se usa)
-- [ ] Presentación lista
-- [ ] Subido con margen antes de las 14:30 del domingo 15
-- [ ] Video corto de respaldo (si lo piden o por seguridad)
+- [ ] Datos sintéticos de desarrollo eliminados (`synthetic: true` fuera de `sites.json`, E-01 #48)
+- [ ] Web desplegada desde la versión final, con link en el README
+
+**Demo** (E-03, #50)
+- [ ] Hasta 7 diapositivas contando título e introducción, en inglés, con nombre del equipo, integrantes y desafío; o un video de hasta 30 s (con subtítulos en inglés si se habla otro idioma)
+- [ ] Link público sin login, probado en una ventana privada
+
+**Formulario en spaceappschallenge.org** (borrador en `docs/08-SUBMISSION.md`)
+- [ ] Todos los campos completos y en inglés
+- [ ] Link al proyecto final: la web con `?lang=en` y el repo
+- [ ] Todos los integrantes figuran en la pestaña Members
+- [ ] Las dos casillas marcadas y "Submit for Judging" antes del domingo 15 a las 23:59 (apuntamos a las 14:30)
+
+**Defensa presencial**
+- [ ] Presentación lista y ensayada
+- [ ] Video corto de respaldo por si falla internet o el proyector

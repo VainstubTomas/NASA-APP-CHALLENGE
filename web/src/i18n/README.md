@@ -37,7 +37,8 @@ tanto, la web muestra el nombre de `sites.json`.
 ## Cómo funciona
 
 - `src/i18n-core.js`: lógica sin DOM (probada en `src/i18n.test.js`): `t()`, detección de idioma, nombres de sitio.
-- `src/i18n.js`: conecta con la página. El idioma sale de la elección guardada (`localStorage`), si no del
-  navegador, si no español. Al cambiarlo en el selector se guarda y se recarga la página (sitio y fecha
-  quedan en la URL).
+- `src/i18n.js`: conecta con la página. El idioma sale de `?lang=` en la URL (por ejemplo `?lang=en`, para el
+  link de la entrega), si no de la elección guardada (`localStorage`), si no del navegador, si no **inglés**
+  (#110: Space Apps pide inglés en todo lo que se enlaza en la entrega). Al cambiarlo en el selector se guarda
+  y se recarga la página (sitio y fecha quedan en la URL).
 - Fechas y números usan el formato de cada idioma (`toLocaleString`).

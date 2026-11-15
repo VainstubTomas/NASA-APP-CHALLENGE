@@ -1,0 +1,232 @@
+/* Comparación de escenarios (capa 4, #92). Colores y medidas de theme.css (#38). */
+.compare {
+  margin-top: var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+}
+
+.compare__title {
+  margin: 0;
+  font-size: var(--fs-lg);
+}
+
+.compare__intro,
+.compare__limits {
+  margin: var(--space-1) 0 var(--space-3);
+  color: var(--color-muted);
+  font-size: var(--fs-sm);
+}
+
+.compare__limits {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-xs);
+}
+
+.compare-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.compare-scenario {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-3);
+  align-items: end;
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 1.5);
+}
+
+.compare-scenario__name {
+  padding: 0 var(--space-1);
+  font-weight: 700;
+}
+
+.compare-scenario select,
+.compare-scenario input {
+  background: var(--color-bg);
+}
+
+@media (max-width: 36rem) {
+  .compare-scenario {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-btn {
+  min-height: 44px; /* tamaño cómodo para el dedo en el celular */
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 1.5);
+  cursor: pointer;
+}
+
+.compare-btn:hover:not(:disabled) {
+  border-color: var(--color-focus);
+}
+
+.compare-btn:disabled {
+  color: var(--color-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.compare-btn--add {
+  margin-top: var(--space-3);
+  font-weight: 700;
+  border-color: var(--color-sun);
+}
+
+.compare-btn--remove {
+  background: var(--color-bg);
+}
+
+/* Tarjetas de escenarios (C4-01c, #93): reusan .panel-card (panel.css), una columna por escenario. */
+.compare-results {
+  margin-top: var(--space-4);
+}
+
+.compare-cards {
+  display: grid;
+  grid-template-columns: repeat(var(--compare-cols, 2), minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 36rem) {
+  .compare-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  --card-color: var(--color-border);
+}
+
+.compare-card__name {
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.compare-card__body {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.compare-card__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-weight: 600;
+}
+
+.compare-card__hours {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.compare-card__body--sun .compare-card__hours {
+  color: var(--color-sun);
+}
+
+.compare-card__body--earth .compare-card__hours {
+  color: var(--color-earth);
+}
+
+.compare-card__next,
+.compare-card__empty,
+.compare-card__partial {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+.compare-card__partial {
+  color: var(--color-notice);
+}
+
+.compare__window,
+.compare__flat,
+.compare__loading {
+  margin: var(--space-3) 0 0;
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+}
+
+/* Aviso del horizonte ideal: visible, como el #notice principal. */
+.compare__flat {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-notice);
+  background: var(--color-notice-bg);
+  border-radius: calc(var(--radius) / 1.5);
+}
+
+/* Resumen "cuál conviene" (C4-01d, #94). */
+.compare-summary {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-sun);
+  border-radius: calc(var(--radius) / 1.5);
+}
+
+.compare-summary--tie,
+.compare-summary--same,
+.compare-summary--only,
+.compare-summary--none {
+  border-left-color: var(--color-muted);
+}
+
+.compare-summary__title {
+  margin: 0;
+  font-size: var(--fs-base);
+}
+
+.compare-summary__text {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-lg);
+  font-weight: 600;
+}
+
+.compare-summary__rule {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-xs);
+  color: var(--color-muted);
+}
+
+/* Tarjeta ganadora: borde del color del Sol y etiqueta (no depende solo del color). */
+.compare-card--best {
+  --card-color: var(--color-sun);
+  border-color: var(--color-sun);
+}
+
+.compare-card__badge {
+  align-self: flex-start;
+  margin: 0 0 var(--space-1);
+  padding: 0.15rem 0.6rem;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--color-bg);
+  background: var(--color-sun);
+  border-radius: var(--radius-pill);
+}

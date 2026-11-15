@@ -1,8 +1,9 @@
 // Selector de sitio y de fecha/hora UTC. Escribe el estado en la URL.
 import {
-  getRange, clampTime, toInputValue, fromInputValue, resolveState, buildSearch,
+  getRange, clampTime, toInputValue, fromInputValue, resolveState, formatT, mergeSearch,
 } from './state.js';
 import { t, siteName } from './i18n.js';
+import { LANGS } from './i18n-core.js';
 
 const base = import.meta.env.BASE_URL;
 
@@ -53,7 +54,21 @@ export async function initSelector({ onChange, onUserInput } = {}) {
   async function render() {
     siteSelect.value = state.site;
     timeInput.value = toInputValue(state.t);
-    history.replaceState(null, '', buildSearch(state));
+    // Conserva los demás parámetros de la URL (c, escenarios, etc.)
+    // y también el idioma seleccionado (?lang=).
+    const search = new URLSearchParams(
+      mergeSearch(window.location.search, {
+        site: state.site,
+        t: formatT(state.t),
+      })
+    );
+
+    const lang = new URLSearchParams(window.location.search).get('lang');
+    if (LANGS.includes(lang)) {
+      search.set('lang', lang);
+    }
+
+    history.replaceState(null, '', `?${search}`);
     const ok = await hasData(state.site);
     notice.hidden = ok;
     notice.textContent = ok ? '' : t('selector.noData');

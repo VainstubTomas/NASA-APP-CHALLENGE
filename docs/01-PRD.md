@@ -34,7 +34,7 @@ Objetivo: capas 1 a 4 (la 4 subió de prioridad en el ADR-009 porque es el eje d
 **Luna lisa primero (ADR-011).** Las capas 1 a 4 suponen una Luna esfera sin relieve: el horizonte es 0° en todas las direcciones. El relieve real llega al final y solo cambia los datos de `horizon.json`, no la web. Mientras tanto la web avisa "horizonte ideal, sin relieve": el resultado es optimista, porque una montaña de un par de grados puede tapar el Sol o la Tierra.
 
 ## Fuera de alcance
-- Visualización 3D del terreno o render realista de la superficie.
+- Render realista del terreno (relieve, texturas). La vista 3D del cielo con el horizonte liso sí entró (ADR-016).
 - Relieve real antes de cerrar las capas 1 a 4 (ADR-011).
 - Calcular iluminación para todo el polo (solo los sitios de la lista y, como mucho, una grilla).
 - Backend en producción, cuentas de usuario, base de datos.

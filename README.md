@@ -1,36 +1,36 @@
-> 🇬🇧 [Read in English](README.en.md)
+> 🇪🇸 [Leer en español](README.es.md)
 
 # Lunar Landing Site Navigator
 
-> NASA Space Apps Challenge 2026. Proyecto en desarrollo.
+> NASA Space Apps Challenge 2026. Project in progress.
 
-**¿Si aterrizo en este lugar de la Luna en esta fecha, voy a tener Sol y voy a poder hablar con la Tierra?**
+**If I land at this place on the Moon on this date, will I have Sun and will I be able to talk to Earth?**
 
-Cerca del polo sur lunar el Sol y la Tierra apenas asoman sobre el horizonte, y cualquier montaña los tapa. Esta herramienta toma un sitio y una fecha, calcula dónde están el Sol y la Tierra, dibuja el horizonte real del lugar y muestra cuándo hay energía y cuándo hay comunicación.
+Near the lunar south pole the Sun and the Earth barely peek above the horizon, and any mountain hides them. This tool takes a site and a date, finds where the Sun and the Earth are, draws them over the horizon of the place, and shows when there is energy and when there is communication. For now the horizon is ideal (a smooth Moon, no terrain), and the app says so; real terrain from LOLA is the next step (ADR-011).
 
-## Cómo funciona
-1. **Efemérides** (Python + API de JPL Horizons): azimut y elevación del Sol y la Tierra por sitio y por hora.
-2. **Terreno** (Python + mapa de elevación LOLA): perfil de horizonte de 360 direcciones por sitio.
-3. **Web**: lee esos datos precalculados y compara cada cuerpo contra el horizonte.
+## How it works
+1. **Ephemerides** (Python + JPL Horizons API): azimuth and elevation of the Sun and the Earth per site and per hour.
+2. **Terrain** (Python): horizon profile of 360 directions per site. Today it is flat (0°); the LOLA elevation map comes last (ADR-011).
+3. **Web**: reads that precalculated data and compares each body against the horizon.
 
-Las posiciones del Sol y la Tierra salen de [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); los sitios y el terreno se exploran con Quickmap y Moon Trek, los recursos oficiales del desafío.
+The positions of the Sun and the Earth come from [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/); the sites and the terrain are explored with Quickmap and Moon Trek, the official resources of the challenge.
 
-## Mapa del proyecto
-El trabajo se divide en capas (fases). Cada capa es una **épica** en el tablero (`[EPICA] ...`) y una demo completa por sí sola: si algo se atrasa, se muestra la última capa que funcione.
+## Project map
+The work is split into layers (phases). Each layer is an **epic** on the board (`[EPICA] ...`) and a complete demo on its own: if something falls behind, the last working layer is shown.
 
 ```mermaid
 flowchart TD
-    subgraph C0["Capa 0 · Base · viernes 13"]
-        H["Horizons descargado<br/>y validado"]
-        S["Sitios con<br/>coordenadas verificadas"]
-        W["Web con Vite<br/>y deploy de prueba"]
+    subgraph C0["Layer 0 · Base · Friday 13"]
+        H["Horizons downloaded<br/>and validated"]
+        S["Sites with<br/>verified coordinates"]
+        W["Web with Vite<br/>and test deploy"]
     end
-    C1["Capa 1 · Elegir sitio y fecha (desde la primera pantalla); ver el Sol y la Tierra<br/>sábado, antes de las 12:30"]
-    C2["Capa 2 · Horizonte liso (Luna sin relieve) con el Sol y la Tierra<br/>demo mínima, sábado 14:30"]
-    C3["Capa 3 · Línea de tiempo, cuenta regresiva y validación<br/>sábado a la noche"]
-    C4["Capa 4 · Comparación de escenarios<br/>sábado a la noche"]
-    C5["Capa 5 · Extras y, al final, relieve real (mapa de elevación)<br/>solo si sobra tiempo"]
-    E["Entrega · README, demo y presentación<br/>features congeladas dom 12:30 · subida 14:30"]
+    C1["Layer 1 · Choose site and date (from the first screen); see the Sun and the Earth<br/>Saturday, before 12:30"]
+    C2["Layer 2 · Flat horizon (Moon without relief) with the Sun and the Earth<br/>minimal demo, Saturday 14:30"]
+    C3["Layer 3 · Timeline, countdown and validation<br/>Saturday night"]
+    C4["Layer 4 · Scenario comparison<br/>Saturday night"]
+    C5["Layer 5 · Extras and, at the very end, real relief (elevation map)<br/>only if there is time left"]
+    E["Delivery · README, demo and presentation<br/>features frozen Sun 12:30 · upload 14:30"]
 
     H --> C1
     S --> C1
@@ -39,41 +39,68 @@ flowchart TD
     C4 -.-> C5 -.-> E
 ```
 
-Obligatorias: capas 0 a 4. Opcional: capa 5. Los issues de cada capa, los horarios y los hitos están en [`docs/05-ROADMAP.md`](docs/05-ROADMAP.md).
+Mandatory: layers 0 to 4. Optional: layer 5. The issues of each layer, the schedule and the milestones are in [`docs/en/05-ROADMAP.md`](docs/en/05-ROADMAP.md).
 
-## Estructura
-| Carpeta | Contenido |
+## Structure
+| Folder | Contents |
 |---|---|
-| `docs/` | Contexto, PRD, arquitectura, contrato de datos, flujo de trabajo, roadmap, ADRs |
-| `precompute/` | Scripts Python que generan los datos (`ephemeris/`, `terrain/`) |
-| `web/` | Web (Vite) |
-| `data/public/` | JSON precalculados que consume la web |
-| `data/schema/` | Esquemas JSON del contrato de datos |
-| `tests/` | Pruebas del contrato y validación contra Horizons |
+| `docs/` | Context, PRD, architecture, data contract, workflow, roadmap, pitch, ADRs (Spanish originals; English versions in `docs/en/`) |
+| `precompute/` | Python scripts that generate the data (`ephemeris/`, `terrain/`) |
+| `web/` | Web app (Vite) |
+| `data/public/` | Precalculated JSON files consumed by the web app |
+| `data/schema/` | JSON schemas of the data contract |
+| `tests/` | Contract tests and validation against Horizons |
 
-## Cómo correrlo
-Estado: la estructura está lista; el código se está construyendo. Los comandos definitivos se completan a medida que existen.
+## How to run it
+Requirements: Node.js 20+ for the web app and Python 3.12 for the precalculation and the tests.
 
 ```bash
-# Hooks de Git (una vez después de clonar)
+# Git hooks (once after cloning)
 git config core.hooksPath .githooks
 # Commits (in English): first line of 10+ words, suggested type(scope): description. No commits on main.
 
-# Python (precálculo y tests). Probado con Python 3.12; el Python 3.8 de algunos sistemas no sirve.
-python3.12 -m venv .venv         # o con uv: uv venv --python 3.12
+# Python (precalculation and tests). Tested with Python 3.12; Python 3.8, found on some systems, does not work.
+python3.12 -m venv .venv         # or with uv: uv venv --python 3.12
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r precompute/requirements.txt   # con uv: uv pip install -r precompute/requirements.txt
-python -m pytest tests/          # incluye tests/test_environment.py, que revisa que las librerías importen
+pip install -r precompute/requirements.txt   # with uv: uv pip install -r precompute/requirements.txt
+python -m pytest tests/          # includes tests/test_environment.py, which checks that the libraries import
 
-# Web (Vite; sirve data/public/ como carpeta estática)
-cd web && npm ci && npm run dev   # http://localhost:5173 y /sites.json
+# Web (Vite; serves data/public/ as a static folder)
+cd web && npm ci && npm run dev   # http://localhost:5173 and /sites.json
 ```
 
-Versión desplegada (Vercel): https://vizcachasfueradeorbita.vercel.app/
+Deployed version (Vercel): https://vizcachasfueradeorbita.vercel.app/
 
-Versión de prueba desplegada (GitHub Pages, desde `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
+Test version deployed (GitHub Pages, from `main`): https://vainstubtomas.github.io/NASA-APP-CHALLENGE/
 
-Los datos pesados (mapa de elevación y caché de consultas a Horizons) no están en el repo. Ver `docs/02-ARCHITECTURE.md` y el ADR-006 para saber de dónde salen.
+The heavy data (elevation map and Horizons query cache) is not in the repo. See `docs/en/02-ARCHITECTURE.md` and ADR-006 to learn where it comes from.
 
-## Documentación
-Empezar por [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md). Para trabajar con Claude, ver [`CLAUDE.md`](CLAUDE.md).
+## Documentation
+Start with [`docs/en/00-CONTEXT.md`](docs/en/00-CONTEXT.md). Spanish originals are in [`docs/`](docs/) (start with [`docs/00-CONTEXT.md`](docs/00-CONTEXT.md)). To work with Claude, see [`CLAUDE.md`](CLAUDE.md). The Space Apps submission form draft is in [`docs/08-SUBMISSION.md`](docs/08-SUBMISSION.md).
+
+## Use of AI
+We used AI tools, as the Space Apps rules allow, and we say where:
+- **Code, tests and documentation**: written with the help of Claude (Anthropic), used as a coding assistant inside our Git workflow. Commits where it took part carry a `Co-Authored-By: Claude` line, and every change went through a pull request reviewed by a team member. The guide we give it is [`CLAUDE.md`](CLAUDE.md).
+- **Translations**: the English, Hindi and Simplified Chinese texts of the web app were translated with AI and were not reviewed by native speakers (see [`web/src/i18n/README.md`](web/src/i18n/README.md)). The app also says this in its footer.
+- **Not generated by AI**: the numbers. Sun and Earth positions come from JPL Horizons and are checked against saved Horizons answers by automated tests (ADR-005, ADR-013).
+- No images, video or audio in the project were generated with AI.
+
+## Credits and references
+**NASA data and resources**
+- [JPL Horizons System](https://ssd.jpl.nasa.gov/horizons/) (NASA/JPL): azimuth and elevation of the Sun and the Earth for every site and hour. Source of every number in the app.
+- [Quickmap](https://quickmap.lroc.asu.edu/) (Arizona State University, Lunar Reconnaissance Orbiter data): checking site coordinates and terrain.
+- [Moon Trek](https://trek.nasa.gov/moon/) (NASA): exploring the sites and their topography.
+
+**Space Agency Partner resources**
+- [Moon Exploration](https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/) (CSA, Canadian Space Agency): context for the pitch.
+
+**Landing site coordinates**: each site in [`data/public/sites.json`](data/public/sites.json) lists its own source.
+
+**Open source software**
+- Web: [three.js](https://threejs.org/) (MIT) for the 3D view, [Vite](https://vite.dev/) (MIT) for the build.
+- Python: [NumPy](https://numpy.org/) (BSD-3-Clause), [Requests](https://requests.readthedocs.io/) (Apache-2.0), [rasterio](https://rasterio.readthedocs.io/) (BSD-3-Clause), [pyproj](https://pyproj4.github.io/pyproj/) (MIT), [Matplotlib](https://matplotlib.org/) (Matplotlib license), [pytest](https://pytest.org/) (MIT), [jsonschema](https://python-jsonschema.readthedocs.io/) (MIT); for the live API (ADR-015): [FastAPI](https://fastapi.tiangolo.com/) (MIT), [Uvicorn](https://www.uvicorn.org/) (BSD-3-Clause), [HTTPX](https://www.python-httpx.org/) (BSD-3-Clause).
+
+No NASA logos or other NASA branding are used.
+
+## License
+The code is released under the [MIT License](LICENSE). The data come from the sources listed above, under their own terms.

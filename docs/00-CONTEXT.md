@@ -7,7 +7,7 @@
 ## El evento
 NASA Space Apps Challenge 2026, hackatón global de dos días (sábado 14 y domingo 15 de noviembre). Nuestra sede es presencial.
 
-**Entregables**: el proyecto subido a GitHub y una presentación (defensa ante jurado). Confirmar con los organizadores si piden algo más (video, resumen escrito).
+**Entregables** (guías oficiales, ver "Entrega oficial y rúbrica"): la página del proyecto en spaceappschallenge.org, en inglés y enviada con "Submit for Judging" antes del domingo 15 a las 23:59; una demo de hasta 7 diapositivas o un video de hasta 30 s, en inglés; el link al proyecto final (web y repo de GitHub), y la defensa presencial ante el jurado local.
 
 ### Cronograma en el lugar
 | Momento | Qué pasa |
@@ -31,7 +31,7 @@ Tiempo efectivo de trabajo: unas 15 horas (estimación: ~10 en el lugar y ~5 en 
 ## El desafío elegido
 **Lunar Landing Site Navigator**: una herramienta que, dado un sitio de la Luna y una fecha, muestra dónde están el Sol y la Tierra respecto del terreno, y por lo tanto cuánta energía solar y cuánta comunicación directa con la Tierra habrá.
 
-> Texto oficial completo (traducido) en [`docs/07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). **La página del desafío no publica criterios de evaluación**, pero Space Apps sí publica sus 10 premios globales (ver "Premios" abajo; apuntamos a Best Use of Data, ADR-012). La rúbrica del jurado sigue a confirmar con los organizadores (C0-11). La página avisa que se pueden sumar recursos antes del hackatón: revisar la pestaña Recursos el sábado a la mañana.
+> Texto oficial completo (traducido) en [`docs/07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Recursos liberados el 13/11 (ver "Recursos" abajo y ADR-006). **La página del desafío no publica criterios de evaluación**, pero Space Apps sí publica sus 10 premios globales (ver "Premios" abajo; apuntamos a Best Use of Data, ADR-012). La rúbrica del jurado está en la Guía de Evaluación y Premios (ver "Entrega oficial y rúbrica" abajo). La página avisa que se pueden sumar recursos antes del hackatón: revisar la pestaña Recursos el sábado a la mañana.
 
 ### Qué pide el desafío, traducido
 | Pedido | En la práctica |
@@ -59,6 +59,31 @@ No hace falta hacer todo: lo importante es que lo que hagamos funcione bien y se
 | Animaciones o línea de tiempo de un día lunar | Cubierto (C3-02, C3-03) | Nada |
 | Por qué pequeños cambios de lugar o fecha cambian todo | Capa 5 (C5-01) | Puede ir en los textos y en la demo sin código extra |
 | Útil para planificadores, educadores y el público | Cubierto (PRD, C3-05) | Nada |
+
+## Entrega oficial y rúbrica
+Fuentes: [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/) y [Judging & Awards Guide](https://www.spaceappschallenge.org/resources/judging-awards-guide/), publicadas el 13/11/2026 (leídas el 14/11). El checklist para tachar está en `docs/06-PITCH-DEMO.md`; el borrador del formulario, en `docs/08-SUBMISSION.md`.
+
+**Requisitos para entrar en la evaluación global**
+- **Todo en inglés**: el formulario del proyecto y todo lo que se enlace (web, repo, demo). Un video puede hablarse en otro idioma solo con subtítulos en inglés.
+- **Demo obligatoria**: hasta **7 diapositivas** (contando título e introducción) o un **video de hasta 30 segundos**. Si se pasa del límite, el proyecto queda fuera de la evaluación global. Las diapositivas llevan nombre del equipo, integrantes y desafío elegido.
+- **Links públicos**: demo y proyecto final accesibles sin login ni permisos. Probarlos en una ventana privada.
+- **Formulario** en spaceappschallenge.org (pestaña Project del equipo): nombre, resumen, link a la demo, link al proyecto final, descripción detallada, uso de IA ("Super Intelligence"), datos de NASA (hace falta al menos uno para los premios globales), datos de agencias socias y **referencias de todo lo externo** (código, texto e imágenes, aunque sean libres).
+- **IA**: el código y los datos hechos con IA se declaran en el texto descriptivo; las imágenes y videos generados llevan marca de agua. Lo generado no puede usar logos ni marca de NASA.
+- Nada de imágenes, voces ni video de menores de 18 años.
+- Dos casillas: términos y condiciones, y trabajo original con todas las referencias listadas.
+- **Cierre: domingo 15 a las 23:59, hora del evento local**, con el botón "Submit for Judging". Se puede reenviar hasta el cierre; vale la última versión guardada. Nuestro plan es subirlo a las 14:30, con margen.
+- Todos los integrantes tienen que figurar en la pestaña Members del equipo; después del cierre no se pueden sumar.
+
+**Rúbrica** (de 1 a 5 en cada criterio, en todas las etapas)
+| Criterio | Qué miran |
+|---|---|
+| Impacto | Qué problema resuelve y a cuánta gente ayuda |
+| Creatividad | Originalidad, o una mejora con sentido sobre lo que ya existe |
+| Validez | Base científica, que funcione, que sea usable |
+| Relevancia | Que responda al desafío y que los datos de NASA sean centrales, no un adorno |
+| Presentación | Cómo se cuenta: la demo y el proyecto completo |
+
+**Fechas**: nominados globales el 3/12/2026, finalistas el 17/12/2026 y ganadores el 26/1/2027.
 
 ## Premios (awards)
 Fuente: https://www.spaceappschallenge.org/awards/ (copiado el 2026-11-14). Son los 10 premios globales de Space Apps. **Apuntamos a Best Use of Data y, en segundo lugar, a Best Use of Science** (ADR-012). No cambia el alcance: cambia cómo lo contamos.
@@ -101,5 +126,5 @@ Fuente: https://www.spaceappschallenge.org/awards/ (copiado el 2026-11-14). Son 
 
 ## Pendientes de confirmar con los organizadores
 1. ¿Se puede llegar con repo, datos y cálculos preparados de antemano, o el código debe escribirse durante el evento? ¿Se pueden usar datos públicos de NASA que no están en la lista de recursos (por ejemplo, el mapa LOLA del PDS)?
-2. Rúbrica del jurado (local y global) y entregables exactos. Los premios ya están publicados (ver "Premios").
+2. ~~Rúbrica del jurado y entregables exactos.~~ Resuelto el 14/11 con las guías oficiales (ver "Entrega oficial y rúbrica"). Solo queda confirmar el horario de la evaluación local.
 3. Si la presentación es en vivo, cuánto dura y si hay proyector y conexión (C0-11).

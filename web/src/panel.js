@@ -1,31 +1,17 @@
-// Panel de números (C1-03): elevación y azimut del Sol y la Tierra en un instante.
-// Uso: renderPanel(contenedor, { ephemeris, horizon, utcMs, siteName }).
-// Con `horizon` (horizon.json) los estados se calculan contra el horizonte real (#32).
-// El selector de sitio y fecha (C1-02) solo tiene que volver a llamar a renderPanel.
+// Hoja de datos del cajón "Más información" (rediseño #99; antes panel de números C1-03).
+// Uso: renderPanel(contenedor, { ephemeris, horizon, utcMs, siteName, coords }).
+// Todo en tablas, sin gráficos ni emojis: posición ahora (Sol y Tierra lado a lado), horas con
+// visibilidad desde la fecha elegida y resumen del período completo. Los estados se calculan
+// contra horizon.json (#32) con la regla del contrato; las horas, con visibilitySeries.
 import './panel.css';
-import { sampleAt, compassLabel, elevationDisplay } from './ephemeris.js';
-import { statusAgainstHorizon } from './horizon.js';
+import { sampleAt, compassLabel, nextVisibilityChange } from './ephemeris.js';
+import { horizonAt, statusAgainstHorizon } from './horizon.js';
+import { visibilitySeries } from './visibility.js';
+import { windowHours, periodSummary } from './info-core.js';
 import { t, locale } from './i18n.js';
-import { sunIcon, earthIcon } from './icons.js';
-import { compassChart, elevationRuler } from './dials.js';
-import { renderCountdown, stopCountdown } from './countdown.js';
 
-const fmtDeg = (value, decimals) => {
-  // Evita mostrar "-0,0°": si redondeado da cero, se muestra como cero.
-  const rounded = Number(value.toFixed(decimals));
-  const shown = rounded === 0 ? 0 : rounded;
-  return `${shown.toLocaleString(locale, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}°`;
-};
-
-const fmtUtc = (utcMs) =>
-  `${new Date(utcMs).toLocaleString(locale, {
-    timeZone: 'UTC',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })} UTC`;
+const BODIES = ['sun', 'earth'];
+let timer = null;
 
 function el(tag, className, text) {
   const node = document.createElement(tag);
@@ -34,108 +20,154 @@ function el(tag, className, text) {
   return node;
 }
 
-function bodyCard({ body, icon, position, radiusDeg, horizon, featured }) {
-  const state = statusAgainstHorizon(position, radiusDeg, horizon);
-  const card = el('article', `panel-card panel-card--${body}${featured ? ' panel-card--featured' : ''}`);
+const num = (value, decimals) => {
+  const rounded = Number(value.toFixed(decimals));
+  return (rounded === 0 ? 0 : rounded).toLocaleString(locale, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+};
+const signedDeg = (v, d = 2) => `${v > 0 && Number(v.toFixed(d)) !== 0 ? '+' : ''}${num(v, d)}°`;
+const pct = (part, total) => `${num(total ? (100 * part) / total : 0, 1)} %`;
+const fmtUtc = (ms) => `${new Date(ms).toISOString().slice(0, 16).replace('T', ' ')} UTC`;
+const pad = (n) => String(n).padStart(2, '0');
 
-  const title = el('h3', 'panel-card__title');
-  const status = el('span', `panel-status panel-status--${state}`, t(`panel.status.${state}`));
-  title.append(icon, t(`panel.${body}`), status);
-  // Para qué sirve este cuerpo: el Sol da energía, la Tierra comunicación (#38).
-  const why = el('p', 'panel-card__why', t(`panel.${body}.why`));
-
-  // Sin signo menos: el texto dice de qué lado del horizonte está ("42,6° bajo el horizonte").
-  const shown = elevationDisplay(position.elevation_deg);
-  const elevation = el('p', 'panel-card__elevation', fmtDeg(shown.value, 1));
-  const elevationLabel = el('p', 'panel-card__caption', t(`panel.elevation.${shown.side}`));
-  const azimuth = el(
-    'p',
-    'panel-card__azimuth',
-    t('panel.azimuth', {
-      direction: t(`compass.${compassLabel(position.azimuth_deg)}`),
-      azimuth: fmtDeg(position.azimuth_deg, 0),
-    }),
-  );
-
-  card.append(title, why, elevation, elevationLabel, azimuth);
-  return card;
+function duration(hours) {
+  const d = Math.floor(hours / 24);
+  const h = Math.round(hours % 24);
+  return d > 0 ? t('info.dh', { d, h }) : t('info.h', { h });
 }
 
-// Un solo visor 3D para toda la sesión (un solo contexto WebGL); null si no se pudo crear.
-let viewer = null;
-let viewerPromise = null;
-function loadViewer() {
-  viewerPromise ??= import('./scene3d.js')
-    .then((m) => {
-      viewer = m.createViewer();
-      return viewer;
-    })
-    .catch((error) => {
-      console.warn('Vista 3D no disponible, se usa la brújula y la regla en 2D:', error);
-      return null;
-    });
-  return viewerPromise;
+function clock(ms) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const d = Math.floor(total / 86400);
+  const rest = `${pad(Math.floor((total % 86400) / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
+  return d > 0 ? `${d} d ${rest}` : rest;
 }
 
-/** Limpia el panel y detiene el contador (cuando no hay datos que mostrar). */
+/** Tabla con encabezado; `rows` = [[th, ...celdas]], cada celda texto o { text, className }. */
+function table(caption, head, rows, className = '') {
+  const tbl = el('table', `info-table ${className}`.trim());
+  tbl.append(el('caption', 'info-table__caption', caption));
+  const thead = el('thead');
+  const hr = el('tr');
+  head.forEach((h, i) => {
+    const th = el('th', i === 0 ? 'info-table__key' : '', h);
+    th.scope = 'col';
+    hr.append(th);
+  });
+  thead.append(hr);
+  const tbody = el('tbody');
+  for (const [key, ...cells] of rows) {
+    const tr = el('tr');
+    const th = el('th', 'info-table__key', key);
+    th.scope = 'row';
+    tr.append(th);
+    for (const c of cells) {
+      const td = el('td', c?.className ?? '', typeof c === 'object' && c !== null ? c.text : c);
+      tr.append(td);
+    }
+    tbody.append(tr);
+  }
+  tbl.append(thead, tbody);
+  return tbl;
+}
+
+/** Detiene la cuenta regresiva en marcha. */
+function stopTimer() {
+  if (timer !== null) clearInterval(timer);
+  timer = null;
+}
+
+/** Limpia la hoja (cuando no hay datos que mostrar). */
 export function clearPanel(container) {
-  stopCountdown();
+  stopTimer();
   container.replaceChildren();
 }
 
-export function renderPanel(container, { ephemeris, horizon, utcMs, siteName }) {
-  stopCountdown();
+export function renderPanel(container, { ephemeris, horizon, utcMs, siteName, coords }) {
+  stopTimer();
   container.replaceChildren();
-  container.classList.add('panel');
+  container.classList.add('info');
 
   const sample = sampleAt(ephemeris, utcMs);
   if (!sample) {
-    container.append(el('p', 'panel-empty', t('panel.noData')));
+    container.append(el('p', 'info-empty', t('panel.noData')));
     return;
   }
-
-  const header = el('header', 'panel-header');
-  header.append(el('h2', 'panel-header__site', siteName), el('p', 'panel-header__time', fmtUtc(sample.utcMs)));
-
   const radius = ephemeris.angular_radius_deg;
-  const dials = el('div', 'panel-dials');
-  const figure = (chart, caption) => {
-    const fig = el('figure', 'panel-dial');
-    fig.append(chart, el('figcaption', 'panel-dial__caption', caption));
-    return fig;
-  };
-  dials.append(
-    figure(compassChart({ sample, radius, horizon }), t('dial.compassSub')),
-    figure(elevationRuler({ sample, radius, horizon }), t('dial.rulerSub')),
-  );
-  const hint = el('p', 'panel-hint', t('dial.hint'));
+  const horizonFn = (az) => horizonAt(horizon, az);
 
-  // Vista 3D (three.js, carga diferida). Mientras carga, o si el navegador no tiene WebGL,
-  // queda la brújula + regla en 2D.
-  const data = { sample, radius, horizon };
-  if (viewer) {
-    dials.replaceChildren(viewer.element);
-    hint.textContent = t('view3d.hint');
-    viewer.update(data);
-  } else {
-    loadViewer().then((v) => {
-      if (v && dials.isConnected) {
-        dials.replaceChildren(v.element);
-        hint.textContent = t('view3d.hint');
-        v.update(data);
-      }
-    });
+  // Encabezado: sitio, coordenadas e instante
+  const header = el('header', 'info-head');
+  const meta = [];
+  if (coords) {
+    meta.push(t('info.coords', { lat: num(coords.lat, 4), lon: num(coords.lon, 4) }));
   }
+  meta.push(fmtUtc(sample.utcMs));
+  header.append(el('h2', 'info-head__site', siteName), el('p', 'info-head__meta', meta.join(' · ')));
 
-  const cards = el('div', 'panel-cards');
-  cards.append(
-    bodyCard({ body: 'sun', icon: sunIcon(), position: sample.sun, radiusDeg: radius.sun, horizon, featured: true }),
-    bodyCard({ body: 'earth', icon: earthIcon(), position: sample.earth, radiusDeg: radius.earth, horizon }),
+  // 1) Posición ahora
+  const changes = Object.fromEntries(BODIES.map((b) => [b, nextVisibilityChange(ephemeris, sample.utcMs, b, horizonFn)]));
+  const row = (key, fn) => [t(key), ...BODIES.map(fn)];
+  const position = table(t('info.now'), ['', t('panel.sun'), t('panel.earth')], [
+    row('info.azimuth', (b) => `${num(sample[b].azimuth_deg, 2)}° ${t(`compass.${compassLabel(sample[b].azimuth_deg)}`)}`),
+    row('info.elevation', (b) => signedDeg(sample[b].elevation_deg)),
+    row('info.state', (b) => {
+      const s = statusAgainstHorizon(sample[b], radius[b], horizon);
+      return { text: t(`panel.status.${s}`), className: `info-state info-state--${s}` };
+    }),
+    row('info.next', (b) => {
+      const c = changes[b];
+      if (!c?.event) return t('info.noChange');
+      return `${t(c.event === 'sets' ? 'info.sets' : 'info.rises')} · ${fmtUtc(c.crossMs)}`;
+    }),
+    row('info.countdown', (b) => ({ text: changes[b]?.event ? '' : '—', className: 'info-num info-countdown' })),
+    row('info.radius', (b) => `${num(radius[b], 2)}°`),
+  ], 'info-table--bodies');
+
+  // 2) Horas con visibilidad desde la fecha elegida
+  const series = visibilitySeries(ephemeris, horizon);
+  const vis = { sun: series.sun.visible, earth: series.earth.visible };
+  const windows = [[24, 'info.next24h'], [24 * 7, 'info.next7d'], [24 * 30, 'info.next30d']].map(([hours, key]) => {
+    const w = windowHours(vis, sample.index, hours);
+    const cell = (n) => ({ text: `${n} h`, className: 'info-num' });
+    return [t(key), cell(w.sun), cell(w.earth), cell(w.both)];
+  });
+  const windowsTable = table(t('info.windows'), ['', t('panel.sun'), t('panel.earth'), t('info.both')], windows);
+
+  // 3) Resumen del período completo de datos
+  const sum = periodSummary(vis);
+  const first = Date.parse(ephemeris.time.start_utc);
+  const last = first + (ephemeris.time.count - 1) * ephemeris.time.step_s * 1000;
+  const hp = (n) => ({ text: `${n} h · ${pct(n, sum.samples)}`, className: 'info-num' });
+  const summary = table(
+    t('info.period', { from: fmtUtc(first).slice(0, 10), to: fmtUtc(last).slice(0, 10), hours: sum.samples }),
+    ['', t('info.value')],
+    [
+      [t('info.sunVisible'), hp(sum.sun)],
+      [t('info.earthVisible'), hp(sum.earth)],
+      [t('info.bothVisible'), hp(sum.both)],
+      [t('info.noneVisible'), hp(sum.none)],
+      [t('info.longestNoSun'), { text: duration(sum.longestNoSun), className: 'info-num' }],
+      [t('info.longestNoEarth'), { text: duration(sum.longestNoEarth), className: 'info-num' }],
+      [t('info.longestNoBoth'), { text: duration(sum.longestNoBoth), className: 'info-num' }],
+    ],
   );
 
-  const note = el('p', 'panel-note', t('panel.note'));
+  const note = el('p', 'info-note', t('info.note'));
+  container.append(header, position, windowsTable, summary, note);
 
-  container.append(header, dials, hint, cards);
-  renderCountdown(container, { ephemeris, horizon, utcMs: sample.utcMs });
-  container.append(note);
+  // Cuenta regresiva en vivo (fila 5 de la primera tabla): parte del instante elegido y avanza
+  // con el reloj real.
+  const countdownRow = position.tBodies[0].rows[4];
+  const cells = BODIES.map((b, i) => (changes[b]?.event ? { td: countdownRow.cells[i + 1], crossMs: changes[b].crossMs } : null))
+    .filter(Boolean);
+  const startedAt = Date.now();
+  const tick = () => {
+    const now = sample.utcMs + (Date.now() - startedAt);
+    for (const c of cells) c.td.textContent = clock(c.crossMs - now);
+  };
+  tick();
+  if (cells.length) timer = setInterval(tick, 1000);
 }

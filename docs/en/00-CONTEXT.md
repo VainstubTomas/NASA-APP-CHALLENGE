@@ -7,7 +7,7 @@ Last update: 2026-11-14
 ## The event
 NASA Space Apps Challenge 2026, a global two-day hackathon (Saturday 14 and Sunday 15 November). Our site is in person.
 
-**Deliverables**: the project uploaded to GitHub and a presentation (defense before the jury). Confirm with the organizers whether they ask for anything else (video, written summary).
+**Deliverables** (official guides, see "Official submission and rubric"): the project page on spaceappschallenge.org, in English and sent with "Submit for Judging" before Sunday 15 at 23:59; a demo of up to 7 slides or a video of up to 30 s, in English; the link to the final project (web app and GitHub repo); and the in-person defense before the local jury.
 
 ### On-site schedule
 | Time | What happens |
@@ -31,7 +31,7 @@ Effective work time: about 15 hours (estimate: ~10 on site and ~5 in the Saturda
 ## The chosen challenge
 **Lunar Landing Site Navigator**: a tool that, given a site on the Moon and a date, shows where the Sun and the Earth are relative to the terrain, and therefore how much solar energy and how much direct communication with the Earth there will be.
 
-> Full official text (translated) in [`07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Resources released on 13/11 (see "Resources" below and ADR-006). **The challenge page does not publish evaluation criteria**, but Space Apps does publish its 10 global awards (see "Awards" below; we aim for Best Use of Data, ADR-012). The jury's scoring rubric is still to be confirmed with the organizers (C0-11). The page says more resources may be added before the hackathon: check the Resources tab on Saturday morning.
+> Full official text (translated) in [`07-DESAFIO-OFICIAL.md`](07-DESAFIO-OFICIAL.md). Resources released on 13/11 (see "Resources" below and ADR-006). **The challenge page does not publish evaluation criteria**, but Space Apps does publish its 10 global awards (see "Awards" below; we aim for Best Use of Data, ADR-012). The jury's rubric is in the Judging & Awards Guide (see "Official submission and rubric" below). The page says more resources may be added before the hackathon: check the Resources tab on Saturday morning.
 
 ### What the challenge asks, translated
 | Request | In practice |
@@ -59,6 +59,31 @@ Not everything has to be done: what matters is that what we build works well and
 | Animations or a timeline of a lunar day | Covered (C3-02, C3-03) | Nothing |
 | Why small changes of place or date change everything | Layer 5 (C5-01) | Can go in the texts and the demo without extra code |
 | Useful for planners, educators and the public | Covered (PRD, C3-05) | Nothing |
+
+## Official submission and rubric
+Sources: [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/) and [Judging & Awards Guide](https://www.spaceappschallenge.org/resources/judging-awards-guide/), published on 2026-11-13 (read on 11/14). The checklist to tick off is in `06-PITCH-DEMO.md`; the form draft is in `../08-SUBMISSION.md`.
+
+**Requirements to enter global judging**
+- **Everything in English**: the project form and every linked material (web app, repo, demo). A video may be spoken in another language only with English subtitles.
+- **Mandatory demo**: up to **7 slides** (counting title and intro slides) or a **video of up to 30 seconds**. Going over the limit makes the project ineligible for global judging. Slides include the team name, team members and the chosen challenge.
+- **Public links**: demo and final project reachable with no login or permissions. Test them in a private window.
+- **Form** on spaceappschallenge.org (the team's Project tab): name, summary, demo link, final project link, detailed description, use of AI ("Super Intelligence"), NASA data (at least one is needed for global awards), Space Agency Partner data and **references for everything external** (code, text and images, even if free).
+- **AI**: code and data made with AI are acknowledged in the descriptive text; generated images and videos carry a watermark. Generated content may not use NASA logos or branding.
+- No images, voices or video of people under 18.
+- Two checkboxes: terms and conditions, and original work with all references listed.
+- **Deadline: Sunday 15 at 23:59, local event time**, with the "Submit for Judging" button. It can be resubmitted until the deadline; the last saved version counts. Our plan is to submit at 14:30, with margin.
+- All members must appear in the team's Members tab; nobody can be added after the deadline.
+
+**Rubric** (1 to 5 on each criterion, at every stage)
+| Criterion | What they look at |
+|---|---|
+| Impact | What problem it solves and how many people it helps |
+| Creativity | Originality, or a meaningful improvement on what exists |
+| Validity | Scientific basis, that it works, that it is usable |
+| Relevance | That it answers the challenge and that NASA data are central, not decoration |
+| Presentation | How it is told: the demo and the full project |
+
+**Dates**: global nominees on 2026-12-03, finalists on 2026-12-17 and winners on 2027-01-26.
 
 ## Awards
 Source: https://www.spaceappschallenge.org/awards/ (copied 2026-11-14). These are the 10 global Space Apps awards. **We aim for Best Use of Data and, as a second choice, Best Use of Science** (ADR-012). This does not change the scope; it changes how we tell it.
@@ -101,5 +126,5 @@ Source: https://www.spaceappschallenge.org/awards/ (copied 2026-11-14). These ar
 
 ## Pending questions for the organizers
 1. Can we arrive with the repo, data, and calculations prepared in advance, or must the code be written during the event? Can we use public NASA data that is not on the resources list (for example, the LOLA map from the PDS)?
-2. Jury rubric (local and global) and exact deliverables. The awards are already published (see "Awards").
+2. ~~Jury rubric and exact deliverables.~~ Resolved on 11/14 with the official guides (see "Official submission and rubric"). Only the local judging schedule is left to confirm.
 3. If the presentation is live, how long it lasts and whether there is a projector and connection (C0-11).

@@ -2,7 +2,7 @@
 
 # 05. Roadmap e issues iniciales
 
-Última actualización: 2026-11-14 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.md#mapa-del-proyecto).
+Última actualización: 2026-11-15 · Fuente de verdad de los issues: `scripts/issues.json`. Este documento se mantiene a mano: si cambia `issues.json`, se actualiza acá en el mismo PR. El mapa general de las fases está en el [README](../README.es.md#mapa-del-proyecto).
 
 Los issues se cargan en GitHub con `python scripts/create_issues.py` (ver `docs/04-GIT-WORKFLOW.md`). Cada capa es una **épica** (`[EPICA] ...`, issue padre) y sus issues cuelgan de ella como sub-issues (ver "Épicas" en `docs/04-GIT-WORKFLOW.md` y ADR-008). Cada issue es una tarea de hasta ~4 horas, con un solo responsable asignado, etiquetas de capa, área y tamaño. Es un equipo multirubro: no hay roles fijos y cualquiera toma issues de cualquier área.
 
@@ -75,33 +75,52 @@ Luna esfera sin relieve: el horizonte es 0° en todas las direcciones (ADR-011).
 
 ### Capa 4: comparación de escenarios (obligatoria desde el ADR-009)
 
-| ID | Tarea | Área | Tamaño |
-|---|---|---|---|
-| C4-01 | Comparación de 2 o 3 escenarios lado a lado | Web | L |
+Estado al 14/11 a la noche: **todas las sub-issues cerradas**. La épica #40 se cierra cuando la comparación esté publicada desde `main`.
+
+| ID | Tarea | Área | Tamaño | Estado |
+|---|---|---|---|---|
+| C4-01 | Comparación de 2 o 3 escenarios lado a lado (#41) | Web | L | Hecha, partida en C4-01a a C4-01d |
+| C4-01a | Núcleo de comparación: horas de Sol y Tierra por escenario (#91) | Web | S | Hecha |
+| C4-01b | Selector de 2 o 3 escenarios (#92) | Web | S | Hecha |
+| C4-01c | Tarjetas de escenarios lado a lado (#93) | Web | S | Hecha |
+| C4-01d | Resumen de cuál escenario conviene (#94) | Web | S | Hecha |
+| C4-02 | ADR-014: criterio de "cuál conviene" (#95) | Producto | S | Hecha |
+| C4-04 | Escenarios guardados en la URL (#97, opcional) | Web | S | Hecha |
+| - | API propia para consultar Horizons en vivo con coordenadas elegidas (#104, ADR-015) | Efemérides | L | Hecha (resuelve C5-04) |
+
+C4-03 (comparación en el guion y en la diapositiva) se movió a la entrega: #113.
 
 ### Capa 5: extras y, al final, relieve real (solo si sobra tiempo)
 
-Orden: primero los extras y **último de todo el relieve** (ADR-011).
+Orden: primero los extras y **último de todo el relieve** (ADR-011). Corte final del 14/11 a la noche (detalle en la épica #42):
 
-| ID | Tarea | Área | Tamaño |
-|---|---|---|---|
-| C5-01 | Botón se atrasó el lanzamiento | Web | M |
-| C5-03 | Buscador de mejores ventanas de aterrizaje | Efemérides | L |
-| C5-04 | Decidir coordenadas personalizadas: grilla precalculada o servidor | Terreno | M |
-| C5-05 | Conseguir el mapa de elevación del polo sur (Moon Trek, Quickmap o PDS). Antes C0-03 | Terreno | M |
-| C5-06 | Perfil de horizonte de un sitio (360 valores) y gráfico de la silueta. Antes C0-06 | Terreno | L |
-| C5-07 | Generar horizon.json con relieve de los sitios del polo sur | Terreno | M |
-| C5-08 | Dibujo de la silueta con relieve y visible o tapado por el relieve en la web | Web | M |
-| C5-02 | Pendiente del terreno por sitio | Terreno | M |
+| ID | Tarea | Área | Tamaño | Decisión |
+|---|---|---|---|---|
+| C5-01 | Botón se atrasó el lanzamiento (#43) | Web | M | Cerrada: la cubren el reproductor (C3-02) y la comparación (capa 4) |
+| C5-03 | Buscador de mejores ventanas de aterrizaje (#45) | Efemérides | L | **Extra principal. Hecha como herramienta de línea de comandos** (`python -m precompute.ephemeris.windows`, PR #117): usa `metrics.json` y la regla del ADR-014, y solo lista ventanas desde hoy. Mostrarla en la web queda por decidir y tiene que entrar antes de las 12:30 del domingo |
+| C5-04 | Decidir coordenadas personalizadas: grilla precalculada o servidor (#46) | Terreno | M | Cerrada: ADR-015 (servidor) e implementación en #104 |
+| C5-05 | Conseguir el mapa de elevación del polo sur (#13). Antes C0-03 | Terreno | M | **Spike de 1 h**: si sale, sigue la cadena; si no, se cierran C5-05 a C5-08 |
+| C5-06 | Perfil de horizonte de un sitio y gráfico de la silueta (#16). Antes C0-06 | Terreno | L | Condicionada al spike; como mucho 1 o 2 sitios del polo sur |
+| C5-07 | Generar horizon.json con relieve de los sitios del polo sur (#51) | Terreno | M | Condicionada al spike |
+| C5-08 | Dibujo de la silueta con relieve en la web (#52) | Web | M | Condicionada al spike |
+| C5-02 | Pendiente del terreno por sitio (#44) | Terreno | M | Cerrada: depende del mapa; pasa a "próximos pasos" del pitch |
+| - | Rediseño con el diseño de Figma (#99) | Web | M | Tiene que entrar antes de las 12:30 del domingo |
+| - | Agrupar escenarios repetidos en la comparación (#107) | Web | S | Opcional, prioridad baja |
+| - | Cobertura de tests del núcleo web (#106) | Web | S | Hecha (PR #115): las ramas del núcleo llegan a 99,33 %. Los módulos que dibujan quedan fuera de la medición, y su lógica está en los `*-core.js` probados |
 
 ### Entrega y demo
 
 | ID | Tarea | Área | Tamaño |
 |---|---|---|---|
-| E-01 | Repo listo para entrega: README final y limpieza de datos sintéticos | Producto | S |
-| E-02 | Guion de la demo y ensayo | Producto | M |
-| E-03 | Presentación y video de respaldo | Producto | M |
-| E-04 | Diapositiva Luna frente a Tierra: horas de Sol en un sitio lunar y en una ciudad | Producto | S |
+| E-01 | Repo listo para entrega: README final y limpieza de datos sintéticos (#48) | Producto | S |
+| E-02 | Guion de la demo y ensayo (#49) | Producto | M |
+| E-03 | Presentación y video de respaldo (#50): demo oficial de hasta 7 diapositivas o 30 s, en inglés | Producto | M |
+| E-04 | Diapositiva Luna frente a Tierra: horas de Sol en un sitio lunar y en una ciudad (#79) | Producto | S |
+| E-05 | Requisitos oficiales de entrega: inglés, uso de IA, créditos y licencia (#110) | Producto | M |
+| C4-03 | Escenario de comparación en el guion de la demo y la diapositiva (#113) | Producto | M |
+| - | Test de regresión: horas de Sol y Tierra de escenarios contra JPL Horizons (#105, hecho en el PR #115) | Efemérides | M |
+
+E-05 y el test de regresión (#105) ya están hechos.
 
 ## Cómo se divide el trabajo
 
