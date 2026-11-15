@@ -718,6 +718,9 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
 
   function draw() {
     pose = currentPose();
+    // Seguir: la mirada sigue al cuerpo en cada cuadro (incluidas las transiciones y la vista previa
+    // del deslizador). Durante un giro animado (anim) manda la animación; al terminar, vuelve a seguir.
+    if (follow && pose && !anim) heading = normAz(pose[follow].azimuth_deg);
     drawStage();
     drawChart();
     if (move && !moveQueued) {
@@ -1025,11 +1028,6 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
         heading = normAz(initialHeading(sample.sun, sample.earth, radii.sun, radii.earth));
         tilt = 0;
         fov = FOV_DEG;
-      }
-      if (follow && sample) {
-        const aim = normAz(sample[follow].azimuth_deg);
-        if (newSite) heading = aim;
-        else animateTo(aim);
       }
       drawTime();
       drawCountdown();
