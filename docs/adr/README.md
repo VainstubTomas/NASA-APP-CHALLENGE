@@ -22,5 +22,6 @@ Plantilla: copiar `ADR-000-template.md`, numerar el siguiente (`ADR-011-...`) y 
 | [012](ADR-012-premio-objetivo.md) | Premio objetivo: Best Use of Data y, en segundo lugar, Best Use of Science | Propuesto |
 | [013](ADR-013-validation-json-para-el-panel.md) | validation.json en data/public/ para el panel de validación (C3-06) | Propuesto |
 | [014](ADR-014-criterio-comparacion-escenarios.md) | Criterio de "cuál conviene" en la comparación de escenarios (Sol, luego Tierra) | Propuesto |
+| [015](ADR-015-api-horizons-en-vivo.md) | API propia en `data/api/` para consultar Horizons en vivo con un sitio elegido por el usuario | Propuesto |
 
 Estados: Propuesto, Aceptado, Reemplazado.
