@@ -11,6 +11,7 @@ import './sky.css';
 import sunImg from './assets/sky/sun.png';
 import earthImg from './assets/sky/earth.png';
 import groundImg from './assets/sky/ground.png';
+import { makeGroundPanorama, PANO_DEP_MIN_DEG, PANO_DEP_MAX_DEG } from './ground-texture.js';
 import logoImg from './assets/sky/logo-vizcachas.svg';
 import searchIcon from './assets/sky/search.svg';
 import { t, locale } from './i18n.js';
@@ -93,6 +94,7 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
   const stage = el('div', 'sky-stage');
   const air = el('div', 'sky-air'); // recorta los discos en el horizonte
   const ground = el('div', 'sky-ground');
+  let groundPano = false; // true cuando el fallback usa el panorama generado (sin WebGL)
   ground.style.backgroundImage = `url("${groundImg}")`;
   const horizon = el('div', 'sky-horizon');
   const ticks = el('div', 'sky-ticks');
@@ -234,9 +236,17 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
     drawStars(v, k, hy);
     scaleNote.textContent = t('sky.scale', { fov: Math.round(fov) });
     for (const node of [ground, horizon, ticks, headingLabel, smooth]) node.style.top = `${hy}px`;
-    const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
-    ground.style.backgroundSize = `${tileW}px auto`;
-    ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    if (groundPano) {
+      // Panorama de 360° ya en perspectiva: columna = azimut, fila = grados bajo el horizonte
+      ground.style.backgroundSize = `${360 * k}px ${(PANO_DEP_MAX_DEG - PANO_DEP_MIN_DEG) * k}px`;
+      ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+      ground.style.backgroundPositionY = `${PANO_DEP_MIN_DEG * k}px`;
+      ground.style.backgroundRepeat = 'repeat-x';
+    } else {
+      const tileW = 30 * k; // la textura se repite cada 30°: gira sin saltos al cruzar el norte
+      ground.style.backgroundSize = `${tileW}px auto`;
+      ground.style.backgroundPositionX = `${v.width / 2 - heading * k}px`;
+    }
     ground.style.setProperty('--ground-light', groundLight(data?.sample?.sun?.elevation_deg).toFixed(3));
     drawGround(v, k, hy);
     root.classList.toggle('is-tilted', tilt !== 0);
@@ -292,7 +302,21 @@ export function initSky(root, { range, onTime, onUserInput, drawer, liveEnabled 
         root.classList.add('has-ground-3d');
         draw();
       })
-      .catch((err) => console.warn('[sky] suelo 3D no disponible, se usa la textura plana:', err.message));
+      .catch((err) => {
+        console.warn('[sky] suelo 3D no disponible, se usa el suelo generado:', err.message);
+        // Panorama con perspectiva en lugar de la foto cenital en mosaico (tarda ~1 s, una vez)
+        setTimeout(() => {
+          try {
+            const { canvas, edgeColor } = makeGroundPanorama();
+            groundPano = true;
+            ground.style.backgroundImage = `url("${canvas.toDataURL('image/jpeg', 0.9)}")`;
+            ground.style.backgroundColor = edgeColor;
+            draw();
+          } catch (e) {
+            console.warn('[sky] no se pudo generar el suelo, queda la foto:', e.message);
+          }
+        }, 0);
+      });
   }, 0);
 
   // Posición de cada estrella en el cielo del sitio. El cielo gira con la fecha (una vuelta por mes
