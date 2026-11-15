@@ -117,6 +117,27 @@
 }
 
 /* Aviso obligatorio: Luna lisa (ADR-011) */
+/* Botón Seguir (cielo): apagado / Sol / Tierra */
+.sky-follow {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  padding: 6px 10px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sky-follow[aria-pressed='true'] {
+  background: #fff;
+  color: #000;
+}
+
 .sky-smooth {
   position: absolute;
   right: 16px;

@@ -33,6 +33,7 @@ import {
 
 /** Duración del movimiento de Sol, Tierra y suelo al cambiar la fecha o la hora. */
 const MOVE_MS = 600;
+const DAY_MS = 86400000;
 
 // Márgenes horizontales del gráfico de 360° (en unidades del viewBox).
 const CHART_X0 = 44;
@@ -153,7 +154,13 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   loading.append(loadingBox);
   root.append(loading);
 
-  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers);
+  // Botón Seguir: cicla apagado → Sol → Tierra → apagado (ver setFollow).
+  const followBtn = el('button', 'sky-follow');
+  followBtn.type = 'button';
+  followBtn.textContent = t('sky.follow.off');
+  followBtn.setAttribute('aria-pressed', 'false');
+  followBtn.addEventListener('click', () => setFollow(nextFollow(follow)));
+  stage.append(air, ground, horizon, ticks, headingLabel, smooth, scaleNote, overlay, pointers, followBtn);
 
   // --- Arriba a la izquierda: logo, búsqueda y fecha ---
   const topLeft = el('div', 'sky-topleft');
@@ -223,6 +230,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   let fov = FOV_DEG; // cambia con la rueda del mouse (zoom)
   let data = null; // { ephemeris, horizon, utcMs, siteName, sample }
   let move = null; // { from, to, t0 }: transición en curso de la pose de Sol y Tierra
+  let follow = null; // null | 'sun' | 'earth': la vista acompaña a ese cuerpo
   let pose = null; // pose mostrada este cuadro (interpolada durante la transición)
   let moveQueued = false;
   let siteKey = null;
@@ -354,10 +362,20 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
 
   // Posición de cada estrella en el cielo del sitio. El cielo gira con la fecha (una vuelta por mes
   // sidéreo), así que se recalcula solo cuando cambian la fecha o la latitud, no en cada cuadro.
+  // Días (con fracción) que muestran las estrellas. Durante una transición usan el mismo easing que
+  // Sol y Tierra: el cielo se desliza en vez de saltar.
+  function starDays(now = performance.now()) {
+    if (move?.days) {
+      const t = Math.min(1, (now - move.t0) / MOVE_MS);
+      const e = 1 - (1 - t) ** 3;
+      return move.days[0] + (move.days[1] - move.days[0]) * e;
+    }
+    return (data?.utcMs ?? 0) / DAY_MS;
+  }
   let starCache = { key: '', pos: STARS.map(() => ({ az: 0, el: 0 })) };
   function starPositions() {
     const lat = data?.lat ?? 0;
-    const days = (data?.utcMs ?? 0) / 86400000;
+    const days = starDays();
     const key = `${lat}|${days}`;
     if (starCache.key !== key) {
       starCache = { key, pos: STARS.map((st) => starAzEl(st, lat, days)) };
@@ -480,7 +498,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     b.classList.toggle('is-in-view', inView);
     b.classList.toggle('is-centered', inView && nearCenter(p.x, p.y, v.width, v.height));
     const name = bodyName(key);
-    const az = Math.round(data.sample[key].azimuth_deg);
+    const az = Math.round((pose ?? data.sample)[key].azimuth_deg);
     b.setAttribute('aria-label', t('sky.goTo', { body: name, az }));
     b.title = name;
   }
@@ -524,7 +542,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     const X1 = CHART_X1;
     const Y0 = 14;
     const Y1 = 160;
-    const sample = data?.sample;
+    const sample = pose;
     const relief = hasRelief(data?.horizon);
     const profile = relief ? chartProfile(data.horizon) : null;
     // Con relieve el rango también tiene que abarcar la cresta más alta del horizonte.
@@ -724,6 +742,18 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
   }
 
   // --- Interacción ---
+  // Seguir: la vista acompaña al Sol o a la Tierra al cambiar fecha, sitio o misión. Girar, arrastrar o
+  // mirar otro cuerpo lo corta. Solo rota (heading): la altura de la mirada no cambia.
+  const nextFollow = (f) => (f === null ? 'sun' : f === 'sun' ? 'earth' : null);
+  function setFollow(next) {
+    follow = next;
+    followBtn.textContent = t('sky.follow.' + (next ?? 'off'));
+    followBtn.setAttribute('aria-pressed', String(next !== null));
+    if (next && data?.sample) animateTo(normAz(data.sample[next].azimuth_deg));
+  }
+  function stopFollow() {
+    if (follow) setFollow(null);
+  }
   // Gira hasta `target`; opcionalmente también acerca (fovTo) y mueve la mirada vertical (tiltTo).
   function animateTo(target, { fovTo = fov, tiltTo = tilt } = {}) {
     if (anim) cancelAnimationFrame(anim);
@@ -746,11 +776,15 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     };
     anim = requestAnimationFrame(step);
   }
-  const turn = (delta) => animateTo(rotate(heading, delta));
+  const turn = (delta) => {
+    stopFollow();
+    animateTo(rotate(heading, delta));
+  };
   // Las flechas verticales animan igual que las laterales. Se encadenan desde el destino anterior,
   // no desde la posición a mitad de camino, para que varias pulsaciones seguidas sumen sus pasos.
   let tiltGoal = null;
   const stepTilt = (stepFn, limit) => {
+    stopFollow();
     const from = anim && tiltGoal !== null ? tiltGoal : tilt;
     tiltGoal = clampTilt(stepFn(from, limit), maxTilt(), minTilt());
     animateTo(heading, { tiltTo: tiltGoal });
@@ -770,6 +804,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
 
   function lookAt(key, zoom = false) {
     if (!data?.sample) return;
+    if (follow && follow !== key) stopFollow();
     const pos = data.sample[key];
     const v = view();
     const fovTo = zoom ? Math.max(FOV_MIN_DEG, Math.min(fov, ZOOM_ON_BODY_FOV)) : fov;
@@ -827,6 +862,7 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
     stage.classList.add('is-dragging');
     if (anim) cancelAnimationFrame(anim);
     const k = pxPerDeg(stage.clientWidth, fov);
+    stopFollow();
     heading = normAz(drag.heading - dx / k);
     tilt = clampTilt(drag.tilt + dy / k, maxTilt(), minTilt());
     drawSoon();
@@ -976,17 +1012,24 @@ export function initSky(root, { range, onTime, onMissionExit, onUserInput, drawe
       const sample = sampleAt(ephemeris, utcMs);
       // Misma sitio: los cuerpos se deslizan desde donde están hasta la nueva muestra. Sitio nuevo: salto.
       const sameSite = key === siteKey;
+      const prevMs = data?.utcMs ?? null;
       const from = sameSite && data?.sample && sample ? currentPose() : null;
       data = { ephemeris, horizon: hz, utcMs, siteName, sample, lat };
-      move = from ? { from, to: sample, t0: performance.now() } : null;
+      move = from ? { from, to: sample, t0: performance.now(), days: [prevMs / DAY_MS, utcMs / DAY_MS] } : null;
       // El aviso "horizonte ideal, sin relieve" solo aparece en los sitios sin `dem` (C5-08).
       smooth.style.display = hasRelief(hz) ? 'none' : '';
-      if (key !== siteKey && sample) {
+      const newSite = key !== siteKey;
+      if (newSite && sample) {
         siteKey = key;
         const radii = ephemeris.angular_radius_deg;
         heading = normAz(initialHeading(sample.sun, sample.earth, radii.sun, radii.earth));
         tilt = 0;
         fov = FOV_DEG;
+      }
+      if (follow && sample) {
+        const aim = normAz(sample[follow].azimuth_deg);
+        if (newSite) heading = aim;
+        else animateTo(aim);
       }
       drawTime();
       drawCountdown();
